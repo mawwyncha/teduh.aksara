@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 interface MascotProps {
   message: string;
   isLoading?: boolean;
+  onAskInfo?: () => void;
 }
 
 interface Particle {
@@ -15,7 +16,7 @@ interface Particle {
   delay: string;
 }
 
-export const Mascot: React.FC<MascotProps> = ({ message, isLoading }) => {
+export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo }) => {
   const [isFlustered, setIsFlustered] = useState(false);
   const [reactionMessage, setReactionMessage] = useState<string | null>(null);
   const [particles, setParticles] = useState<Particle[]>([]);
@@ -24,7 +25,7 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading }) => {
     if (isFlustered) return;
 
     setIsFlustered(true);
-    setReactionMessage("Aduh! Buahku berjatuhan! 🍒💨");
+    setReactionMessage("Aduh! Buah kersenku berjatuhan! 🍒💨");
     
     // Generate particles
     const newParticles: Particle[] = [];
@@ -69,11 +70,10 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading }) => {
       <div 
         className="relative shrink-0 cursor-pointer select-none group flex justify-center w-full sm:w-auto"
         onClick={handleMascotClick}
-        title="Guncang Tara!"
+        title="Guncang Tara si Pohon Kersen!"
       >
-        {/* Updated sizes: w-44/h-44 on mobile, scaled SVG as well */}
         <div className={`w-44 h-44 md:w-36 md:h-36 flex items-center justify-center transition-all duration-700 
-          ${isFlustered ? 'animate-tree-flinch' : (isLoading ? 'animate-tree-sway' : 'animate-tree-breath')}`}>
+          ${isFlustered ? 'animate-tree-flinch' : (isLoading ? 'animate-tree-breath' : 'animate-tree-breath')}`}>
           <svg viewBox="0 0 100 100" className="w-40 h-40 md:w-32 md:h-32 overflow-visible">
             <ellipse cx="50" cy="95" rx="35" ry="7" fill="#e0eee0" opacity="0.4" />
             
@@ -137,7 +137,18 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading }) => {
       <div className="flex-1 relative z-10 text-center sm:text-left w-full">
         <div className="flex items-center justify-center sm:justify-start gap-3 mb-2 md:mb-3">
           <span className={`w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)] ${isFlustered ? 'bg-orange-500' : 'bg-red-500'}`}></span>
-          <h4 className="font-bold text-emerald-800 dark:text-emerald-400 text-sm md:text-lg uppercase tracking-wider">Tara:</h4>
+          <h4 className="font-bold text-emerald-800 dark:text-emerald-400 text-base md:text-lg uppercase tracking-wider">Tara si Pohon Kersen:</h4>
+          
+          {onAskInfo && !isLoading && !isFlustered && (
+            <button 
+              onClick={(e) => { e.stopPropagation(); onAskInfo(); }}
+              className="ml-auto sm:ml-2 p-2 bg-emerald-100 dark:bg-emerald-900/50 hover:bg-emerald-200 dark:hover:bg-emerald-800 text-emerald-700 dark:text-emerald-300 rounded-xl text-base font-bold uppercase tracking-widest transition-all flex items-center gap-1.5 shadow-sm group/btn"
+              title="Apa itu Teduh Aksara?"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover/btn:rotate-12"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+              Apa ini?
+            </button>
+          )}
         </div>
         <p className={`text-emerald-900/80 dark:text-emerald-100/70 leading-relaxed italic text-base md:text-xl select-none transition-all duration-300 ${isFlustered ? 'text-orange-600 dark:text-orange-300 font-bold scale-105' : ''}`}>
           {isLoading ? "Aku sedang meneliti naskahmu..." : (reactionMessage || message)}

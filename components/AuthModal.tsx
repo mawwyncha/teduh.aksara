@@ -36,13 +36,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           <div className="inline-flex p-1.5 bg-emerald-50/50 dark:bg-emerald-900/20 rounded-2xl">
             <button 
               onClick={() => setMode('login')}
-              className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all ${mode === 'login' ? 'bg-white dark:bg-emerald-800 text-emerald-700 dark:text-emerald-100 shadow-sm' : 'text-emerald-400 dark:text-emerald-600'}`}
+              className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-base font-bold transition-all ${mode === 'login' ? 'bg-white dark:bg-emerald-800 text-emerald-700 dark:text-emerald-100 shadow-sm' : 'text-emerald-400 dark:text-emerald-600'}`}
             >
               Masuk
             </button>
             <button 
               onClick={() => setMode('signup')}
-              className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-sm sm:text-base font-bold transition-all ${mode === 'signup' ? 'bg-white dark:bg-emerald-800 text-emerald-700 dark:text-emerald-100 shadow-sm' : 'text-emerald-400 dark:text-emerald-600'}`}
+              className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-base font-bold transition-all ${mode === 'signup' ? 'bg-white dark:bg-emerald-800 text-emerald-700 dark:text-emerald-100 shadow-sm' : 'text-emerald-400 dark:text-emerald-600'}`}
             >
               Daftar
             </button>
@@ -53,7 +53,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
           <h2 className="text-3xl sm:text-4xl font-bold text-emerald-900 dark:text-emerald-50 mb-2 sm:mb-3">
             {mode === 'login' ? 'Selamat Datang' : 'Mari Bergabung'}
           </h2>
-          <p className="text-sm sm:text-base text-emerald-600/60 dark:text-emerald-400/40 font-medium italic">
+          <p className="text-base text-emerald-600/60 dark:text-emerald-400/40 font-medium italic">
             {mode === 'login' ? 'Mari lanjut memupuk tulisanmu.' : 'Mulai perjalanan menulis yang menenangkan.'}
           </p>
         </div>
@@ -61,7 +61,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {mode === 'signup' && (
             <div className="group">
-              <label className="block text-[10px] font-bold text-emerald-700/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] mb-1.5 ml-4">Nama Panggilan</label>
+              <label className="block text-base font-bold text-emerald-700/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] mb-1.5 ml-4">Nama Panggilan</label>
               <input 
                 type="text" 
                 required
@@ -73,7 +73,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
             </div>
           )}
           <div className="group">
-            <label className="block text-[10px] font-bold text-emerald-700/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] mb-1.5 ml-4">Email</label>
+            <label className="block text-base font-bold text-emerald-700/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] mb-1.5 ml-4">Email</label>
             <input 
               type="email" 
               required
@@ -84,7 +84,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
             />
           </div>
           <div className="group">
-            <label className="block text-[10px] font-bold text-emerald-700/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] mb-1.5 ml-4">Kata Sandi</label>
+            <label className="block text-base font-bold text-emerald-700/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] mb-1.5 ml-4">Kata Sandi</label>
             <input 
               type="password" 
               required

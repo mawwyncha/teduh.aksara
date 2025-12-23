@@ -33,7 +33,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, his
         <div className="p-6 sm:p-8 pb-4 sm:pb-5 flex items-center justify-between bg-emerald-50/30 dark:bg-emerald-900/20">
           <div className="flex flex-col gap-1">
             <h2 className="text-xl sm:text-2xl font-bold text-emerald-900 dark:text-emerald-50">Jejak Semai</h2>
-            <p className="text-[10px] sm:text-xs text-emerald-600/60 dark:text-emerald-400/40 font-bold italic">
+            <p className="text-base text-emerald-600/60 dark:text-emerald-400/40 font-bold italic">
               Klik dan gulir untuk melihat seluruh riwayat naskahmu.
             </p>
           </div>
@@ -57,7 +57,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, his
                 onClick={() => { onSelectItem(item); onClose(); }}
                 className="w-full text-left bg-emerald-50/20 dark:bg-emerald-900/10 hover:bg-emerald-50 dark:hover:bg-emerald-800/40 p-5 sm:p-7 rounded-2xl transition-all shadow-sm group"
               >
-                <span className="text-[10px] font-bold text-emerald-700/50 dark:text-emerald-400/40 uppercase tracking-widest block mb-2 sm:mb-3">
+                <span className="text-base font-bold text-emerald-700/50 dark:text-emerald-400/40 uppercase tracking-widest block mb-2 sm:mb-3">
                   {new Date(item.timestamp).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                 </span>
                 <p className="text-lg sm:text-xl text-emerald-900 dark:text-emerald-100 font-medium line-clamp-3 leading-relaxed italic">

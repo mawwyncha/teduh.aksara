@@ -45,11 +45,11 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
         {/* Header */}
         <div className="flex justify-between items-start mb-8">
           <div>
-            <h2 className="text-3xl font-bold text-emerald-900 dark:text-emerald-50">Panduan Tara</h2>
-            <p className="text-xs text-emerald-600/50 dark:text-emerald-400/40 font-bold uppercase tracking-widest mt-1">Cara merawat naskahmu</p>
+            <h2 className="text-3xl font-bold text-emerald-900 dark:text-emerald-50">Panduan Tara si Pohon Kersen</h2>
+            <p className="text-base text-emerald-600/50 dark:text-emerald-400/40 font-bold uppercase tracking-widest mt-1">Cara merawat naskahmu</p>
           </div>
           <div className="text-right hidden sm:block">
-            <span className="text-[10px] bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full font-bold animate-pulse">
+            <span className="text-base bg-emerald-50 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 px-3 py-1 rounded-full font-bold animate-pulse">
               ↕️ GULIR KE BAWAH
             </span>
           </div>
@@ -57,7 +57,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
 
         {/* Interaction hint for mobile */}
         <div className="sm:hidden mb-4 py-2 px-4 bg-amber-50/50 dark:bg-amber-900/10 rounded-2xl border border-amber-100 dark:border-amber-900/20">
-          <p className="text-[10px] text-amber-800/60 dark:text-amber-200/40 font-bold italic text-center">
+          <p className="text-base text-amber-800/60 dark:text-amber-200/40 font-bold italic text-center">
             Klik dan gulir untuk melihat seluruh informasi panduan.
           </p>
         </div>
@@ -81,7 +81,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
 
           {/* Core Categories Grid */}
           <section>
-            <h3 className="text-xs font-bold text-emerald-700/40 dark:text-emerald-400/20 uppercase tracking-[0.2em] mb-4 ml-2">Apa yang Tara periksa?</h3>
+            <h3 className="text-base font-bold text-emerald-700/40 dark:text-emerald-400/20 uppercase tracking-[0.2em] mb-4 ml-2">Apa yang Tara periksa?</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {features.map((f, i) => (
                 <div key={i} className={`p-6 rounded-3xl ${f.color} transition-all hover:scale-[1.02] shadow-sm`}>
@@ -96,7 +96,7 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
           <div className="bg-[#fff9f0] dark:bg-[#1a1410] p-6 rounded-3xl flex items-start gap-4">
             <span className="text-3xl">🌳</span>
             <p className="text-lg text-[#5c4033] dark:text-amber-100/60 leading-relaxed italic font-bold">
-              Tara membantu naskahmu agar lebih jernih tanpa mengubah niat asli tulisanmu.
+              Tara si Pohon Kersen membantu naskahmu agar lebih jernih tanpa mengubah niat asli tulisanmu.
             </p>
           </div>
         </div>

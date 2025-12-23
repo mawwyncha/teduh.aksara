@@ -1,12 +1,13 @@
 
 export type WritingStyle = 'formal' | 'casual' | 'academic' | 'creative';
 export type WritingContext = 'business' | 'education' | 'social_media' | 'general';
+export type TargetLanguage = 'en' | 'ja' | 'ar' | 'ko';
 
 export interface GrammarSuggestion {
   original: string;
   replacement: string;
   reason: string;
-  type: 'spelling' | 'grammar' | 'style' | 'punctuation' | 'cultural';
+  type: 'Ejaan' | 'Tata Bahasa' | 'Gaya Bahasa' | 'Tanda Baca' | 'Budaya';
   kbbiLink?: string;
 }
 
@@ -16,12 +17,10 @@ export interface PlagiarismResult {
   summary: string;
 }
 
-export interface CollabComment {
-  id: string;
-  user: string;
-  avatar: string;
-  text: string;
-  timestamp: number;
+export interface TranslationResult {
+  translatedText: string;
+  languageName: string;
+  note?: string;
 }
 
 export interface AnalysisResult {
@@ -31,6 +30,7 @@ export interface AnalysisResult {
   styleScore: number;
   culturalNote?: string;
   plagiarism?: PlagiarismResult;
+  translation?: TranslationResult;
 }
 
 export interface HistoryItem {

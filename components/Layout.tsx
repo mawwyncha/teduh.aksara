@@ -67,7 +67,7 @@ export const Layout: React.FC<LayoutProps> = ({
                 <h1 className="text-2xl md:text-4xl font-bold text-rose-600 dark:text-emerald-400 tracking-tighter leading-none mb-1 md:mb-2 whitespace-nowrap">
                   Teduh Aksara
                 </h1>
-                <p className="text-[8px] md:text-[10px] font-bold text-emerald-900/60 dark:text-emerald-500 uppercase tracking-[0.3em] leading-[1.4] whitespace-pre-line">
+                <p className="text-base font-bold text-emerald-900/60 dark:text-emerald-500 uppercase tracking-[0.3em] leading-[1.4] whitespace-pre-line">
                   Tapis Ambigu.{"\n"}Rapi Arti.
                 </p>
               </div>
@@ -100,8 +100,8 @@ export const Layout: React.FC<LayoutProps> = ({
           {user ? (
             <div className="flex items-center gap-3 md:gap-5 bg-white dark:bg-[#2d1e17] px-4 md:px-6 py-2 md:py-3 rounded-[1.5rem] md:rounded-[2rem] shadow-sm transition-all">
                <div className="flex flex-col items-end">
-                 <span className="text-[8px] md:text-[10px] uppercase font-bold text-rose-600 dark:text-rose-400 tracking-widest">Sahabat</span>
-                 <span className="text-sm md:text-xl font-bold text-emerald-950 dark:text-emerald-50 truncate max-w-[80px] md:max-w-none">{user.name}</span>
+                 <span className="text-base uppercase font-bold text-rose-600 dark:text-rose-400 tracking-widest">Sahabat</span>
+                 <span className="text-base md:text-xl font-bold text-emerald-950 dark:text-emerald-50 truncate max-w-[80px] md:max-w-none">{user.name}</span>
                </div>
                <div className="relative group/profile">
                  <img src={`https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=${user.name}`} className="w-10 h-10 md:w-16 md:h-16 rounded-full border-2 md:border-4 border-white dark:border-[#0a1a12] shadow-sm bg-amber-50" alt="Profile" />
@@ -131,13 +131,13 @@ export const Layout: React.FC<LayoutProps> = ({
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <nav className="fixed bottom-4 left-4 right-4 h-20 bg-white/90 dark:bg-[#1a110c]/80 backdrop-blur-xl rounded-[2.5rem] shadow-[0_15px_50px_-15px_rgba(0,0,0,0.3)] border border-white/20 flex items-center justify-around px-6 z-[80] lg:hidden animate-in slide-in-from-bottom-10 duration-700">
+      <nav className="fixed bottom-4 left-4 right-4 h-24 bg-white/90 dark:bg-[#1a110c]/80 backdrop-blur-xl rounded-[2.5rem] shadow-[0_15px_50px_-15px_rgba(0,0,0,0.3)] border border-white/20 flex items-center justify-around px-6 z-[80] lg:hidden animate-in slide-in-from-bottom-10 duration-700">
         <button 
           onClick={onEditorClick}
           className={`${mobileNavClass} ${activeModal === null ? mobileNavActiveClass : ''}`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          <span className="text-[10px] uppercase tracking-widest font-bold">Aksara</span>
+          <span className="text-base uppercase tracking-widest font-bold">Aksara</span>
         </button>
         
         <button 
@@ -145,7 +145,7 @@ export const Layout: React.FC<LayoutProps> = ({
           className={`${mobileNavClass} ${activeModal === 'history' ? mobileNavActiveClass : ''}`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
-          <span className="text-[10px] uppercase tracking-widest font-bold">Jejak</span>
+          <span className="text-base uppercase tracking-widest font-bold">Jejak</span>
         </button>
 
         <button 
@@ -153,15 +153,14 @@ export const Layout: React.FC<LayoutProps> = ({
           className={`${mobileNavClass} ${activeModal === 'guide' ? mobileNavActiveClass : ''}`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a4 4 0 0 0-4-4H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a4 4 0 0 1 4-4h6z"/></svg>
-          <span className="text-[10px] uppercase tracking-widest font-bold">Panduan</span>
+          <span className="text-base uppercase tracking-widest font-bold">Panduan</span>
         </button>
       </nav>
 
-      <footer className="mt-16 md:mt-28 text-center text-[#2d4d3a]/60 dark:text-emerald-500/40 font-bold text-xs md:text-lg pb-10 md:pb-14 pt-10 md:pt-14 w-full max-w-6xl border-t border-emerald-50 dark:border-emerald-900/20 mb-20 lg:mb-0 relative group/footer">
-        <p className="mb-2">&copy; 2024 Teduh Aksara. Dirawat sepenuh hati oleh Tara Si Pohon Kersen. 🍒🌿</p>
+      <footer className="mt-16 md:mt-28 text-center text-[#2d4d3a]/60 dark:text-emerald-500/40 font-bold text-base md:text-lg pb-10 md:pb-14 pt-10 md:pt-14 w-full max-w-6xl border-t border-emerald-50 dark:border-emerald-900/20 mb-24 lg:mb-0 relative group/footer">
+        <p className="mb-2">&copy; 2024 Teduh Aksara. Dirawat sepenuh hati oleh Tara si Pohon Kersen. 🍒🌿</p>
         
-        {/* Hidden Message */}
-        <div className="text-[8px] md:text-[10px] opacity-10 dark:opacity-5 group-hover/footer:opacity-40 transition-opacity duration-1000 uppercase tracking-[0.4em] font-medium pointer-events-none select-none mt-4">
+        <div className="text-base opacity-10 dark:opacity-5 group-hover/footer:opacity-40 transition-opacity duration-1000 uppercase tracking-[0.4em] font-medium pointer-events-none select-none mt-4">
           Hak cipta milik mawwyncha
         </div>
       </footer>
