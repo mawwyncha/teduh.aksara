@@ -1,0 +1,7 @@
+{
+  "name": "Teduh Aksara: Tapis Ambigu. Rapi Arti.",
+  "description": "Tempat berteduh untuk merawat dan menyelaraskan tata bahasa Indonesia dengan antarmuka yang menenangkan bertema alam.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
