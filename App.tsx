@@ -3,13 +3,19 @@ import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { Layout } from './components/Layout';
 import { Mascot } from './components/Mascot';
 import { HistoryCard } from './components/HistoryCard';
-import { AuthModal } from './components/AuthModal';
 import { HistoryModal } from './components/HistoryModal';
 import { GuideModal } from './components/GuideModal';
 import { analyzeGrammar, generateSpeech, askTaraAboutPlatform, translateText } from './services/geminiService';
+import { saveData, getData, clearStore, deleteData } from './services/dbService';
 import { AnalysisResult, HistoryItem, WritingStyle, WritingContext, TargetLanguage, TranslationResult } from './types';
 
 const INITIAL_MASCOT_MESSAGE = "Selamat datang di Teduh Aksara. Aku Tara si Pohon Kersen, siap membantumu menyelaraskan naskah agar tumbuh indah.";
+const STORE_DRAFT = 'draft';
+const STORE_HISTORY = 'history';
+const STORE_SETTINGS = 'settings';
+const KEY_CURRENT_DRAFT = 'current_draft';
+const KEY_HISTORY_LIST = 'history_list';
+const KEY_DYSLEXIA = 'dyslexia_mode';
 
 const LOADING_MESSAGES = [
   "Tara si Pohon Kersen sedang menyisir diksi...",
@@ -58,10 +64,58 @@ const App: React.FC = () => {
   const [loadingMsg, setLoadingMsg] = useState(LOADING_MESSAGES[0]);
   
   const [isDyslexiaMode, setIsDyslexiaMode] = useState(false);
-  const [user, setUser] = useState<{name: string} | null>(null);
-  const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Initial Load from IndexedDB
+  useEffect(() => {
+    const loadSavedData = async () => {
+      try {
+        const savedDraft = await getData(STORE_DRAFT, KEY_CURRENT_DRAFT);
+        const savedHistory = await getData(STORE_HISTORY, KEY_HISTORY_LIST);
+        const savedDyslexia = await getData(STORE_SETTINGS, KEY_DYSLEXIA);
+        
+        if (savedDraft) setInputText(savedDraft);
+        if (savedHistory) setHistory(savedHistory);
+        if (savedDyslexia !== undefined) {
+          setIsDyslexiaMode(savedDyslexia);
+          if (savedDyslexia) document.body.classList.add('dyslexia-mode');
+        }
+      } catch (err) {
+        console.error("Gagal memuat data dari IndexedDB:", err);
+      } finally {
+        setIsLoaded(true);
+      }
+    };
+    loadSavedData();
+  }, []);
+
+  // Sync Draft to IndexedDB
+  useEffect(() => {
+    if (isLoaded) {
+      saveData(STORE_DRAFT, KEY_CURRENT_DRAFT, inputText);
+    }
+  }, [inputText, isLoaded]);
+
+  // Sync History to IndexedDB
+  useEffect(() => {
+    if (isLoaded) {
+      saveData(STORE_HISTORY, KEY_HISTORY_LIST, history);
+    }
+  }, [history, isLoaded]);
+
+  // Sync Dyslexia Mode to IndexedDB
+  useEffect(() => {
+    if (isLoaded) {
+      saveData(STORE_SETTINGS, KEY_DYSLEXIA, isDyslexiaMode);
+      if (isDyslexiaMode) {
+        document.body.classList.add('dyslexia-mode');
+      } else {
+        document.body.classList.remove('dyslexia-mode');
+      }
+    }
+  }, [isDyslexiaMode, isLoaded]);
 
   const handleClear = () => {
     if (inputText.length > 100) {
@@ -72,6 +126,14 @@ const App: React.FC = () => {
     setInputText('');
     setResult(null);
     setMascotMessage(INITIAL_MASCOT_MESSAGE);
+    deleteData(STORE_DRAFT, KEY_CURRENT_DRAFT);
+  };
+
+  const handleClearAllHistory = async () => {
+    if (confirm("Hapus seluruh riwayat yang tersimpan di perangkat ini? Tindakan ini tidak bisa dibatalkan.")) {
+      setHistory([]);
+      await clearStore(STORE_HISTORY);
+    }
   };
 
   const handleAskInfo = async () => {
@@ -172,12 +234,20 @@ const App: React.FC = () => {
     setIsHistoryModalOpen(false);
   };
 
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#faf9f6] dark:bg-[#050a08]">
+        <div className="flex flex-col items-center gap-6">
+          <div className="w-16 h-16 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
+          <p className="text-emerald-800 dark:text-emerald-400 font-bold animate-pulse">Menyiapkan Jejak Aksara...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <Layout 
-      user={user} 
       activeModal={isHistoryModalOpen ? 'history' : (isGuideModalOpen ? 'guide' : null)}
-      onAuthClick={() => setIsAuthOpen(true)} 
-      onLogout={() => setUser(null)}
       onHistoryClick={() => setIsHistoryModalOpen(true)}
       onGuideClick={() => setIsGuideModalOpen(true)}
       onEditorClick={() => {
@@ -188,10 +258,7 @@ const App: React.FC = () => {
     >
       <div className="fixed left-4 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-40">
         <button 
-          onClick={() => {
-            setIsDyslexiaMode(!isDyslexiaMode);
-            document.body.classList.toggle('dyslexia-mode');
-          }}
+          onClick={() => setIsDyslexiaMode(!isDyslexiaMode)}
           className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isDyslexiaMode ? 'bg-amber-600 text-white' : 'bg-white dark:bg-[#2d1e17] text-amber-600 hover:scale-110 active:scale-90'}`}
           title="Mode Disleksia"
         >
@@ -266,7 +333,7 @@ const App: React.FC = () => {
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               placeholder="Tuliskan naskahmu di sini..."
-              className={`flex-1 w-full bg-transparent resize-none border-none outline-none text-emerald-950 dark:text-emerald-50 text-xl md:text-2xl leading-relaxed placeholder-emerald-800/15 ${isDyslexiaMode ? 'font-dyslexic' : 'font-medium'}`}
+              className={`flex-1 w-full bg-transparent resize-none border-none outline-none text-emerald-950 dark:text-emerald-50 text-xl md:text-2xl leading-relaxed placeholder-emerald-800/15 font-medium`}
             />
 
             <div className="flex flex-col sm:flex-row gap-5 mt-10">
@@ -398,20 +465,25 @@ const App: React.FC = () => {
                   </div>
                 )}
              </div>
-             {history.length > 4 && (
+             {history.length > 0 && (
                <button 
                 onClick={() => setIsHistoryModalOpen(true)}
                 className="w-full mt-6 py-4 text-base font-bold text-emerald-600/60 uppercase tracking-widest hover:text-emerald-600 transition-colors"
                >
-                 Lihat Semua Jejak →
+                 {history.length > 4 ? `Lihat Semua (${history.length}) →` : 'Kelola Jejak →'}
                </button>
              )}
           </div>
         </div>
       </div>
 
-      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} onSuccess={(n) => setUser({name: n})} />
-      <HistoryModal isOpen={isHistoryModalOpen} onClose={() => setIsHistoryModalOpen(false)} history={history} onSelectItem={loadHistoryItem} />
+      <HistoryModal 
+        isOpen={isHistoryModalOpen} 
+        onClose={() => setIsHistoryModalOpen(false)} 
+        history={history} 
+        onSelectItem={loadHistoryItem} 
+        onClearAll={handleClearAllHistory}
+      />
       <GuideModal isOpen={isGuideModalOpen} onClose={() => setIsGuideModalOpen(false)} />
     </Layout>
   );

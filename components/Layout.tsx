@@ -1,44 +1,59 @@
 
 import React, { useEffect, useState } from 'react';
+import { getData, saveData } from '../services/dbService';
 
 interface LayoutProps {
   children: React.ReactNode;
-  user: { name: string } | null;
   activeModal: 'history' | 'guide' | null;
-  onAuthClick: () => void;
-  onLogout: () => void;
   onHistoryClick: () => void;
   onGuideClick: () => void;
   onEditorClick: () => void;
 }
 
+const STORE_SETTINGS = 'settings';
+const KEY_THEME = 'theme';
+
 export const Layout: React.FC<LayoutProps> = ({ 
   children, 
-  user, 
   activeModal,
-  onAuthClick, 
-  onLogout, 
   onHistoryClick, 
   onGuideClick,
   onEditorClick
 }) => {
-  const [isDark, setIsDark] = useState(() => {
-    if (typeof window !== 'undefined') {
-      return localStorage.getItem('theme') === 'dark' || 
-        (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
-    }
-    return false;
-  });
+  const [isDark, setIsDark] = useState(false);
+  const [isReady, setIsReady] = useState(false);
+
+  // Load theme from IndexedDB on mount
+  useEffect(() => {
+    const loadTheme = async () => {
+      try {
+        const savedTheme = await getData(STORE_SETTINGS, KEY_THEME);
+        if (savedTheme !== undefined) {
+          setIsDark(savedTheme === 'dark');
+        } else {
+          // Default to system preference if no DB entry
+          setIsDark(window.matchMedia('(prefers-color-scheme: dark)').matches);
+        }
+      } catch (e) {
+        console.error("Gagal memuat tema dari IndexedDB", e);
+      } finally {
+        setIsReady(true);
+      }
+    };
+    loadTheme();
+  }, []);
 
   useEffect(() => {
+    if (!isReady) return;
+    
     if (isDark) {
       document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
+      saveData(STORE_SETTINGS, KEY_THEME, 'dark');
     } else {
       document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+      saveData(STORE_SETTINGS, KEY_THEME, 'light');
     }
-  }, [isDark]);
+  }, [isDark, isReady]);
 
   const toggleTheme = () => setIsDark(!isDark);
 
@@ -46,6 +61,8 @@ export const Layout: React.FC<LayoutProps> = ({
   
   const mobileNavClass = "flex flex-col items-center justify-center gap-1 flex-1 py-2 text-emerald-800/60 dark:text-emerald-400/50 transition-all active:scale-95";
   const mobileNavActiveClass = "text-rose-600 dark:text-emerald-400 font-bold bg-emerald-50/50 dark:bg-emerald-900/20 rounded-2xl";
+
+  if (!isReady) return null; // Prevent flickering during initial theme load
 
   return (
     <div className="min-h-screen bg-[#faf9f6] dark:bg-[#050a08] flex flex-col items-center p-4 md:p-8 text-[#1a0f0e] dark:text-emerald-50 transition-colors duration-700 pb-24 lg:pb-8">
@@ -84,7 +101,7 @@ export const Layout: React.FC<LayoutProps> = ({
           <button onClick={onGuideClick} className={navLinkClass}>Panduan</button>
         </nav>
 
-        <div className="flex items-center gap-3 md:gap-6 w-full md:w-auto justify-between md:justify-end">
+        <div className="flex items-center gap-3 md:gap-6 w-full md:w-auto justify-end">
           <button 
             onClick={toggleTheme}
             className="p-3 md:p-4 bg-white dark:bg-[#2d1e17] rounded-xl md:rounded-2xl text-amber-600 dark:text-emerald-300 shadow-sm hover:scale-110 hover:rotate-12 transition-all"
@@ -96,33 +113,6 @@ export const Layout: React.FC<LayoutProps> = ({
               <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="md:w-6 md:h-6"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
             )}
           </button>
-
-          {user ? (
-            <div className="flex items-center gap-3 md:gap-5 bg-white dark:bg-[#2d1e17] px-4 md:px-6 py-2 md:py-3 rounded-[1.5rem] md:rounded-[2rem] shadow-sm transition-all">
-               <div className="flex flex-col items-end">
-                 <span className="text-base uppercase font-bold text-rose-600 dark:text-rose-400 tracking-widest">Sahabat</span>
-                 <span className="text-base md:text-xl font-bold text-emerald-950 dark:text-emerald-50 truncate max-w-[80px] md:max-w-none">{user.name}</span>
-               </div>
-               <div className="relative group/profile">
-                 <img src={`https://api.dicebear.com/7.x/adventurer-neutral/svg?seed=${user.name}`} className="w-10 h-10 md:w-16 md:h-16 rounded-full border-2 md:border-4 border-white dark:border-[#0a1a12] shadow-sm bg-amber-50" alt="Profile" />
-                 <button 
-                  onClick={onLogout}
-                  className="absolute -top-1 -right-1 w-6 h-6 md:w-9 md:h-9 bg-rose-500 text-white rounded-full flex items-center justify-center shadow-lg hover:bg-rose-700 transition-colors border-2 md:border-4 border-white dark:border-[#0a1a12]"
-                 >
-                   <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" className="md:w-[18px] md:h-[18px]"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                 </button>
-               </div>
-            </div>
-          ) : (
-            <div className="flex items-center gap-2 md:gap-4">
-              <button onClick={onAuthClick} className="px-4 md:px-8 py-2 md:py-3 text-emerald-800 dark:text-emerald-300 font-bold hover:text-rose-600 transition-colors text-base md:text-xl">
-                Masuk
-              </button>
-              <button onClick={onAuthClick} className="px-6 md:px-10 py-2.5 md:py-4 bg-emerald-700 dark:bg-emerald-600 text-white font-bold hover:bg-emerald-800 rounded-xl md:rounded-2xl transition-all text-base md:text-xl shadow-lg">
-                Daftar
-              </button>
-            </div>
-          )}
         </div>
       </header>
       
