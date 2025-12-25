@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 
 interface MascotProps {
   message: string;
@@ -9,149 +9,144 @@ interface MascotProps {
 
 interface Particle {
   id: number;
-  type: 'leaf' | 'cherry';
-  left: string;
-  tx: string;
+  type: 'cherry' | 'leaf';
+  left: number;
   duration: string;
-  delay: string;
+  drift: string;
+  rotation: string;
 }
 
 export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo }) => {
-  const [isFlustered, setIsFlustered] = useState(false);
-  const [reactionMessage, setReactionMessage] = useState<string | null>(null);
+  const [isShaking, setIsShaking] = useState(false);
+  const [isEmbarrassed, setIsEmbarrassed] = useState(false);
   const [particles, setParticles] = useState<Particle[]>([]);
+  const [reaction, setReaction] = useState<string | null>(null);
 
-  const handleMascotClick = () => {
-    if (isFlustered) return;
-
-    setIsFlustered(true);
-    setReactionMessage("Aduh! Buah kersenku berjatuhan! 🍒💨");
+  const handleClick = () => {
+    if (isShaking) return;
     
-    // Generate particles
-    const newParticles: Particle[] = [];
-    for (let i = 0; i < 15; i++) {
-      newParticles.push({
-        id: Date.now() + i,
-        type: Math.random() > 0.4 ? 'cherry' : 'leaf',
-        left: `${Math.random() * 80 + 10}%`,
-        tx: `${(Math.random() - 0.5) * 200}px`,
-        duration: `${2 + Math.random() * 2}s`,
-        delay: `${Math.random() * 0.5}s`
-      });
-    }
-    setParticles(newParticles);
+    setIsShaking(true);
+    setIsEmbarrassed(true);
+    setReaction("Aduh! Buah kersen dan daunku berjatuhan! 🍒🌿");
+    
+    // Generate partikel kersen dan daun
+    const newParticles: Particle[] = Array.from({ length: 15 }).map((_, i) => ({
+      id: Date.now() + i,
+      type: Math.random() > 0.4 ? 'cherry' : 'leaf',
+      left: 10 + Math.random() * 80,
+      duration: (1.2 + Math.random() * 2) + 's',
+      drift: (Math.random() * 100 - 50) + 'px',
+      rotation: (Math.random() * 360) + 'deg'
+    }));
 
-    // Reset after animation
+    setParticles(prev => [...prev, ...newParticles]);
+
+    // Reset getaran
+    setTimeout(() => setIsShaking(false), 600);
+    
+    // Reset ekspresi merona dan bersihkan reaksi setelah beberapa detik
     setTimeout(() => {
-      setIsFlustered(false);
-      setReactionMessage(null);
-      setParticles([]);
-    }, 3000);
+      setIsEmbarrassed(false);
+      setReaction(null);
+      setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
+    }, 3500);
   };
 
   return (
-    <div className="bg-white/60 dark:bg-emerald-900/20 backdrop-blur-sm p-6 md:p-8 rounded-[2.5rem] md:rounded-[3rem] border border-emerald-50 dark:border-emerald-800 soft-shadow flex flex-col sm:flex-row items-center gap-6 md:gap-8 mb-4 transition-all duration-500 relative overflow-hidden">
-      {/* Particles layer */}
-      {particles.map((p) => (
-        <div
-          key={p.id}
-          className="absolute top-0 pointer-events-none z-50 animate-particle text-2xl"
-          style={{
-            left: p.left,
-            '--tx': p.tx,
-            '--duration': p.duration,
-            animationDelay: p.delay,
-          } as any}
-        >
-          {p.type === 'cherry' ? '🍒' : '🍃'}
-        </div>
-      ))}
+    <div className="bg-white/70 dark:bg-emerald-900/10 backdrop-blur-xl p-8 rounded-[3rem] border border-emerald-50 dark:border-emerald-800/20 shadow-xl flex flex-col sm:flex-row items-center gap-10 transition-all relative overflow-hidden">
+      {/* Layer Partikel Jatuh */}
+      <div className="absolute inset-0 pointer-events-none z-50">
+        {particles.map(p => (
+          <div 
+            key={p.id}
+            className="animate-particle"
+            style={{ 
+              left: `${p.left}%`, 
+              top: '-20px',
+              '--duration': p.duration,
+              '--drift': p.drift 
+            } as React.CSSProperties}
+          >
+            {p.type === 'cherry' ? (
+              <div className="flex flex-col items-center">
+                <div className="w-1 h-3 bg-green-800 rounded-full mb-[-2px]" />
+                <div className="w-4 h-4 bg-red-600 rounded-full shadow-md" />
+              </div>
+            ) : (
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="#15803d" style={{ transform: `rotate(${p.rotation})` }}>
+                <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8.17,20C14.31,20 22,14 22,10C22,10 21,8 17,8Z" />
+              </svg>
+            )}
+          </div>
+        ))}
+      </div>
 
       <div 
-        className="relative shrink-0 cursor-pointer select-none group flex justify-center w-full sm:w-auto"
-        onClick={handleMascotClick}
-        title="Guncang Tara si Pohon Kersen!"
+        className={`relative shrink-0 cursor-pointer select-none transition-all duration-300 ${isShaking ? 'animate-tree-shake' : 'hover:scale-105 active:scale-95'}`} 
+        onClick={handleClick}
       >
-        <div className={`w-44 h-44 md:w-36 md:h-36 flex items-center justify-center transition-all duration-700 
-          ${isFlustered ? 'animate-tree-flinch' : (isLoading ? 'animate-tree-breath' : 'animate-tree-breath')}`}>
-          <svg viewBox="0 0 100 100" className="w-40 h-40 md:w-32 md:h-32 overflow-visible">
-            <ellipse cx="50" cy="95" rx="35" ry="7" fill="#e0eee0" opacity="0.4" />
+        <div className={`w-40 h-40 flex items-center justify-center ${isLoading ? 'animate-tree-breath' : ''}`}>
+          <svg viewBox="0 0 100 100" className="w-36 h-36 overflow-visible">
+            {/* Batang Utama */}
+            <path d="M42 98 L45 65 L55 65 L58 98" fill="#5d4037" />
             
-            <g className="drop-shadow-sm">
-              <circle cx="50" cy="35" r="32" fill="#2e7d32" />
-              <circle cx="28" cy="45" r="22" fill="#2e7d32" />
-              <circle cx="72" cy="45" r="22" fill="#2e7d32" />
-              <circle cx="50" cy="38" r="28" fill="#43a047" />
-              <circle cx="22" cy="48" r="20" fill="#43a047" />
-              <circle cx="78" cy="48" r="20" fill="#43a047" />
-              <circle cx="50" cy="15" r="18" fill="#66bb6a" />
-
-              <g fill="#ef4444">
-                <circle cx="35" cy="25" r="2.5" className={isLoading || isFlustered ? "animate-pulse" : ""} />
-                <circle cx="65" cy="20" r="2" />
-                <circle cx="85" cy="45" r="2.5" className={isLoading || isFlustered ? "animate-pulse" : ""} />
-              </g>
-
-              <g fill="white">
-                <circle cx="42" cy="12" r="1.2" />
-                <circle cx="58" cy="18" r="1" />
-              </g>
-            </g>
-            
+            {/* Rimbun Daun (Tara) */}
             <g>
-              <path d="M32 95 L38 55 Q50 45 62 55 L68 95" fill="#8d6e63" stroke="#5d4037" strokeWidth="2" />
-              <g className={isFlustered ? "animate-arm-wave-left" : "animate-arm-left"}>
-                <path d="M40 75 Q25 70 18 82" fill="none" stroke="#8d6e63" strokeWidth="3.5" strokeLinecap="round" />
-                <circle cx="18" cy="82" r="2.5" fill="#43a047" />
-              </g>
-              <g className={isFlustered ? "animate-arm-wave-right" : "animate-arm-right"}>
-                <path d="M60 75 Q75 70 82 82" fill="none" stroke="#8d6e63" strokeWidth="3.5" strokeLinecap="round" />
-                <circle cx="82" cy="82" r="2.5" fill="#43a047" />
-              </g>
-              <g transform="translate(0, 10)">
-                {isFlustered ? (
-                  <g>
-                    <path d="M38 55 L46 58 L38 61" fill="none" stroke="#3e2723" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    <path d="M62 55 L54 58 L62 61" fill="none" stroke="#3e2723" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-                    <circle cx="38" cy="65" r="4" fill="#fca5a5" opacity="0.6" />
-                    <circle cx="62" cy="65" r="4" fill="#fca5a5" opacity="0.6" />
-                    <circle cx="50" cy="68" r="3" fill="#3e2723" />
-                  </g>
-                ) : (
-                  <g>
-                    <g className="animate-tree-blink">
-                      <circle cx="43" cy="58" r="6" fill="white" />
-                      <circle cx="57" cy="58" r="6" fill="white" />
-                      <circle cx="43" cy="58" r="4.5" fill="#3e2723" />
-                      <circle cx="57" cy="58" r="4.5" fill="#3e2723" />
-                    </g>
-                    <path d="M46 68 Q50 71 54 68" fill="none" stroke="#3e2723" strokeWidth="1.5" strokeLinecap="round" />
-                  </g>
-                )}
-              </g>
+              <circle cx="50" cy="35" r="32" fill="#1b5e20" />
+              <circle cx="35" cy="45" r="25" fill="#2e7d32" />
+              <circle cx="65" cy="45" r="25" fill="#2e7d32" />
+              <circle cx="50" cy="50" r="28" fill="#388e3c" />
             </g>
+
+            {/* Efek Blush (Pipi Merah) */}
+            {isEmbarrassed && (
+              <g className="transition-opacity duration-300">
+                <circle cx="35" cy="62" r="6" fill="#f87171" opacity="0.6" />
+                <circle cx="65" cy="62" r="6" fill="#f87171" opacity="0.6" />
+              </g>
+            )}
+
+            {/* Wajah Tara: Kondisional Normal vs Terkejut (> <) */}
+            {isEmbarrassed ? (
+              <g className="transition-all duration-300">
+                {/* Mata Kiri > */}
+                <path d="M35 50 L43 55 L35 60" fill="none" stroke="#212121" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+                {/* Mata Kanan < */}
+                <path d="M65 50 L57 55 L65 60" fill="none" stroke="#212121" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
+                {/* Mulut O */}
+                <circle cx="50" cy="68" r="4" fill="none" stroke="#212121" strokeWidth="2.5" />
+              </g>
+            ) : (
+              <g className="animate-tree-blink transition-all duration-300">
+                <circle cx="40" cy="52" r="6" fill="white" />
+                <circle cx="60" cy="52" r="6" fill="white" />
+                <circle cx="40" cy="52" r="3.5" fill="#212121" />
+                <circle cx="60" cy="52" r="3.5" fill="#212121" />
+                <path d="M44 64 Q50 68 56 64" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" />
+              </g>
+            )}
+            
+            {/* Buah Kersen di Pohon */}
+            <circle cx="30" cy="35" r="3" fill="#d32f2f" />
+            <circle cx="70" cy="40" r="3" fill="#d32f2f" />
+            <circle cx="50" cy="25" r="3" fill="#d32f2f" />
           </svg>
         </div>
       </div>
 
-      <div className="flex-1 relative z-10 text-center sm:text-left w-full">
-        <div className="flex items-center justify-center sm:justify-start gap-3 mb-2 md:mb-3">
-          <span className={`w-2.5 h-2.5 md:w-3.5 md:h-3.5 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.6)] ${isFlustered ? 'bg-orange-500' : 'bg-red-500'}`}></span>
-          <h4 className="font-bold text-emerald-800 dark:text-emerald-400 text-base md:text-lg uppercase tracking-wider">Tara si Pohon Kersen:</h4>
-          
-          {onAskInfo && !isLoading && !isFlustered && (
-            <button 
-              onClick={(e) => { e.stopPropagation(); onAskInfo(); }}
-              className="ml-auto sm:ml-2 p-2 bg-emerald-100 dark:bg-emerald-900/50 hover:bg-emerald-200 dark:hover:bg-emerald-800 text-emerald-700 dark:text-emerald-300 rounded-xl text-base font-bold uppercase tracking-widest transition-all flex items-center gap-1.5 shadow-sm group/btn"
-              title="Apa itu Teduh Aksara?"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="group-hover/btn:rotate-12"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-              Apa ini?
-            </button>
+      <div className="flex-1 text-center sm:text-left z-20">
+        <div className="flex items-center gap-3 mb-3">
+          <div className="flex gap-1">
+            <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse delay-75"></span>
+          </div>
+          <h4 className="font-bold text-emerald-800 dark:text-emerald-400 text-sm uppercase tracking-[0.3em]">Tara si Pohon Kersen</h4>
+          {onAskInfo && !isLoading && (
+            <button onClick={onAskInfo} className="ml-auto text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest hover:text-rose-600 transition-colors">Identitas ↗</button>
           )}
         </div>
-        <p className={`text-emerald-900/80 dark:text-emerald-100/70 leading-relaxed italic text-base md:text-xl select-none transition-all duration-300 ${isFlustered ? 'text-orange-600 dark:text-orange-300 font-bold scale-105' : ''}`}>
-          {isLoading ? "Aku sedang meneliti naskahmu..." : (reactionMessage || message)}
+        <p className="text-emerald-950 dark:text-emerald-50 italic text-xl md:text-2xl leading-relaxed font-medium">
+          {isLoading ? "Sabar ya, aku sedang menyisir dahan bahasamu..." : (reaction || message)}
         </p>
       </div>
     </div>

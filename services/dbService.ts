@@ -1,30 +1,34 @@
 
 const DB_NAME = 'TeduhAksaraDB';
-const DB_VERSION = 2; // Dinaikkan versinya untuk menambah store baru
+const DB_VERSION = 2;
 const STORES = {
   DRAFT: 'draft',
   HISTORY: 'history',
   SETTINGS: 'settings'
 };
 
+// Cache koneksi database (Singleton Pattern)
+let dbCache: IDBDatabase | null = null;
+
 export const initDB = (): Promise<IDBDatabase> => {
+  if (dbCache) return Promise.resolve(dbCache);
+
   return new Promise((resolve, reject) => {
     const request = indexedDB.open(DB_NAME, DB_VERSION);
 
     request.onupgradeneeded = (event) => {
       const db = (event.target as IDBOpenDBRequest).result;
-      if (!db.objectStoreNames.contains(STORES.DRAFT)) {
-        db.createObjectStore(STORES.DRAFT);
-      }
-      if (!db.objectStoreNames.contains(STORES.HISTORY)) {
-        db.createObjectStore(STORES.HISTORY);
-      }
-      if (!db.objectStoreNames.contains(STORES.SETTINGS)) {
-        db.createObjectStore(STORES.SETTINGS);
-      }
+      Object.values(STORES).forEach(store => {
+        if (!db.objectStoreNames.contains(store)) {
+          db.createObjectStore(store);
+        }
+      });
     };
 
-    request.onsuccess = () => resolve(request.result);
+    request.onsuccess = () => {
+      dbCache = request.result;
+      resolve(dbCache);
+    };
     request.onerror = () => reject(request.error);
   });
 };
