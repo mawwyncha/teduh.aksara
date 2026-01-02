@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 
 interface MascotProps {
   message: string;
@@ -16,20 +16,56 @@ interface Particle {
   rotation: string;
 }
 
+type Expression = 'normal' | 'embarrassed' | 'happy' | 'shocked' | 'dizzy' | 'cool';
+
 export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo }) => {
   const [isShaking, setIsShaking] = useState(false);
-  const [isEmbarrassed, setIsEmbarrassed] = useState(false);
+  const [expression, setExpression] = useState<Expression>('normal');
   const [particles, setParticles] = useState<Particle[]>([]);
   const [reaction, setReaction] = useState<string | null>(null);
+
+  const expressions: { type: Expression; text: string }[] = [
+    { type: 'embarrassed', text: "Aduh! Buah kersen dan daunku berjatuhan! 🍒🌿" },
+    { type: 'happy', text: "Geli tahu! Rasanya seperti disiram pupuk organik pilihan! ✨" },
+    { type: 'shocked', text: "Hah?! Kupikir ada ulat bulu yang lewat! Terkejut aku! 🐛" },
+    { type: 'dizzy', text: "Aduh pusing... duniaku berputar seperti gasing kayu! 😵‍💫" },
+    { type: 'cool', text: "Tenang, Sahabat. Daun yang jatuh adalah bagian dari estetika. 😎" }
+  ];
+
+  const playTaraSound = useCallback(() => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      const notes = [440, 493, 523, 587, 659, 783, 880];
+      const frequency = notes[Math.floor(Math.random() * notes.length)];
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'triangle';
+      osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.15, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.5);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.5);
+      setTimeout(() => ctx.close(), 600);
+    } catch (e) {
+      console.warn("Audio Context tidak didukung");
+    }
+  }, []);
 
   const handleClick = () => {
     if (isShaking) return;
     
+    playTaraSound();
     setIsShaking(true);
-    setIsEmbarrassed(true);
-    setReaction("Aduh! Buah kersen dan daunku berjatuhan! 🍒🌿");
     
-    // Generate partikel kersen dan daun
+    // Pilih ekspresi acak (kecuali normal)
+    const randomExp = expressions[Math.floor(Math.random() * expressions.length)];
+    setExpression(randomExp.type);
+    setReaction(randomExp.text);
+    
     const newParticles: Particle[] = Array.from({ length: 15 }).map((_, i) => ({
       id: Date.now() + i,
       type: Math.random() > 0.4 ? 'cherry' : 'leaf',
@@ -41,20 +77,88 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo })
 
     setParticles(prev => [...prev, ...newParticles]);
 
-    // Reset getaran
     setTimeout(() => setIsShaking(false), 600);
     
-    // Reset ekspresi merona dan bersihkan reaksi setelah beberapa detik
     setTimeout(() => {
-      setIsEmbarrassed(false);
+      setExpression('normal');
       setReaction(null);
       setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
     }, 3500);
   };
 
+  const renderEyes = () => {
+    switch (expression) {
+      case 'embarrassed':
+        return (
+          <g>
+            <path d="M32 50 L40 55 L32 60" fill="none" stroke="#212121" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M68 50 L60 55 L68 60" fill="none" stroke="#212121" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+          </g>
+        );
+      case 'happy':
+        return (
+          <g>
+            <path d="M30 55 Q40 45 50 55" fill="none" stroke="#212121" strokeWidth="3" strokeLinecap="round" transform="translate(-8, 0)" />
+            <path d="M50 55 Q60 45 70 55" fill="none" stroke="#212121" strokeWidth="3" strokeLinecap="round" transform="translate(8, 0)" />
+          </g>
+        );
+      case 'shocked':
+        return (
+          <g>
+            <circle cx="35" cy="52" r="7" fill="white" stroke="#212121" strokeWidth="1" />
+            <circle cx="65" cy="52" r="7" fill="white" stroke="#212121" strokeWidth="1" />
+            <circle cx="35" cy="52" r="3" fill="#212121" />
+            <circle cx="65" cy="52" r="3" fill="#212121" />
+          </g>
+        );
+      case 'dizzy':
+        return (
+          <g>
+            <path d="M30 48 Q35 43 40 48 Q35 53 30 48" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" />
+            <path d="M60 48 Q65 43 70 48 Q65 53 60 48" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" />
+            <path d="M32 52 L38 58 M38 52 L32 58" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" />
+            <path d="M62 52 L68 58 M68 52 L62 58" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" />
+          </g>
+        );
+      case 'cool':
+        return (
+          <g>
+            <rect x="28" y="48" width="18" height="4" rx="2" fill="#212121" />
+            <rect x="54" y="48" width="18" height="4" rx="2" fill="#212121" />
+            <path d="M46 50 L54 50" stroke="#212121" strokeWidth="1" />
+          </g>
+        );
+      default: // Normal
+        return (
+          <g className="animate-tree-blink">
+            <circle cx="40" cy="52" r="6" fill="white" />
+            <circle cx="60" cy="52" r="6" fill="white" />
+            <circle cx="40" cy="52" r="3.5" fill="#212121" />
+            <circle cx="60" cy="52" r="3.5" fill="#212121" />
+          </g>
+        );
+    }
+  };
+
+  const renderMouth = () => {
+    switch (expression) {
+      case 'embarrassed':
+        return <circle cx="50" cy="68" r="4" fill="none" stroke="#212121" strokeWidth="2.5" />;
+      case 'happy':
+        return <path d="M40 64 Q50 72 60 64" fill="none" stroke="#212121" strokeWidth="3" strokeLinecap="round" />;
+      case 'shocked':
+        return <circle cx="50" cy="70" r="5" fill="#212121" />;
+      case 'dizzy':
+        return <path d="M45 68 Q47 64 50 68 Q53 72 55 68" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" />;
+      case 'cool':
+        return <path d="M48 68 Q55 68 58 64" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" />;
+      default:
+        return <path d="M44 64 Q50 68 56 64" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" />;
+    }
+  };
+
   return (
     <div className="bg-white/70 dark:bg-emerald-900/10 backdrop-blur-xl p-8 rounded-[3rem] border border-emerald-50 dark:border-emerald-800/20 shadow-xl flex flex-col sm:flex-row items-center gap-10 transition-all relative overflow-hidden">
-      {/* Layer Partikel Jatuh */}
       <div className="absolute inset-0 pointer-events-none z-50">
         {particles.map(p => (
           <div 
@@ -87,10 +191,7 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo })
       >
         <div className={`w-40 h-40 flex items-center justify-center ${isLoading ? 'animate-tree-breath' : ''}`}>
           <svg viewBox="0 0 100 100" className="w-36 h-36 overflow-visible">
-            {/* Batang Utama */}
             <path d="M42 98 L45 65 L55 65 L58 98" fill="#5d4037" />
-            
-            {/* Rimbun Daun (Tara) */}
             <g>
               <circle cx="50" cy="35" r="32" fill="#1b5e20" />
               <circle cx="35" cy="45" r="25" fill="#2e7d32" />
@@ -98,35 +199,16 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo })
               <circle cx="50" cy="50" r="28" fill="#388e3c" />
             </g>
 
-            {/* Efek Blush (Pipi Merah) */}
-            {isEmbarrassed && (
+            {expression !== 'normal' && (
               <g className="transition-opacity duration-300">
-                <circle cx="35" cy="62" r="6" fill="#f87171" opacity="0.6" />
-                <circle cx="65" cy="62" r="6" fill="#f87171" opacity="0.6" />
+                <circle cx="35" cy="62" r="6" fill="#f87171" opacity={expression === 'embarrassed' ? "0.6" : "0.3"} />
+                <circle cx="65" cy="62" r="6" fill="#f87171" opacity={expression === 'embarrassed' ? "0.6" : "0.3"} />
               </g>
             )}
 
-            {/* Wajah Tara: Kondisional Normal vs Terkejut (> <) */}
-            {isEmbarrassed ? (
-              <g className="transition-all duration-300">
-                {/* Mata Kiri > */}
-                <path d="M35 50 L43 55 L35 60" fill="none" stroke="#212121" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-                {/* Mata Kanan < */}
-                <path d="M65 50 L57 55 L65 60" fill="none" stroke="#212121" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round" />
-                {/* Mulut O */}
-                <circle cx="50" cy="68" r="4" fill="none" stroke="#212121" strokeWidth="2.5" />
-              </g>
-            ) : (
-              <g className="animate-tree-blink transition-all duration-300">
-                <circle cx="40" cy="52" r="6" fill="white" />
-                <circle cx="60" cy="52" r="6" fill="white" />
-                <circle cx="40" cy="52" r="3.5" fill="#212121" />
-                <circle cx="60" cy="52" r="3.5" fill="#212121" />
-                <path d="M44 64 Q50 68 56 64" fill="none" stroke="#212121" strokeWidth="2" strokeLinecap="round" />
-              </g>
-            )}
+            {renderEyes()}
+            {renderMouth()}
             
-            {/* Buah Kersen di Pohon */}
             <circle cx="30" cy="35" r="3" fill="#d32f2f" />
             <circle cx="70" cy="40" r="3" fill="#d32f2f" />
             <circle cx="50" cy="25" r="3" fill="#d32f2f" />

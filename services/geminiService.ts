@@ -8,30 +8,57 @@ const getAI = () => {
   return new GoogleGenAI({ apiKey });
 };
 
-async function decodeAudioData(data: Uint8Array, ctx: AudioContext, sampleRate: number): Promise<AudioBuffer> {
+// Fungsi decode manual sesuai panduan Coding Guidelines
+function decode(base64: string) {
+  const binaryString = atob(base64);
+  const len = binaryString.length;
+  const bytes = new Uint8Array(len);
+  for (let i = 0; i < len; i++) {
+    bytes[i] = binaryString.charCodeAt(i);
+  }
+  return bytes;
+}
+
+async function decodeAudioData(
+  data: Uint8Array,
+  ctx: AudioContext,
+  sampleRate: number,
+  numChannels: number,
+): Promise<AudioBuffer> {
   const dataInt16 = new Int16Array(data.buffer);
-  const buffer = ctx.createBuffer(1, dataInt16.length, sampleRate);
-  const channelData = buffer.getChannelData(0);
-  for (let i = 0, l = dataInt16.length; i < l; i++) {
-    channelData[i] = dataInt16[i] / 32768.0;
+  const frameCount = dataInt16.length / numChannels;
+  const buffer = ctx.createBuffer(numChannels, frameCount, sampleRate);
+
+  for (let channel = 0; channel < numChannels; channel++) {
+    const channelData = buffer.getChannelData(channel);
+    for (let i = 0; i < frameCount; i++) {
+      channelData[i] = dataInt16[i * numChannels + channel] / 32768.0;
+    }
   }
   return buffer;
 }
 
 export const generateSpeech = async (text: string, translationText?: string): Promise<void> => {
+  const sanitizedText = text.slice(0, 1000).replace(/[*_#~]/g, '');
+  const sanitizedTranslation = translationText?.slice(0, 1000).replace(/[*_#~]/g, '');
+
   return new Promise(async (resolve, reject) => {
     try {
       const ai = getAI();
-      const combinedPrompt = translationText 
-        ? `Bacakan naskah Indonesia ini dengan tenang: "${text}". Beri jeda sejenak, lalu katakan 'Dalam bahasa lain' dan bacakan terjemahannya: "${translationText}"`
-        : `Bacakan naskah ini dengan tenang: ${text}`;
+      const combinedPrompt = sanitizedTranslation 
+        ? `Bacakan: ${sanitizedText}. Lalu katakan 'Dalam bahasa lain' dan bacakan: ${sanitizedTranslation}`
+        : `Bacakan dengan tenang: ${sanitizedText}`;
 
       const response = await ai.models.generateContent({
         model: "gemini-2.5-flash-preview-tts",
         contents: [{ parts: [{ text: combinedPrompt }] }],
         config: {
           responseModalities: [Modality.AUDIO],
-          speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } },
+          speechConfig: { 
+            voiceConfig: { 
+              prebuiltVoiceConfig: { voiceName: 'Kore' } 
+            } 
+          },
         },
       });
 
@@ -42,22 +69,25 @@ export const generateSpeech = async (text: string, translationText?: string): Pr
       }
 
       const ctx = new (window.AudioContext || (window as any).webkitAudioContext)({ sampleRate: 24000 });
-      const bin = atob(b64);
-      const bytes = new Uint8Array(bin.length);
-      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      if (ctx.state === 'suspended') {
+        await ctx.resume();
+      }
+
+      const bytes = decode(b64);
+      const buf = await decodeAudioData(bytes, ctx, 24000, 1);
       
-      const buf = await decodeAudioData(bytes, ctx, 24000);
       const src = ctx.createBufferSource();
       src.buffer = buf;
       src.connect(ctx.destination);
       
       src.onended = () => {
+        setTimeout(() => ctx.close(), 100);
         resolve();
       };
 
       src.start();
-    } catch (err) {
-      console.warn("TTS Failed", err);
+    } catch (err: any) {
+      console.error("Detail Error TTS:", err);
       reject(err);
     }
   });
@@ -65,7 +95,6 @@ export const generateSpeech = async (text: string, translationText?: string): Pr
 
 export const transcribeAudio = async (base64Audio: string, mimeType: string): Promise<string> => {
   const ai = getAI();
-  // Clean mimeType (e.g. "audio/webm;codecs=opus" -> "audio/webm")
   const cleanMimeType = mimeType.split(';')[0] || "audio/webm";
   
   const response = await ai.models.generateContent({
@@ -90,30 +119,43 @@ export const analyzeGrammar = async (
   withPlagiarism: boolean = false
 ): Promise<AnalysisResult> => {
   const ai = getAI();
-  const langMap = { 
-    en: 'Inggris', 
-    ja: 'Jepang', 
-    ar: 'Arab', 
-    ko: 'Korea',
-    ru: 'Rusia',
-    ms: 'Malaysia (Melayu)',
-    zh: 'Tionghoa (Mandarin)',
-    tet: 'Tetun (Timor Leste)',
-    hi: 'Hindi (India)',
-    fr: 'Perancis',
-    nl: 'Belanda'
+  const langMap: Record<TargetLanguage, string> = { 
+    en_us: 'Inggris (Amerika Serikat)',
+    en_uk: 'Inggris (Britania Raya)',
+    en_au: 'Inggris (Australia)',
+    jv_central: 'Jawa Tengah (Dialek Solo/Mataraman - Halus, tenang, gunakan Krama Alus untuk formal)',
+    jv_yogyakarta: 'Jawa Yogyakarta (Dialek DIY - Tekankan pada kekhasan Ngayogyakarta, gunakan partikel penegas khas DIY seperti "je", "tho", "og" untuk gaya santai, dan Krama Inggil yang sangat sopan untuk gaya formal)',
+    jv_central_coastal: 'Jawa Tengah Pesisiran (Semarang/Demak dsk - Dialek lugas, intonasi lebih tegas/cepat, gunakan partikel khas Semarang seperti "ik", "lha", "tho" dalam konteks santai, namun tetap sopan untuk formal)',
+    jv_east: 'Jawa Timur (Dialek Arekan - Lugas, egaliter, gunakan imbuhan khas Jawa Timuran)',
+    su: 'Sunda',
+    min: 'Minangkabau',
+    ban: 'Bali',
+    bug: 'Bugis',
+    mad: 'Madura',
+    ace: 'Aceh',
+    bjn: 'Banjar',
+    mk: 'Makassar',
+    bt: 'Batak (Toba/Karo)',
+    lp: 'Lampung',
+    sas: 'Sasak (Lombok)',
+    pap: 'Melayu Papua',
+    amb: 'Melayu Ambon',
+    go: 'Gorontalo',
+    ni: 'Nias',
+    tet: 'Tetum (Timor Leste)',
+    pt_tl: 'Portugis (Timor Leste)'
   };
   
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: `Koreksi teks ini: "${text}". Gaya: ${style}, Konteks: ${context}. Selain itu, terjemahkan hasil koreksinya ke bahasa ${langMap[targetLang]} dan berikan cara membacanya (fonetik) agar mudah diucapkan oleh orang Indonesia.`,
+    contents: `Koreksi teks ini: "${text}". Gaya: ${style}, Konteks: ${context}. Selain itu, terjemahkan hasil koreksinya ke bahasa ${langMap[targetLang]} (pastikan nuansa dialeknya tepat) dan berikan cara membacanya (fonetik) agar mudah diucapkan oleh orang Indonesia.`,
     config: {
-      systemInstruction: `Anda Tara, pakar bahasa Indonesia. 
+      systemInstruction: `Anda Tara, pakar bahasa Indonesia dan berbagai dialek Nusantara. 
       Tugas: 
       1. Koreksi naskah sesuai EYD V dan KBBI.
-      2. Berikan 'readingGuideIndo' berupa pemenggalan suku kata untuk teks Indonesia (contoh: 'mem-ba-ca').
-      3. Terjemahkan ke bahasa target.
-      4. Berikan 'readingGuide' untuk teks terjemahan tersebut (cara baca fonetik untuk lidah orang Indonesia).
+      2. Berikan 'readingGuideIndo' berupa pemenggalan suku kata untuk teks Indonesia.
+      3. Terjemahkan ke bahasa target. Perhatikan kekhasan dialek Pesisiran (Semarang/Demak) yang lebih lugas dan intonasinya tegas dibanding Solo/Jogja.
+      4. Berikan 'readingGuide' untuk teks terjemahan tersebut.
       Respon WAJIB JSON sesuai schema.`,
       responseMimeType: "application/json",
       responseSchema: {
@@ -151,8 +193,16 @@ export const analyzeGrammar = async (
   });
 
   const data: AnalysisResult = JSON.parse(response.text || "{}");
+  const displayLangNames: Record<TargetLanguage, string> = {
+    ...langMap,
+    jv_central: 'Jawa Tengah (Solo)',
+    jv_yogyakarta: 'Jawa Yogyakarta',
+    jv_central_coastal: 'Jawa (Semarang/Demak)',
+    jv_east: 'Jawa Timur'
+  } as any;
+  
   if (data.translation) {
-    data.translation.languageName = langMap[targetLang];
+    data.translation.languageName = displayLangNames[targetLang];
   }
 
   if (withPlagiarism) {

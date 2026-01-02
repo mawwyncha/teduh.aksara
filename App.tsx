@@ -74,24 +74,37 @@ const CONTEXT_OPTIONS = [
 ];
 
 const LANG_OPTIONS = [
-  { value: 'en', label: 'Inggris 🇺🇸' },
-  { value: 'ja', label: 'Jepang 🇯🇵' },
-  { value: 'ar', label: 'Arab 🇸🇦' },
-  { value: 'ko', label: 'Korea 🇰🇷' },
-  { value: 'ru', label: 'Rusia 🇷🇺' },
-  { value: 'ms', label: 'Malaysia 🇲🇾' },
-  { value: 'zh', label: 'Tiongkok 🇨🇳' },
-  { value: 'tet', label: 'Timor Leste 🇹🇱' },
-  { value: 'hi', label: 'Hindi (India) 🇮🇳' },
-  { value: 'fr', label: 'Perancis 🇫🇷' },
-  { value: 'nl', label: 'Belanda 🇳🇱' }
+  { value: 'en_us', label: 'Inggris (AS) 🇺🇸' },
+  { value: 'en_uk', label: 'Inggris (Britania) 🇬🇧' },
+  { value: 'en_au', label: 'Inggris (Australia) 🇦🇺' },
+  { value: 'jv_central', label: 'Jawa Tengah (Solo) 🇮🇩' },
+  { value: 'jv_yogyakarta', label: 'Jawa Yogyakarta 🇮🇩' },
+  { value: 'jv_central_coastal', label: 'Jawa (Semarang/Demak) 🇮🇩' },
+  { value: 'jv_east', label: 'Jawa Timur 🇮🇩' },
+  { value: 'su', label: 'Sunda 🇮🇩' },
+  { value: 'min', label: 'Minangkabau 🇮🇩' },
+  { value: 'ban', label: 'Bali 🇮🇩' },
+  { value: 'bug', label: 'Bugis 🇮🇩' },
+  { value: 'mad', label: 'Madura 🇮🇩' },
+  { value: 'ace', label: 'Aceh 🇮🇩' },
+  { value: 'bjn', label: 'Banjar 🇮🇩' },
+  { value: 'mk', label: 'Makassar 🇮🇩' },
+  { value: 'bt', label: 'Batak 🇮🇩' },
+  { value: 'lp', label: 'Lampung 🇮🇩' },
+  { value: 'sas', label: 'Sasak (Lombok) 🇮🇩' },
+  { value: 'pap', label: 'Papua (Melayu) 🇮🇩' },
+  { value: 'amb', label: 'Ambon (Melayu) 🇮🇩' },
+  { value: 'go', label: 'Gorontalo 🇮🇩' },
+  { value: 'ni', label: 'Nias 🇮🇩' },
+  { value: 'tet', label: 'Tetum (Timor Leste) 🇹🇱' },
+  { value: 'pt_tl', label: 'Portugis (Timor Leste) 🇹🇱' }
 ];
 
 const App: React.FC = () => {
   const [inputText, setInputText] = useState('');
   const [selectedStyle, setSelectedStyle] = useState<WritingStyle>('formal');
   const [selectedContext, setSelectedContext] = useState<WritingContext>('general');
-  const [targetLang, setTargetLang] = useState<TargetLanguage>('en');
+  const [targetLang, setTargetLang] = useState<TargetLanguage>('en_us');
   const [isDyslexiaMode, setIsDyslexiaMode] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   
@@ -333,8 +346,14 @@ const App: React.FC = () => {
     
     try {
       await generateSpeech(textToRead, translationToRead);
-    } catch (error) {
+      setMascotMessage("Begitulah alunan aksaramu jika diucapkan, Sahabat.");
+    } catch (error: any) {
       console.error("Speech interaction failed:", error);
+      if (error.message?.includes("INTERNAL")) {
+         setMascotMessage("Maaf, pita suaraku sedang serak (Internal Error). Coba dengan teks yang lebih pendek.");
+      } else {
+         setMascotMessage("Aduh, suaraku tersangkut di dahan. Coba sebentar lagi ya?");
+      }
     } finally {
       setIsSpeaking(false);
       processActiveRef.current = false;
@@ -414,7 +433,7 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-7xl w-full mx-auto">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-7xl w-full mx-auto pb-32">
         <div className="lg:col-span-8 space-y-8">
           <Mascot message={mascotMessage} isLoading={isWaiting} onAskInfo={async () => {
             if (isBusy) return;

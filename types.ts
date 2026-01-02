@@ -1,7 +1,10 @@
 
 export type WritingStyle = 'formal' | 'casual' | 'academic' | 'creative';
 export type WritingContext = 'business' | 'education' | 'social_media' | 'general';
-export type TargetLanguage = 'en' | 'ja' | 'ar' | 'ko' | 'ru' | 'ms' | 'zh' | 'tet' | 'hi' | 'fr' | 'nl';
+export type TargetLanguage = 
+  | 'en_us' | 'en_uk' | 'en_au' 
+  | 'jv_central' | 'jv_yogyakarta' | 'jv_east' | 'jv_central_coastal' | 'su' | 'min' | 'ban' | 'bug' | 'mad' | 'ace' | 'bjn' | 'mk' | 'bt' 
+  | 'lp' | 'sas' | 'pap' | 'amb' | 'go' | 'ni' | 'tet' | 'pt_tl';
 
 export interface GrammarSuggestion {
   original: string;
