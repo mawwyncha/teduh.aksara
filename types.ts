@@ -3,8 +3,9 @@ export type WritingStyle = 'formal' | 'casual' | 'academic' | 'creative';
 export type WritingContext = 'business' | 'education' | 'social_media' | 'general';
 export type TargetLanguage = 
   | 'en_us' | 'en_uk' | 'en_au' 
-  | 'jv_central' | 'jv_yogyakarta' | 'jv_east' | 'jv_central_coastal' | 'su' | 'min' | 'ban' | 'bug' | 'mad' | 'ace' | 'bjn' | 'mk' | 'bt' 
-  | 'lp' | 'sas' | 'pap' | 'amb' | 'go' | 'ni' | 'tet' | 'pt_tl';
+  | 'jv_central' | 'jv_yogyakarta' | 'jv_east' | 'jv_central_coastal' | 'su' | 'min' | 'ban' | 'bug' | 'mad' | 'ace' | 'bjn' | 'mk' | 'bt_toba' | 'bt_karo'
+  | 'lp' | 'sas' | 'pap' | 'amb' | 'go' | 'ni' | 'tet' | 'pt_tl' 
+  | 'zh_hokkien_medan' | 'zh_hokkien_jakarta' | 'zh_hakka_singkawang' | 'zh_hakka_bangka' | 'zh_teochew_pontianak' | 'zh_cantonese_id';
 
 export interface GrammarSuggestion {
   original: string;

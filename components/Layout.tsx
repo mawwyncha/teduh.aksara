@@ -143,7 +143,7 @@ export const Layout: React.FC<LayoutProps> = ({
           </div>
         </div>
         <p className="mb-2">&copy; 2024 Teduh Aksara. Dirawat sepenuh hati oleh Tara si Pohon Kersen. 🍒🌿</p>
-        <div className="text-[10px] opacity-10 uppercase tracking-[0.4em] font-medium pointer-events-none select-none mt-4">Hak cipta milik mawwyncha</div>
+        <div className="text-[10px] opacity-10 uppercase tracking-[0.4em] font-medium pointer-events-none select-none mt-4">digenerate dengan AI oleh mawwyncha</div>
       </footer>
     </div>
   );

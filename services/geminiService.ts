@@ -1,5 +1,5 @@
 
-import { GoogleGenAI, Type, Modality } from "@google/genai";
+import { GoogleGenAI, Type } from "@google/genai";
 import { AnalysisResult, WritingStyle, WritingContext, TargetLanguage } from "../types";
 
 const getAI = () => {
@@ -53,7 +53,7 @@ export const generateSpeech = async (text: string, translationText?: string): Pr
         model: "gemini-2.5-flash-preview-tts",
         contents: [{ parts: [{ text: combinedPrompt }] }],
         config: {
-          responseModalities: [Modality.AUDIO],
+          responseModalities: ['AUDIO'],
           speechConfig: { 
             voiceConfig: { 
               prebuiltVoiceConfig: { voiceName: 'Kore' } 
@@ -123,10 +123,10 @@ export const analyzeGrammar = async (
     en_us: 'Inggris (Amerika Serikat)',
     en_uk: 'Inggris (Britania Raya)',
     en_au: 'Inggris (Australia)',
-    jv_central: 'Jawa Tengah (Dialek Solo/Mataraman - Halus, tenang, gunakan Krama Alus untuk formal)',
-    jv_yogyakarta: 'Jawa Yogyakarta (Dialek DIY - Tekankan pada kekhasan Ngayogyakarta, gunakan partikel penegas khas DIY seperti "je", "tho", "og" untuk gaya santai, dan Krama Inggil yang sangat sopan untuk gaya formal)',
-    jv_central_coastal: 'Jawa Tengah Pesisiran (Semarang/Demak dsk - Dialek lugas, intonasi lebih tegas/cepat, gunakan partikel khas Semarang seperti "ik", "lha", "tho" dalam konteks santai, namun tetap sopan untuk formal)',
-    jv_east: 'Jawa Timur (Dialek Arekan - Lugas, egaliter, gunakan imbuhan khas Jawa Timuran)',
+    jv_central: 'Jawa Tengah (Solo/Mataraman)',
+    jv_yogyakarta: 'Jawa Yogyakarta',
+    jv_central_coastal: 'Jawa (Semarang/Demak)',
+    jv_east: 'Jawa Timur (Arekan)',
     su: 'Sunda',
     min: 'Minangkabau',
     ban: 'Bali',
@@ -135,7 +135,8 @@ export const analyzeGrammar = async (
     ace: 'Aceh',
     bjn: 'Banjar',
     mk: 'Makassar',
-    bt: 'Batak (Toba/Karo)',
+    bt_toba: 'Batak Toba',
+    bt_karo: 'Batak Karo (Dialek Karo otentik dengan partikel khas Sumatera Utara)',
     lp: 'Lampung',
     sas: 'Sasak (Lombok)',
     pap: 'Melayu Papua',
@@ -143,19 +144,26 @@ export const analyzeGrammar = async (
     go: 'Gorontalo',
     ni: 'Nias',
     tet: 'Tetum (Timor Leste)',
-    pt_tl: 'Portugis (Timor Leste)'
+    pt_tl: 'Portugis (Timor Leste)',
+    zh_hokkien_medan: 'Hokkien Medan (Gunakan dialek Min Nan versi Medan yang kental dengan serapan Melayu/Indonesia seperti "mana", "pasar", "suka" dan partikel khas Medan)',
+    zh_hokkien_jakarta: 'Hokkien Jakarta (Gunakan dialek Hokkien yang lebih banyak bercampur dengan Bahasa Indonesia/Betawi, khas komunitas Tionghoa Jakarta)',
+    zh_hakka_singkawang: 'Hakka Singkawang (Gunakan dialek Khek Singkawang yang sangat khas dan dominan di Kalimantan Barat)',
+    zh_hakka_bangka: 'Hakka Bangka (Gunakan dialek Khek versi Bangka Belitung dengan nada dan kosa kata yang unik)',
+    zh_teochew_pontianak: 'Teochew Pontianak (Gunakan dialek Tiochiu yang umum digunakan di Pontianak dan sekitarnya)',
+    zh_cantonese_id: 'Cina Kanton Indonesia (Konghu Jakarta/Surabaya - Gaya bahasa yang sering digunakan komunitas Tionghoa perkotaan)'
   };
   
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: `Koreksi teks ini: "${text}". Gaya: ${style}, Konteks: ${context}. Selain itu, terjemahkan hasil koreksinya ke bahasa ${langMap[targetLang]} (pastikan nuansa dialeknya tepat) dan berikan cara membacanya (fonetik) agar mudah diucapkan oleh orang Indonesia.`,
+    contents: `Koreksi teks ini: "${text}". Gaya: ${style}, Konteks: ${context}. Selain itu, terjemahkan hasil koreksinya ke bahasa ${langMap[targetLang]} (pastikan nuansa dialek regional Indonesia yang tepat, BUKAN Mandarin standar) dan berikan cara membacanya (fonetik Indonesia).`,
     config: {
-      systemInstruction: `Anda Tara, pakar bahasa Indonesia dan berbagai dialek Nusantara. 
+      systemInstruction: `Anda Tara, pakar bahasa Indonesia dan berbagai dialek Nusantara termasuk ragam Cina Indonesia (Hokkien, Hakka, Teochew, Kanton versi Peranakan). 
       Tugas: 
-      1. Koreksi naskah sesuai EYD V dan KBBI.
-      2. Berikan 'readingGuideIndo' berupa pemenggalan suku kata untuk teks Indonesia.
-      3. Terjemahkan ke bahasa target. Perhatikan kekhasan dialek Pesisiran (Semarang/Demak) yang lebih lugas dan intonasinya tegas dibanding Solo/Jogja.
-      4. Berikan 'readingGuide' untuk teks terjemahan tersebut.
+      1. Koreksi naskah sesuai EYD V.
+      2. Berikan 'readingGuideIndo' berupa pemenggalan suku kata teks Indonesia.
+      3. Terjemahkan ke dialek target. JANGAN gunakan Mandarin standar (Putonghua). Gunakan dialek regional Indonesia yang diminta (misal Hokkien Medan jika targetnya zh_hokkien_id). 
+      4. Gunakan kosa kata khas seperti 'kamsia', 'ciak', 'tancia', dsb jika relevan dengan dialeknya.
+      5. Berikan 'readingGuide' untuk teks terjemahan tersebut.
       Respon WAJIB JSON sesuai schema.`,
       responseMimeType: "application/json",
       responseSchema: {
@@ -195,10 +203,12 @@ export const analyzeGrammar = async (
   const data: AnalysisResult = JSON.parse(response.text || "{}");
   const displayLangNames: Record<TargetLanguage, string> = {
     ...langMap,
-    jv_central: 'Jawa Tengah (Solo)',
-    jv_yogyakarta: 'Jawa Yogyakarta',
-    jv_central_coastal: 'Jawa (Semarang/Demak)',
-    jv_east: 'Jawa Timur'
+    zh_hokkien_medan: 'Hokkien Medan',
+    zh_hokkien_jakarta: 'Hokkien Jakarta',
+    zh_hakka_singkawang: 'Hakka Singkawang',
+    zh_hakka_bangka: 'Hakka Bangka',
+    zh_teochew_pontianak: 'Teochew Pontianak',
+    zh_cantonese_id: 'Kanton Indonesia'
   } as any;
   
   if (data.translation) {
