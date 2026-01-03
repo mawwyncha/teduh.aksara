@@ -53,10 +53,19 @@ const FUN_FACTS = [
   "Bahasa Indonesia memiliki lebih dari 110.000 kosakata dalam KBBI V.",
   "Kata 'Matahari' berasal dari gabungan kata 'Mata' dan 'Hari', yang berarti 'Mata dari Sang Hari'.",
   "Bahasa Indonesia adalah bahasa ke-10 yang paling banyak digunakan di dunia.",
-  "Ada sekitar 718 bahasa daerah di Indonesia, namun Bahasa Indonesia menyatukan semuanya.",
+  "Bahasa Jawa adalah salah satu bahasa daerah dengan jumlah penutur terbanyak di dunia, setelah bahasa Mandarin",
+  "Ada sekitar 718 bahasa daerah di Indonesia, tetapi Bahasa Indonesia menyatukan semuanya.",
+  "Bahasa Minangkabau memiliki pola kalimat yang unik, di mana subjek dan predikat bisa berubah tergantung konteks sosial.",
+  "Bahasa Batak memiliki berbagai dialek, dan setiap dialek memiliki ciri khas berbeda.",
+  "Bahasa Aceh memiliki bunyi konsonan yang unik, seperti bunyi 'glottal stop' yang jarang ditemukan di bahasa lain.",
+  "Bahasa Betawi dikenal dengan logatnya yang unik dan sering digunakan dalam berbagai kesenian tradisional.",
+  "Bahasa Sasak di Lombok memiliki pengaruh dari bahasa Bali dan Jawa, menciptakan campuran yang khas.",
   "Kata 'Rumah Sakit' adalah terjemahan harfiah dari bahasa Belanda 'Ziekenhuis'.",
+  "Bahasa Ternate dan Tidore di Maluku memiliki sejarah panjang sebagai bahasa perdagangan di kawasan timur Indonesia.",
+  "Bahasa Ambon memiliki kosakata yang dipengaruhi oleh bahasa Portugis, sebagai warisan masa lalu.",
   "Bahasa Indonesia menggunakan abjad Latin, namun dulunya pernah menggunakan aksara Jawi.",
-  "Huruf 'Q' dan 'X' biasanya hanya digunakan untuk nama atau istilah ilmiah dalam Bahasa Indonesia."
+  "Huruf 'Q' dan 'X' biasanya hanya digunakan untuk nama atau istilah ilmiah dalam Bahasa Indonesia.",
+  "Bahasa Indonesia adalah bahasa yang dipilih sebagai bahasa persatuan dan memiliki lebih dari 700 bahasa daerah di Indonesia."
 ];
 
 const STYLE_OPTIONS = [
