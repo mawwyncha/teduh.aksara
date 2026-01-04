@@ -10,9 +10,7 @@
       "DOM.Iterable"
     ],
     "skipLibCheck": true,
-    "types": [
-      "react", "node"
-    ],
+    "types": [],
     "moduleResolution": "bundler",
     "isolatedModules": true,
     "moduleDetection": "force",
@@ -21,7 +19,7 @@
     "paths": {
       "@/*": [
         "./*"
-      ]
+      ],
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
