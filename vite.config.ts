@@ -11,6 +11,17 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [react()],
       build: {
+        sourcemap: false,
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              // Split Google GenAI ke chunk terpisah
+              'google-genai': ['@google/genai'],
+              // Split React
+              'react-vendor': ['react', 'react-dom'],
+            },
+          },
+        },
         chunkSizeWarningLimit: 600,
       },
       define: {
