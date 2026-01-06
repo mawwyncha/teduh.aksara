@@ -47,13 +47,6 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
               ))}
             </div>
           </section>
-
-          <section className="bg-[#fff9f0] dark:bg-[#1a1410] p-8 rounded-[2rem] border border-amber-100/50">
-            <h3 className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-widest mb-4">Fitur Premium</h3>
-            <p className="text-amber-900/70 dark:text-amber-200/50 leading-relaxed font-medium italic">
-              Tara juga mampu menerjemahkan naskah ke berbagai bahasa daerah di Nusantara secara otentik, serta membacakannya dengan intonasi yang tenang.
-            </p>
-          </section>
         </div>
       </div>
     </div>

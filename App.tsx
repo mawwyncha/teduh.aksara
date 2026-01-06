@@ -193,10 +193,6 @@ const App: React.FC = () => {
   }, [history, selectedStyle, selectedContext, targetLang, isDyslexiaMode, isLoaded]);
 
   const startMicProcess = async () => {
-    if (isLimitReached) {
-      setIsLimitModalOpen(true);
-      return;
-    }
     processActiveRef.current = true;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -241,7 +237,6 @@ const App: React.FC = () => {
   };
 
   const executeAnalysis = async (plagiarism: boolean) => {
-    if (isLimitReached) { setIsLimitModalOpen(true); return; }
     processActiveRef.current = true;
     setIsAnalyzing(true);
     setLoadingMsg(LOADING_MESSAGES_ANALYSIS[Math.floor(Math.random() * LOADING_MESSAGES_ANALYSIS.length)]);
@@ -256,15 +251,41 @@ const App: React.FC = () => {
     finally { setIsAnalyzing(false); processActiveRef.current = false; }
   };
 
-  const handleAnalyze = async (plagiarism: boolean = false) => {
+  // Fungsi Eksplisit untuk Izin Mikrofon
+  const handleMicClick = () => {
+    if (isBusy) return;
+    if (isLimitReached) {
+      setIsLimitModalOpen(true);
+      return;
+    }
+    setPermissionType('mic');
+  };
+
+  // Fungsi Eksplisit untuk Izin Plagiarisme
+  const handlePlagiarismClick = () => {
     if (!inputText.trim() || isBusy) return;
-    if (isLimitReached) { setIsLimitModalOpen(true); return; }
-    if (plagiarism) setPermissionType('plagiarism'); else executeAnalysis(false);
+    if (isLimitReached) {
+      setIsLimitModalOpen(true);
+      return;
+    }
+    setPermissionType('plagiarism');
+  };
+
+  const handleAnalyzeNormal = () => {
+    if (!inputText.trim() || isBusy) return;
+    if (isLimitReached) {
+      setIsLimitModalOpen(true);
+      return;
+    }
+    executeAnalysis(false);
   };
 
   const handleSpeech = async () => {
     if (isBusy) return;
-    if (isLimitReached) { setIsLimitModalOpen(true); return; }
+    if (isLimitReached) {
+      setIsLimitModalOpen(true);
+      return;
+    }
     const textToRead = result?.correctedText || inputText;
     if (!textToRead.trim()) return;
     processActiveRef.current = true;
@@ -296,9 +317,10 @@ const App: React.FC = () => {
       onDevClick={() => !isBusy && setIsDevModalOpen(true)}
       onEditorClick={() => { if(!isBusy) { setIsHistoryModalOpen(false); setIsGuideModalOpen(false); setIsDevModalOpen(false); window.scrollTo({top:0, behavior:'smooth'}); }}}
     >
+      {/* Tombol Akses Cepat Kiri */}
       <div className="fixed left-4 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-40">
         <button disabled={isBusy} onClick={() => setIsDyslexiaMode(!isDyslexiaMode)} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isDyslexiaMode ? 'bg-amber-600 text-white' : 'bg-white dark:bg-[#1a110c] text-amber-600 hover:scale-110 active:scale-90'}`}><span className="font-bold text-xl">D</span></button>
-        <button onClick={() => !isBusy && (isLimitReached ? setIsLimitModalOpen(true) : setPermissionType('mic'))} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-white dark:bg-[#1a110c] shadow-2xl flex items-center justify-center text-rose-600 transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${isLimitReached ? 'grayscale opacity-50' : ''}`}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+        <button onClick={handleMicClick} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-white dark:bg-[#1a110c] shadow-2xl flex items-center justify-center text-rose-600 transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${isLimitReached ? 'grayscale opacity-50' : ''}`}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
         <button onClick={handleSpeech} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-white dark:bg-[#1a110c] shadow-2xl flex items-center justify-center text-emerald-600 transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${isLimitReached ? 'grayscale opacity-50' : ''}`}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
       </div>
 
@@ -319,7 +341,7 @@ const App: React.FC = () => {
                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                    <span className="text-[10px] font-bold text-emerald-700/50 uppercase tracking-[0.2em]">Kapasitas Harian</span>
                 </div>
-                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${isQuotaLow ? 'bg-rose-50 text-rose-600 animate-quota-low' : 'bg-emerald-50 text-emerald-700'}`}>
+                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md transition-colors ${isQuotaLow ? 'bg-rose-50 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 animate-quota-low' : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400'}`}>
                    {MAX_DAILY_REQUESTS - usageCount} / {MAX_DAILY_REQUESTS} Tersisa
                 </span>
              </div>
@@ -388,11 +410,12 @@ const App: React.FC = () => {
             )}
             <textarea value={inputText} disabled={isBusy} onChange={(e) => setInputText(e.target.value)} placeholder="Tuliskan naskahmu di sini..." className="w-full min-h-[350px] bg-transparent resize-none border-none outline-none text-emerald-950 dark:text-emerald-50 text-xl leading-relaxed placeholder-emerald-100 pr-12" />
             <div className="flex flex-col sm:flex-row gap-4 mt-8">
-              <button onClick={() => handleAnalyze(false)} disabled={!inputText.trim() || isBusy || isLimitReached} className={`flex-1 py-5 bg-emerald-700 text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg shadow-emerald-700/20 disabled:opacity-30 ${isLimitReached ? 'grayscale cursor-not-allowed' : ''}`}>Koreksi & Terjemahkan</button>
-              <button onClick={() => handleAnalyze(true)} disabled={!inputText.trim() || isBusy || isLimitReached} className={`flex-1 py-5 premium-shimmer text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg disabled:opacity-30 ${isLimitReached ? 'grayscale cursor-not-allowed' : ''}`}>Cek Plagiarisme</button>
+              <button onClick={handleAnalyzeNormal} disabled={!inputText.trim() || isBusy || isLimitReached} className={`flex-1 py-5 bg-emerald-700 text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg shadow-emerald-700/20 disabled:opacity-30 ${isLimitReached ? 'grayscale cursor-not-allowed' : ''}`}>Koreksi & Terjemahkan</button>
+              <button onClick={handlePlagiarismClick} disabled={!inputText.trim() || isBusy || isLimitReached} className={`flex-1 py-5 premium-shimmer text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg disabled:opacity-30 ${isLimitReached ? 'grayscale cursor-not-allowed' : ''}`}>Cek Plagiarisme</button>
             </div>
           </section>
 
+          {/* Hasil */}
           {result && !isAnalyzing && (
             <div id="result-section" className="space-y-8 animate-in fade-in duration-500">
                <div className="bg-emerald-50/40 dark:bg-forest-950/40 p-10 rounded-[3rem] border border-emerald-100 dark:border-emerald-900/30">
@@ -409,6 +432,7 @@ const App: React.FC = () => {
           )}
         </div>
 
+        {/* Samping / Jejak Lokal */}
         <aside className="lg:col-span-4">
           <div className="bg-white dark:bg-forest-900 p-8 rounded-[2.5rem] shadow-xl border border-emerald-50 dark:border-emerald-800/10 sticky top-8">
             <h2 className="text-[10px] font-bold text-emerald-700/30 uppercase tracking-[0.3em] mb-6">Jejak Lokal</h2>
@@ -420,7 +444,19 @@ const App: React.FC = () => {
         </aside>
       </div>
 
-      {permissionType && <PermissionModal type={permissionType} onAccept={() => { if (permissionType === 'mic') startMicProcess(); else if (permissionType === 'plagiarism') executeAnalysis(true); setPermissionType(null); }} onDeny={() => setPermissionType(null)} />}
+      {/* Modal Kotak Dialog Izin Transparan */}
+      {permissionType && (
+        <PermissionModal 
+          type={permissionType} 
+          onAccept={() => {
+            if (permissionType === 'mic') startMicProcess();
+            else if (permissionType === 'plagiarism') executeAnalysis(true);
+            setPermissionType(null);
+          }} 
+          onDeny={() => setPermissionType(null)} 
+        />
+      )}
+
       <LimitModal isOpen={isLimitReached && isLimitModalOpen} onClose={() => setIsLimitModalOpen(false)} />
       <HistoryModal isOpen={isHistoryModalOpen} onClose={() => setIsHistoryModalOpen(false)} history={history} onSelectItem={(it) => { if(!isBusy) { setInputText(it.originalText); setResult(it.result); } }} onClearAll={() => { if(!isBusy && confirm("Hapus semua?")) { setHistory([]); clearStore(STORE_HISTORY); } }} />
       <GuideModal isOpen={isGuideModalOpen} onClose={() => setIsGuideModalOpen(false)} />
