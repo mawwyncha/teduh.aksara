@@ -133,14 +133,6 @@ export const Layout: React.FC<LayoutProps> = ({
 
       <footer className="mt-16 md:mt-28 text-center text-[#2d4d3a]/60 dark:text-emerald-500/40 font-bold text-sm md:text-base pb-10 md:pb-14 pt-10 md:pt-14 w-full max-w-6xl border-t border-emerald-50 dark:border-emerald-900/20 mb-24 lg:mb-0">
         <div className="flex flex-wrap justify-center gap-6 mb-8 uppercase tracking-widest text-[10px] md:text-xs">
-          <div className="flex flex-col gap-2">
-            <span className="text-emerald-800 dark:text-emerald-400 opacity-40">Referensi Utama</span>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <a href="https://kbbi.kemendikdasmen.go.id/" target="_blank" rel="noopener noreferrer" className="hover:text-rose-600 transition-colors">KBBI VI Daring</a>
-              <a href="https://eyd.netlify.app/" target="_blank" rel="noopener noreferrer" className="hover:text-rose-600 transition-colors">PUEBI / EYD V</a>
-              <a href="https://tesaurus.kemendikdasmen.go.id/tematis/" target="_blank" rel="noopener noreferrer" className="hover:text-rose-600 transition-colors">Tesaurus Tematis</a>
-            </div>
-          </div>
         </div>
         <p className="mb-2">&copy; 2024 Teduh Aksara. Dirawat sepenuh hati oleh Tara si Pohon Kersen. 🍒🌿</p>
         <div className="text-[10px] opacity-10 uppercase tracking-[0.4em] font-medium pointer-events-none select-none mt-4">digenerate dengan AI oleh mawwyncha</div>
