@@ -10,10 +10,10 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   const features = [
-    { title: "✍️ Ejaan", desc: "Salah ketik & standar KBBI", color: "bg-amber-50/60 dark:bg-amber-900/10 text-amber-800 dark:text-amber-200" },
-    { title: "🌿 Tata Bahasa", desc: "Struktur PUEBI / EYD V", color: "bg-emerald-50/60 dark:bg-emerald-900/10 text-emerald-800 dark:text-emerald-200" },
-    { title: "📍 Tanda Baca", desc: "Titik, koma, & seru", color: "bg-blue-50/60 dark:bg-blue-900/10 text-blue-800 dark:text-blue-200" },
-    { title: "✨ Gaya Bahasa", desc: "Diksi luwes & variatif", color: "bg-rose-50/60 dark:bg-rose-900/10 text-rose-800 dark:text-rose-200" }
+    { title: "✍️ Ejaan", desc: "Koreksi salah ketik", color: "bg-amber-50/60 dark:bg-amber-900/10 text-amber-800 dark:text-amber-200" },
+    { title: "🌿 Tata Bahasa", desc: "Struktur tata bahasa yang baik", color: "bg-emerald-50/60 dark:bg-emerald-900/10 text-emerald-800 dark:text-emerald-200" },
+    { title: "📍 Tanda Baca", desc: "Titik, koma, dan tanda baca", color: "bg-blue-50/60 dark:bg-blue-900/10 text-blue-800 dark:text-blue-200" },
+    { title: "✨ Gaya Bahasa", desc: "Diksi luwes dan variatif", color: "bg-rose-50/60 dark:bg-rose-900/10 text-rose-800 dark:text-rose-200" }
   ];
 
   return (
@@ -46,24 +46,6 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
                 </div>
               ))}
             </div>
-          </section>
-
-          <section className="bg-[#fff9f0] dark:bg-[#1a1410] p-8 rounded-[2rem] border border-amber-100/50">
-            <h3 className="text-xs font-bold text-amber-800 dark:text-amber-400 uppercase tracking-widest mb-4">Referensi Akademik</h3>
-            <ul className="space-y-4">
-              <li className="flex items-center gap-3">
-                <span className="text-lg">📚</span>
-                <a href="https://kbbi.kemdikbud.go.id/" target="_blank" rel="noopener noreferrer" className="text-base font-bold text-amber-900/80 hover:text-rose-600 transition-colors">KBBI Daring (Kemdikbud)</a>
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="text-lg">⚖️</span>
-                <a href="https://eyd.netlify.app/" target="_blank" rel="noopener noreferrer" className="text-base font-bold text-amber-900/80 hover:text-rose-600 transition-colors">EYD V (Pedoman Umum Ejaan Bahasa Indonesia)</a>
-              </li>
-              <li className="flex items-center gap-3">
-                <span className="text-lg">🌿</span>
-                <a href="https://tesaurus.kemendikdasmen.go.id/tematis/" target="_blank" rel="noopener noreferrer" className="text-base font-bold text-amber-900/80 hover:text-rose-600 transition-colors">Tesaurus Tematis (Kemendikdasmen)</a>
-              </li>
-            </ul>
           </section>
         </div>
       </div>

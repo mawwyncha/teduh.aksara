@@ -69,11 +69,11 @@ export const Layout: React.FC<LayoutProps> = ({
         <div className="flex items-center group cursor-help scale-75 md:scale-100 origin-left">
           <div className="flex items-end">
             <span className="text-6xl md:text-8xl font-serif text-emerald-800 dark:text-emerald-400 select-none leading-[0.7] transform transition-all duration-700 group-hover:scale-y-110 origin-bottom group-hover:text-rose-600">
-              तार
+              तारा
             </span>
             <div className="flex flex-col justify-end ml-[-2px] md:ml-[-4px] pb-[2px] md:pb-[4px]">
               <div className="block group-hover:hidden">
-                <h1 className="text-2xl md:text-4xl font-sans font-bold text-emerald-800 dark:text-emerald-200 tracking-[0.2em] leading-none opacity-90">ARA</h1>
+                <h1 className="text-2xl md:text-4xl font-sans font-bold text-emerald-800 dark:text-emerald-200 tracking-[0.2em] leading-none opacity-90">☆</h1>
               </div>
               <div className="hidden group-hover:block ml-4 md:ml-6 mb-1">
                 <h1 className="text-2xl md:text-4xl font-bold text-rose-600 dark:text-emerald-400 tracking-tighter leading-none mb-1 md:mb-2 whitespace-nowrap">Teduh Aksara</h1>
@@ -90,7 +90,7 @@ export const Layout: React.FC<LayoutProps> = ({
           <div className="w-[1px] h-4 bg-emerald-100 dark:bg-emerald-900"></div>
           <button onClick={onGuideClick} className={navLinkClass}>Panduan</button>
           <div className="w-[1px] h-4 bg-emerald-100 dark:bg-emerald-900"></div>
-          <button onClick={onDevClick} className={navLinkClass}>Tentang Kami</button>
+          <button onClick={onDevClick} className={navLinkClass}>Tentang</button>
         </nav>
 
         <div className="flex items-center gap-3 md:gap-6 w-full md:w-auto justify-end">
@@ -134,8 +134,8 @@ export const Layout: React.FC<LayoutProps> = ({
       <footer className="mt-16 md:mt-28 text-center text-[#2d4d3a]/60 dark:text-emerald-500/40 font-bold text-sm md:text-base pb-10 md:pb-14 pt-10 md:pt-14 w-full max-w-6xl border-t border-emerald-50 dark:border-emerald-900/20 mb-24 lg:mb-0">
         <div className="flex flex-wrap justify-center gap-6 mb-8 uppercase tracking-widest text-[10px] md:text-xs">
         </div>
-        <p className="mb-2">&copy; 2024 Teduh Aksara. Dirawat sepenuh hati oleh Tara si Pohon Kersen. 🍒🌿</p>
-        <div className="text-[10px] opacity-10 uppercase tracking-[0.4em] font-medium pointer-events-none select-none mt-4">digenerate dengan AI oleh mawwyncha</div>
+        <p className="mb-2">&copy; TARA: Teduh Aksara. Dirawat sepenuh hati oleh Tara si Pohon Kersen. 🍒🌿</p>
+        <div className="text-[10px] opacity-10 uppercase tracking-[0.4em] font-medium pointer-events-none select-none mt-4">Digenerate dengan AI oleh Mawwyncha</div>
       </footer>
     </div>
   );
