@@ -8,7 +8,6 @@ const getAI = () => {
   return new GoogleGenAI({ apiKey });
 };
 
-// Fungsi decode manual sesuai panduan Coding Guidelines
 function decode(base64: string) {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -87,7 +86,6 @@ export const generateSpeech = async (text: string, translationText?: string): Pr
 
       src.start();
     } catch (err: any) {
-      console.error("Detail Error TTS:", err);
       reject(err);
     }
   });
@@ -136,7 +134,7 @@ export const analyzeGrammar = async (
     bjn: 'Banjar',
     mk: 'Makassar',
     bt_toba: 'Batak Toba',
-    bt_karo: 'Batak Karo (Gunakan dialek Karo otentik)',
+    bt_karo: 'Batak Karo',
     lp: 'Lampung',
     sas: 'Sasak (Lombok)',
     pap: 'Melayu Papua',
@@ -157,11 +155,11 @@ export const analyzeGrammar = async (
     model: "gemini-3-flash-preview",
     contents: `Koreksi teks ini: "${text}". Gaya: ${style}, Konteks: ${context}. Selain itu, terjemahkan hasil koreksinya ke bahasa ${langMap[targetLang]} dan berikan cara membacanya (fonetik Indonesia).`,
     config: {
-      systemInstruction: `Anda Tara, pakar bahasa Indonesia dan berbagai dialek Nusantara termasuk ragam Cina Indonesia regional. 
+      systemInstruction: `Anda Tara, pakar bahasa Indonesia dan berbagai dialek Nusantara. 
       Tugas: 
-      1. Koreksi naskah.
+      1. Koreksi naskah sesuai standar bahasa yang baik dan benar.
       2. Berikan 'readingGuideIndo' berupa pemenggalan suku kata teks Indonesia.
-      3. Terjemahkan ke dialek target. JANGAN gunakan Mandarin standar. Gunakan dialek regional Indonesia yang diminta secara otentik.
+      3. Terjemahkan ke dialek target secara otentik.
       4. Berikan 'readingGuide' untuk teks terjemahan tersebut.
       Respon WAJIB JSON sesuai schema.`,
       responseMimeType: "application/json",
@@ -227,7 +225,7 @@ export const askTaraAboutPlatform = async (): Promise<string> => {
     model: "gemini-3-flash-preview",
     contents: "Siapa kamu?",
     config: {
-      systemInstruction: "Anda Tara, maskot Teduh Aksara. Jelaskan platform ini sebagai pengoreksi bahasa yang menenangkan. Maks 2 kalimat puitis. Jangan bahas KBBI, Puebi, dan EYD.",
+      systemInstruction: "Anda Tara, maskot Teduh Aksara. Jelaskan platform ini sebagai pengoreksi bahasa AI yang menenangkan. Maks 2 kalimat puitis.",
     },
   });
   return response.text || "Aku Tara, penjaga Teduh Aksara yang membantumu merapikan dahan bahasa agar aksaramu tumbuh indah.";

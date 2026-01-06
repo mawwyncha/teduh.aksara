@@ -31,17 +31,26 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, his
         className="bg-white dark:bg-[#0a1a12] w-full max-w-xl h-[80vh] sm:max-h-[75vh] rounded-[2.5rem] shadow-2xl flex flex-col relative overflow-hidden transition-colors cursor-default"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="p-6 sm:p-8 pb-4 sm:pb-5 flex items-center justify-between bg-emerald-50/30 dark:bg-emerald-900/20">
+        {/* Tombol Tutup (X) */}
+        <button 
+          onClick={onClose}
+          className="absolute top-6 right-6 p-2 text-emerald-300 dark:text-emerald-700 hover:text-rose-500 transition-colors z-30"
+          aria-label="Tutup"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+
+        <div className="p-6 sm:p-8 pb-4 sm:pb-5 flex items-center justify-between bg-emerald-50/30 dark:bg-emerald-900/20 pr-16">
           <div className="flex flex-col gap-1">
             <h2 className="text-xl sm:text-2xl font-bold text-emerald-900 dark:text-emerald-50">Jejak Semai</h2>
             <p className="text-base text-emerald-600/60 dark:text-emerald-400/40 font-bold italic">
-              Tersimpan secara lokal di perangkat Anda.
+              Tersimpan secara lokal.
             </p>
           </div>
           {history.length > 0 && (
             <button 
               onClick={onClearAll}
-              className="px-4 py-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 text-base font-bold rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm"
+              className="px-4 py-2 bg-rose-50 dark:bg-rose-900/20 text-rose-600 dark:text-rose-400 text-xs font-bold rounded-xl hover:bg-rose-600 hover:text-white transition-all shadow-sm"
             >
               Hapus Semua
             </button>
@@ -70,7 +79,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, his
                    <span className="text-base font-bold text-emerald-700/50 dark:text-emerald-400/40 uppercase tracking-widest">
                     {new Date(item.timestamp).toLocaleDateString('id-ID', { day: 'numeric', month: 'short' })}
                   </span>
-                  <span className="text-base px-3 py-1 bg-white/50 dark:bg-white/5 rounded-lg text-emerald-800/40">{item.options.style}</span>
+                  <span className="text-xs px-2 py-0.5 bg-white/50 dark:bg-white/5 rounded-lg text-emerald-800/40">{item.options.style}</span>
                 </div>
                 <p className="text-lg sm:text-xl text-emerald-900 dark:text-emerald-100 font-medium line-clamp-3 leading-relaxed italic">
                   "{item.originalText}"
