@@ -136,7 +136,7 @@ export const Layout: React.FC<LayoutProps> = ({
           <div className="flex flex-col gap-2">
             <span className="text-emerald-800 dark:text-emerald-400 opacity-40">Referensi Utama</span>
             <div className="flex flex-wrap gap-4 justify-center">
-              <a href="https://kbbi.kemdikbud.go.id/" target="_blank" rel="noopener noreferrer" className="hover:text-rose-600 transition-colors">KBBI Daring</a>
+              <a href="https://kbbi.kemendikdasmen.go.id/" target="_blank" rel="noopener noreferrer" className="hover:text-rose-600 transition-colors">KBBI VI Daring</a>
               <a href="https://eyd.netlify.app/" target="_blank" rel="noopener noreferrer" className="hover:text-rose-600 transition-colors">PUEBI / EYD V</a>
               <a href="https://tesaurus.kemendikdasmen.go.id/tematis/" target="_blank" rel="noopener noreferrer" className="hover:text-rose-600 transition-colors">Tesaurus Tematis</a>
             </div>
