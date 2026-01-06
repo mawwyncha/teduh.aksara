@@ -159,7 +159,7 @@ export const analyzeGrammar = async (
     config: {
       systemInstruction: `Anda Tara, pakar bahasa Indonesia dan berbagai dialek Nusantara termasuk ragam Cina Indonesia regional. 
       Tugas: 
-      1. Koreksi naskah sesuai EYD V.
+      1. Koreksi naskah.
       2. Berikan 'readingGuideIndo' berupa pemenggalan suku kata teks Indonesia.
       3. Terjemahkan ke dialek target. JANGAN gunakan Mandarin standar. Gunakan dialek regional Indonesia yang diminta secara otentik.
       4. Berikan 'readingGuide' untuk teks terjemahan tersebut.
@@ -227,7 +227,7 @@ export const askTaraAboutPlatform = async (): Promise<string> => {
     model: "gemini-3-flash-preview",
     contents: "Siapa kamu?",
     config: {
-      systemInstruction: "Anda Tara, maskot Teduh Aksara. Jelaskan platform ini sebagai pengoreksi EYD V & KBBI AI yang menenangkan. Maks 2 kalimat puitis.",
+      systemInstruction: "Anda Tara, maskot Teduh Aksara. Jelaskan platform ini sebagai pengoreksi bahasa yang menenangkan. Maks 2 kalimat puitis. Jangan bahas KBBI, Puebi, dan EYD.",
     },
   });
   return response.text || "Aku Tara, penjaga Teduh Aksara yang membantumu merapikan dahan bahasa agar aksaramu tumbuh indah.";
