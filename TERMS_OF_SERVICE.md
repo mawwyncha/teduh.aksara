@@ -1,6 +1,6 @@
 # Syarat dan Ketentuan Penggunaan Tara
 
-**Berlaku sejak: [TANGGAL]**
+**Berlaku sejak: [7 Januari 2026]**
 
 ## 1. Penerimaan Syarat
 Dengan menggunakan Tara, Anda setuju untuk terikat dengan syarat dan ketentuan ini sesuai UU ITE No. 19 Tahun 2016.
@@ -40,4 +40,4 @@ Kami berhak mengubah, menangguhkan, atau menghentikan layanan kapan saja tanpa p
 Syarat dan ketentuan ini diatur oleh hukum Republik Indonesia. Segala sengketa akan diselesaikan di Pengadilan Negeri yang berwenang di Indonesia.
 
 ## 9. Kontak
-Pertanyaan: **[EMAIL ANDA]**
+Pertanyaan: **[tara-teduhaksara@proton.me]**
