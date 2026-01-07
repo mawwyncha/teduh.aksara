@@ -1,14 +1,14 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { getData, saveData } from '../services/dbService';
 
 interface LayoutProps {
   children: React.ReactNode;
-  activeModal: 'history' | 'guide' | 'dev' | 'gallery' | null;
+  activeModal: 'history' | 'guide' | 'dev' | 'gallery' | 'catalog' | null;
   onHistoryClick: () => void;
   onGuideClick: () => void;
   onDevClick: () => void;
   onGalleryClick: () => void;
+  onCatalogClick: () => void;
   onEditorClick: () => void;
   isHelpActive: boolean;
   onHelpToggle: () => void;
@@ -24,6 +24,7 @@ export const Layout: React.FC<LayoutProps> = ({
   onGuideClick,
   onDevClick,
   onGalleryClick,
+  onCatalogClick,
   onEditorClick,
   isHelpActive,
   onHelpToggle
@@ -94,7 +95,15 @@ export const Layout: React.FC<LayoutProps> = ({
     };
   }, [isHelpActive, hoveredHelp]);
 
-  const toggleTheme = () => setIsDark(!isDark);
+  const toggleTheme = () => {
+    if (isHelpActive) return;
+    setIsDark(!isDark);
+  };
+
+  const wrapAction = (action: () => void) => () => {
+    if (isHelpActive) return;
+    action();
+  };
 
   const navLinkClass = "px-4 py-2 text-[#2d4d3a] dark:text-emerald-200/60 font-bold hover:text-rose-600 dark:hover:text-emerald-400 transition-all text-base md:text-xl";
   const mobileNavClass = "flex flex-col items-center justify-center gap-1 flex-1 py-2 text-emerald-800/60 dark:text-emerald-400/50 transition-all active:scale-95";
@@ -142,20 +151,31 @@ export const Layout: React.FC<LayoutProps> = ({
         </div>
         
         <nav className="hidden lg:flex gap-2 items-center bg-white/50 dark:bg-[#1a110c]/30 px-4 py-1.5 rounded-full backdrop-blur-sm shadow-sm">
-          <button onClick={onEditorClick} className={navLinkClass} data-help="Kembali ke lembaran editor untuk mulai merawat aksara baru.">Editor</button>
+          <button onClick={wrapAction(onEditorClick)} className={`${navLinkClass} ${isHelpActive ? 'opacity-50 cursor-help' : ''}`} data-help="Kembali ke lembaran editor untuk mulai merawat aksara baru.">Editor</button>
           <div className="w-[1px] h-4 bg-emerald-100 dark:bg-emerald-900"></div>
-          <button onClick={onHistoryClick} className={navLinkClass} data-help="Melihat jejak naskah yang pernah kamu semai di perangkat ini.">Riwayat</button>
+          <button onClick={wrapAction(onHistoryClick)} className={`${navLinkClass} ${isHelpActive ? 'opacity-50 cursor-help' : ''}`} data-help="Melihat jejak naskah yang pernah kamu semai di perangkat ini.">Riwayat</button>
           <div className="w-[1px] h-4 bg-emerald-100 dark:bg-emerald-900"></div>
-          <button onClick={onGuideClick} className={navLinkClass} data-help="Pelajari cara terbaik untuk menggunakan fitur-fitur Tara.">Panduan</button>
+          <button onClick={wrapAction(onGuideClick)} className={`${navLinkClass} ${isHelpActive ? 'opacity-50 cursor-help' : ''}`} data-help="Pelajari cara terbaik untuk menggunakan fitur-fitur Tara.">Panduan</button>
           <div className="w-[1px] h-4 bg-emerald-100 dark:bg-emerald-900"></div>
-          <button onClick={onDevClick} className={navLinkClass} data-help="Kenali sosok di balik tumbuhnya dahan-dahan Teduh Aksara.">Tentang Kami</button>
+          <button onClick={wrapAction(onDevClick)} className={`${navLinkClass} ${isHelpActive ? 'opacity-50 cursor-help' : ''}`} data-help="Kenali sosok di balik tumbuhnya dahan-dahan Teduh Aksara.">Tentang Kami</button>
         </nav>
 
         <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto justify-end">
+          {/* Tombol Katalog & Donasi - Hidden on Mobile/Tablet */}
+          <button 
+            onClick={wrapAction(onCatalogClick)}
+            className={`hidden md:flex p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 items-center justify-center ${activeModal === 'catalog' ? 'bg-emerald-700 text-white' : 'bg-white dark:bg-[#2d1e17] text-emerald-700 dark:text-emerald-400'} ${isHelpActive ? 'opacity-50 cursor-help scale-100' : ''}`}
+            data-help="Katalog & Donasi. Lihat produk eksklusif dan dukung keberlanjutan taman aksara kami."
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="md:w-6 md:h-6">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </button>
+
           {/* Tombol Galeri */}
           <button 
-            onClick={onGalleryClick}
-            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center ${activeModal === 'gallery' ? 'bg-emerald-700 text-white' : 'bg-white dark:bg-[#2d1e17] text-emerald-700 dark:text-emerald-400'}`}
+            onClick={wrapAction(onGalleryClick)}
+            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center ${activeModal === 'gallery' ? 'bg-emerald-700 text-white' : 'bg-white dark:bg-[#2d1e17] text-emerald-700 dark:text-emerald-400'} ${isHelpActive ? 'opacity-50 cursor-help scale-100' : ''}`}
             data-help="Galeri Sahabat. Lihat karya dan kiriman kenangan dari sesama Sahabat Aksara."
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="md:w-6 md:h-6">
@@ -163,11 +183,11 @@ export const Layout: React.FC<LayoutProps> = ({
             </svg>
           </button>
 
-          {/* Tombol Tanya (?) */}
+          {/* Tombol Tanya (?) - Tetap Aktif */}
           <button 
             onClick={onHelpToggle}
-            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center ${isHelpActive ? 'premium-shimmer text-white rotate-12' : 'bg-white dark:bg-[#2d1e17] text-emerald-700 dark:text-emerald-400'}`}
-            data-help="Mode Bantuan. Aktifkan lalu arahkan panahmu ke tombol lain untuk penjelasan."
+            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center ${isHelpActive ? 'premium-shimmer text-white rotate-12 scale-110' : 'bg-white dark:bg-[#2d1e17] text-emerald-700 dark:text-emerald-400'}`}
+            data-help={isHelpActive ? "Matikan Mode Bantuan untuk kembali menulis." : "Mode Bantuan. Aktifkan lalu arahkan panahmu ke tombol lain untuk penjelasan."}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="md:w-6 md:h-6">
               <circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/>
@@ -176,7 +196,7 @@ export const Layout: React.FC<LayoutProps> = ({
 
           <button 
             onClick={toggleTheme}
-            className="p-3 md:p-4 bg-white dark:bg-[#2d1e17] rounded-xl md:rounded-2xl text-amber-600 dark:text-emerald-300 shadow-sm hover:scale-110 hover:rotate-12 transition-all"
+            className={`p-3 md:p-4 bg-white dark:bg-[#2d1e17] rounded-xl md:rounded-2xl text-amber-600 dark:text-emerald-300 shadow-sm transition-all ${isHelpActive ? 'opacity-50 cursor-help grayscale' : 'hover:scale-110 hover:rotate-12'}`}
             title={isDark ? "Kembali ke Embun Pagi" : "Masuki Rimbun Malam"}
             data-help="Ubah suasana taman. Pilih Embun Pagi yang cerah atau Rimbun Malam yang tenang."
           >
@@ -194,19 +214,19 @@ export const Layout: React.FC<LayoutProps> = ({
       </main>
 
       <nav className="fixed bottom-4 left-4 right-4 h-24 bg-white/90 dark:bg-[#1a110c]/80 backdrop-blur-xl rounded-[2.5rem] shadow-xl border border-white/20 flex items-center justify-around px-2 z-[80] lg:hidden">
-        <button onClick={onEditorClick} className={`${mobileNavClass} ${activeModal === null ? mobileNavActiveClass : ''}`} data-help="Laman Utama Editor.">
+        <button onClick={wrapAction(onEditorClick)} className={`${mobileNavClass} ${activeModal === null ? mobileNavActiveClass : ''} ${isHelpActive ? 'opacity-30' : ''}`} data-help="Laman Utama Editor.">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           <span className="text-[10px] uppercase tracking-widest font-bold">Aksara</span>
         </button>
-        <button onClick={onHistoryClick} className={`${mobileNavClass} ${activeModal === 'history' ? mobileNavActiveClass : ''}`} data-help="Jejak Riwayat.">
+        <button onClick={wrapAction(onHistoryClick)} className={`${mobileNavClass} ${activeModal === 'history' ? mobileNavActiveClass : ''} ${isHelpActive ? 'opacity-30' : ''}`} data-help="Jejak Riwayat.">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
           <span className="text-[10px] uppercase tracking-widest font-bold">Jejak</span>
         </button>
-        <button onClick={onGuideClick} className={`${mobileNavClass} ${activeModal === 'guide' ? mobileNavActiveClass : ''}`} data-help="Panduan Tara.">
+        <button onClick={wrapAction(onGuideClick)} className={`${mobileNavClass} ${activeModal === 'guide' ? mobileNavActiveClass : ''} ${isHelpActive ? 'opacity-30' : ''}`} data-help="Panduan Tara.">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M2 3h6a4 4 0 0 1 4 4v14a4 4 0 0 0-4-4H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a4 4 0 0 1 4-4h6z"/></svg>
           <span className="text-[10px] uppercase tracking-widest font-bold">Panduan</span>
         </button>
-        <button onClick={onDevClick} className={`${mobileNavClass} ${activeModal === 'dev' ? mobileNavActiveClass : ''}`} data-help="Tentang Kami.">
+        <button onClick={wrapAction(onDevClick)} className={`${mobileNavClass} ${activeModal === 'dev' ? mobileNavActiveClass : ''} ${isHelpActive ? 'opacity-30' : ''}`} data-help="Tentang Kami.">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           <span className="text-[10px] uppercase tracking-widest font-bold">Tentang</span>
         </button>
