@@ -1,15 +1,9 @@
 # Kontak Tara
 
 ## Pengembang
-- **Nama**: [NAMA LENGKAP ANDA]
-- **Email**: [EMAIL ANDA]
-- **Lokasi**: [KOTA, INDONESIA]
+- **Nama**: [TARA]
+- **Email**: [tara-teduhaksara@proton.me]
+- **Lokasi**: [INDONESIA]
 
 ## Untuk Pertanyaan Legal
-Email: [EMAIL LEGAL]
-
-## Untuk Laporan Bug
-GitHub Issues: [LINK REPO]
-
-## Alamat Resmi (Untuk PSE)
-[ALAMAT LENGKAP SESUAI KTP/DOMISILI]
+Email: [tara-teduhaksara@proton.me]

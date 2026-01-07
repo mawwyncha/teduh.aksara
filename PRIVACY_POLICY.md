@@ -1,6 +1,6 @@
 # Kebijakan Privasi Tara (Teduh Aksara)
 
-**Terakhir diperbarui: [TANGGAL HARI INI]**
+**Terakhir diperbarui: [7 Januari 2026]**
 
 ## Pengantar
 Tara adalah aplikasi koreksi tata bahasa Indonesia berbasis AI. Kami menghormati privasi Anda dan berkomitmen melindungi data pribadi sesuai UU No. 27 Tahun 2022 tentang Pelindungan Data Pribadi.
@@ -68,8 +68,7 @@ Kami akan memberitahu Anda melalui aplikasi jika ada perubahan material pada keb
 ## Kontak
 
 Jika ada pertanyaan tentang privasi:
-- Email: **[MASUKKAN EMAIL ANDA]**
-- Alamat: **[MASUKKAN ALAMAT LENGKAP]**
+- Email: **[tara-teduhaksara@proton.me]**
 
 ---
 
