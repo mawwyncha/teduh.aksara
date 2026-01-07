@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 interface GalleryPage {
@@ -13,11 +12,6 @@ interface FanGalleryModalProps {
   onClose: () => void;
 }
 
-/**
- * ============================================================
- * PENGATURAN GALERI
- * ============================================================
- */
 const GALLERY_CONFIG = {
   mainTitle: "ALBUM SAHABAT",
   subTitle: "MEMORI & AKSARA",
@@ -25,18 +19,13 @@ const GALLERY_CONFIG = {
   instructionText: "Ketuk untuk Membuka Album",
 };
 
-/**
- * ============================================================
- * 2. PENGATURAN WARNA TEMA (REVERSE: Merah Cherry & Hijau Daun)
- * ============================================================
- */
 const GALLERY_THEME = {
-  coverBackground: "#991b1b",        // Merah Cherry Hangat
-  spineBorder: "#7f1d1d",            // Merah Gelap
+  coverBackground: "#991b1b",
+  spineBorder: "#7f1d1d",
   accentColor: "text-red-100",
   accentBorder: "border-red-400/10",
-  sealStroke: "#ffffff",             // Putih (Agar lebih kontras)
-  sealBackground: "#7f1d1d"          // Dasar segel merah
+  sealStroke: "#ffffff",
+  sealBackground: "#7f1d1d"
 };
 
 const FAN_CONTENT: GalleryPage[] = [
@@ -102,9 +91,9 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
 
   if (isBookClosed) {
     return (
-      <div className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4 animate-in fade-in duration-500">
+      <div className="fixed inset-0 z-[200] bg-black/95 flex items-center justify-center p-4 animate-in fade-in duration-500 overflow-hidden">
         <div 
-          className={`relative w-full max-w-[320px] aspect-[3/4] rounded-r-3xl shadow-[0_40px_80px_-15px_rgba(0,0,0,0.9)] border-l-[12px] cursor-pointer transition-all duration-700 hover:scale-105 active:scale-95 group ${isFading ? 'opacity-0 scale-110 blur-xl' : 'opacity-100'}`}
+          className={`relative w-full max-w-[320px] aspect-[3/4] rounded-r-3xl shadow-[0_40px_80px_-15px_rgba(0,0,0,0.9)] border-l-[12px] cursor-pointer transition-all duration-700 md:hover:scale-105 active:scale-95 group ${isFading ? 'opacity-0 scale-105 blur-xl' : 'opacity-100'}`}
           style={{ backgroundColor: GALLERY_THEME.coverBackground, borderColor: GALLERY_THEME.spineBorder }}
           onClick={handleOpenBook}
         >
@@ -112,7 +101,7 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
           
           <div className="absolute inset-0 flex items-center justify-center">
              <div 
-               className="p-8 rounded-full border-2 border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.1)] group-hover:shadow-[0_0_60px_rgba(255,255,255,0.3)] transition-all animate-pulse"
+               className="p-8 rounded-full border-2 border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.1)] transition-all animate-pulse"
                style={{ backgroundColor: GALLERY_THEME.sealBackground }}
              >
                 <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke={GALLERY_THEME.sealStroke} strokeWidth="1.5">
@@ -127,12 +116,8 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
             <p className="text-red-100/20 text-[9px] tracking-[0.5em] uppercase mb-2 font-bold">{GALLERY_CONFIG.subTitle}</p>
             <h2 className={`font-serif text-2xl tracking-widest ${GALLERY_THEME.accentColor}`}>{GALLERY_CONFIG.mainTitle}</h2>
           </div>
-          
-          <div className="absolute -bottom-16 left-0 right-0 text-center animate-bounce">
-            <span className="text-emerald-500/60 text-[9px] uppercase tracking-[0.6em] font-bold">{GALLERY_CONFIG.instructionText}</span>
-          </div>
         </div>
-        <button onClick={onClose} className="absolute top-8 right-8 p-4 bg-white/5 rounded-full text-white/30 border border-white/5 hover:bg-emerald-600 hover:text-white transition-all">
+        <button onClick={onClose} className="absolute top-8 right-8 p-4 bg-white/5 rounded-full text-white/30 border border-white/5 md:hover:bg-emerald-600 md:hover:text-white transition-all">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
@@ -152,7 +137,7 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
             <p className="text-red-400/40 text-[10px] uppercase tracking-[0.2em] font-bold">{FAN_CONTENT.length} Memori Tersimpan</p>
           </div>
         </div>
-        <button onClick={onClose} className="p-3 bg-white/5 hover:bg-emerald-600 rounded-full text-white/40 hover:text-white transition-all border border-white/5">
+        <button onClick={onClose} className="p-3 bg-white/5 md:hover:bg-emerald-600 rounded-full text-white/40 md:hover:text-white transition-all border border-white/5">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </header>
@@ -163,12 +148,12 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
             <div 
               key={idx}
               onClick={() => setSelectedIdx(idx)}
-              className="group cursor-pointer animate-in zoom-in-95 duration-500"
-              style={{ animationDelay: `${idx * 100}ms` }}
+              className="group cursor-pointer animate-in fade-in duration-500"
+              style={{ animationDelay: `${idx * 50}ms` }}
             >
-              <div className={`relative bg-red-50 p-2 pb-8 sm:p-3 sm:pb-12 shadow-xl transition-all duration-500 group-hover:-translate-y-4 group-hover:rotate-0 rotate-${(idx % 2 === 0 ? '1' : '-1')} border border-white/20`}>
+              <div className={`relative bg-red-50 p-2 pb-8 sm:p-3 sm:pb-12 shadow-xl transition-all duration-500 md:group-hover:-translate-y-4 md:group-hover:rotate-0 rotate-${(idx % 2 === 0 ? '1' : '-1')} border border-white/20`}>
                 <div className="aspect-square bg-red-100 overflow-hidden relative">
-                  <img src={item.imageUrl} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt={`Karya ${item.sender}`} />
+                  <img src={item.imageUrl} className="w-full h-full object-cover transition-transform duration-700 md:group-hover:scale-110" alt={`Karya ${item.sender}`} />
                   {item.videoUrl && (
                     <div className="absolute top-2 right-2 p-1.5 bg-black/40 backdrop-blur-md rounded-lg">
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="white"><polygon points="5 3 19 12 5 21 5 3"/></svg>
@@ -177,7 +162,6 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
                 </div>
                 <div className="mt-4 text-center">
                    <p className="text-[10px] sm:text-xs font-bold text-red-800/40 uppercase tracking-widest mb-1 truncate">Oleh: {item.sender}</p>
-                   <div className="h-0.5 w-4 bg-emerald-500/20 mx-auto rounded-full"></div>
                 </div>
               </div>
             </div>
@@ -185,51 +169,47 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
         </div>
       </div>
 
-      <footer className="w-full p-6 text-center text-white/10 text-[10px] uppercase tracking-[0.5em] font-bold border-t border-white/5">
-        Klik Salah Satu Foto untuk Melihat Ukuran Penuh
-      </footer>
-
       {selectedIdx !== null && (
         <div 
           className="fixed inset-0 z-[300] bg-black/98 flex items-center justify-center p-4 sm:p-10 animate-in fade-in duration-300"
           onClick={handleCloseDetail}
         >
-          <button className="absolute top-6 right-6 z-[310] p-4 bg-white/10 rounded-full text-white hover:bg-emerald-600 transition-all active:scale-90">
+          <button className="absolute top-6 right-6 z-[310] p-4 bg-white/10 rounded-full text-white md:hover:bg-emerald-600 transition-all active:scale-90">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
 
           <button 
             onClick={(e) => { e.stopPropagation(); setSelectedIdx(p => p !== null ? (p - 1 + FAN_CONTENT.length) % FAN_CONTENT.length : null); }}
-            className="absolute left-6 p-5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all hidden sm:block"
+            className="absolute left-6 p-5 bg-white/5 md:hover:bg-white/10 rounded-full text-white transition-all hidden sm:block"
           >
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <button 
             onClick={(e) => { e.stopPropagation(); setSelectedIdx(p => p !== null ? (p + 1) % FAN_CONTENT.length : null); }}
-            className="absolute right-6 p-5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all hidden sm:block"
+            className="absolute right-6 p-5 bg-white/5 md:hover:bg-white/10 rounded-full text-white transition-all hidden sm:block"
           >
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
           <div className="relative max-w-full max-h-full flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
-            <div className="relative group">
+            <div className="relative">
               {FAN_CONTENT[selectedIdx].videoUrl ? (
                 <video 
                   autoPlay muted loop playsInline 
-                  className="max-w-[90vw] max-h-[75vh] object-contain shadow-[0_0_100px_rgba(16,185,129,0.1)] rounded-lg"
+                  className="max-w-[90vw] max-h-[75vh] object-contain shadow-2xl rounded-lg"
                 >
                   <source src={FAN_CONTENT[selectedIdx].videoUrl} type="video/mp4" />
                 </video>
               ) : (
                 <img 
                   src={FAN_CONTENT[selectedIdx].imageUrl} 
-                  className="max-w-[90vw] max-h-[75vh] object-contain shadow-[0_0_100px_rgba(16,185,129,0.1)] rounded-lg animate-in zoom-in-95 duration-300" 
+                  className="max-w-[90vw] max-h-[75vh] object-contain shadow-2xl rounded-lg" 
                   alt="Full view"
                 />
               )}
             </div>
 
-            <div className="mt-8 text-center max-w-2xl px-6 animate-in slide-in-from-bottom-4 duration-500">
+            <div className="mt-8 text-center max-w-2xl px-6">
                <p className="text-white text-xl sm:text-2xl font-medium italic mb-3">"{FAN_CONTENT[selectedIdx].caption}"</p>
                <div className="flex items-center justify-center gap-3">
                  <span className="w-8 h-[1px] bg-emerald-500/50"></span>

@@ -6,6 +6,7 @@ import { HistoryModal } from './components/HistoryModal';
 import { GuideModal } from './components/GuideModal';
 import { DeveloperModal } from './components/DeveloperModal';
 import { FanGalleryModal } from './components/FanGalleryModal';
+import { CatalogModal } from './components/CatalogModal';
 import { PermissionModal } from './components/PermissionModal';
 import { LimitModal } from './components/LimitModal';
 import { ConsentModal } from './components/ConsentModal';
@@ -158,6 +159,7 @@ const App: React.FC = () => {
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false);
   const [isDevModalOpen, setIsDevModalOpen] = useState(false);
   const [isFanGalleryModalOpen, setIsFanGalleryModalOpen] = useState(false);
+  const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
   const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -216,7 +218,7 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const isAnyModalOpen = isHistoryModalOpen || isGuideModalOpen || isDevModalOpen || isLimitModalOpen || isFanGalleryModalOpen || !!permissionType || isConsentModalOpen;
+    const isAnyModalOpen = isHistoryModalOpen || isGuideModalOpen || isDevModalOpen || isLimitModalOpen || isFanGalleryModalOpen || isCatalogModalOpen || !!permissionType || isConsentModalOpen;
     if (isAnyModalOpen) {
       document.body.style.overflow = 'hidden';
     } else {
@@ -225,7 +227,7 @@ const App: React.FC = () => {
     return () => {
       document.body.style.overflow = 'auto';
     };
-  }, [isHistoryModalOpen, isGuideModalOpen, isDevModalOpen, isLimitModalOpen, isFanGalleryModalOpen, permissionType, isConsentModalOpen]);
+  }, [isHistoryModalOpen, isGuideModalOpen, isDevModalOpen, isLimitModalOpen, isFanGalleryModalOpen, isCatalogModalOpen, permissionType, isConsentModalOpen]);
 
   useEffect(() => {
     let interval: number | null = null;
@@ -448,12 +450,13 @@ const App: React.FC = () => {
 
   return (
     <Layout 
-      activeModal={isHistoryModalOpen ? 'history' : isGuideModalOpen ? 'guide' : isDevModalOpen ? 'dev' : isFanGalleryModalOpen ? 'gallery' : null}
+      activeModal={isHistoryModalOpen ? 'history' : isGuideModalOpen ? 'guide' : isDevModalOpen ? 'dev' : isFanGalleryModalOpen ? 'gallery' : isCatalogModalOpen ? 'catalog' : null}
       onHistoryClick={() => !isBusy && !isBlocked && setIsHistoryModalOpen(true)}
       onGuideClick={() => !isBusy && !isBlocked && setIsGuideModalOpen(true)}
       onDevClick={() => !isBusy && !isBlocked && setIsDevModalOpen(true)}
       onGalleryClick={() => !isBusy && !isBlocked && setIsFanGalleryModalOpen(true)}
-      onEditorClick={() => { if(!isBusy && !isBlocked) { setIsHistoryModalOpen(false); setIsGuideModalOpen(false); setIsDevModalOpen(false); setIsFanGalleryModalOpen(false); window.scrollTo({top:0, behavior:'smooth'}); }}}
+      onCatalogClick={() => !isBusy && !isBlocked && setIsCatalogModalOpen(true)}
+      onEditorClick={() => { if(!isBusy && !isBlocked) { setIsHistoryModalOpen(false); setIsGuideModalOpen(false); setIsDevModalOpen(false); setIsFanGalleryModalOpen(false); setIsCatalogModalOpen(false); window.scrollTo({top:0, behavior:'smooth'}); }}}
       isHelpActive={isHelpActive}
       onHelpToggle={() => !isBlocked && setIsHelpActive(!isHelpActive)}
     >
@@ -716,6 +719,7 @@ const App: React.FC = () => {
       <GuideModal isOpen={isGuideModalOpen} onClose={() => setIsGuideModalOpen(false)} />
       <DeveloperModal isOpen={isDevModalOpen} onClose={() => setIsDevModalOpen(false)} />
       <FanGalleryModal isOpen={isFanGalleryModalOpen} onClose={() => setIsFanGalleryModalOpen(false)} />
+      <CatalogModal isOpen={isCatalogModalOpen} onClose={() => setIsCatalogModalOpen(false)} />
     </Layout>
   );
 };

@@ -1,14 +1,14 @@
-
 import React, { useEffect, useState, useRef } from 'react';
 import { getData, saveData } from '../services/dbService';
 
 interface LayoutProps {
   children: React.ReactNode;
-  activeModal: 'history' | 'guide' | 'dev' | 'gallery' | null;
+  activeModal: 'history' | 'guide' | 'dev' | 'gallery' | 'catalog' | null;
   onHistoryClick: () => void;
   onGuideClick: () => void;
   onDevClick: () => void;
   onGalleryClick: () => void;
+  onCatalogClick: () => void;
   onEditorClick: () => void;
   isHelpActive: boolean;
   onHelpToggle: () => void;
@@ -24,6 +24,7 @@ export const Layout: React.FC<LayoutProps> = ({
   onGuideClick,
   onDevClick,
   onGalleryClick,
+  onCatalogClick,
   onEditorClick,
   isHelpActive,
   onHelpToggle
@@ -152,6 +153,17 @@ export const Layout: React.FC<LayoutProps> = ({
         </nav>
 
         <div className="flex items-center gap-3 md:gap-4 w-full md:w-auto justify-end">
+          {/* Tombol Katalog & Donasi */}
+          <button 
+            onClick={onCatalogClick}
+            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center ${activeModal === 'catalog' ? 'bg-emerald-700 text-white' : 'bg-white dark:bg-[#2d1e17] text-emerald-700 dark:text-emerald-400'}`}
+            data-help="Katalog & Donasi. Lihat produk eksklusif dan dukung keberlanjutan taman aksara kami."
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="md:w-6 md:h-6">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/>
+            </svg>
+          </button>
+
           {/* Tombol Galeri */}
           <button 
             onClick={onGalleryClick}
@@ -197,6 +209,10 @@ export const Layout: React.FC<LayoutProps> = ({
         <button onClick={onEditorClick} className={`${mobileNavClass} ${activeModal === null ? mobileNavActiveClass : ''}`} data-help="Laman Utama Editor.">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           <span className="text-[10px] uppercase tracking-widest font-bold">Aksara</span>
+        </button>
+        <button onClick={onCatalogClick} className={`${mobileNavClass} ${activeModal === 'catalog' ? mobileNavActiveClass : ''}`} data-help="Katalog Merchandise.">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><line x1="3" y1="6" x2="21" y2="6"/></svg>
+          <span className="text-[10px] uppercase tracking-widest font-bold">Toko</span>
         </button>
         <button onClick={onHistoryClick} className={`${mobileNavClass} ${activeModal === 'history' ? mobileNavActiveClass : ''}`} data-help="Jejak Riwayat.">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
