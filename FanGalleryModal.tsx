@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
+
+import React, { useState, useEffect } from 'react';
 
 interface GalleryPage {
   imageUrl: string; 
@@ -77,42 +78,6 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [isFading, setIsFading] = useState(false);
 
-  /**
-   * Menghasilkan bunyi dentingan melodi beragam (Pentatonik G Major)
-   */
-  const playBeautifulChime = useCallback(() => {
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioCtx();
-      
-      const scale = [783.99, 880.00, 987.77, 1174.66, 1318.51]; // G5, A5, B5, D6, E6
-      
-      const noteCount = 2 + Math.floor(Math.random() * 2);
-      const selectedNotes = Array.from({ length: noteCount }, () => scale[Math.floor(Math.random() * scale.length)]);
-
-      selectedNotes.forEach((freq, index) => {
-        const startTime = ctx.currentTime + (index * 0.15);
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, startTime);
-        
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.08, startTime + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.8);
-        
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.start(startTime);
-        osc.stop(startTime + 1.0);
-      });
-
-      setTimeout(() => ctx.close(), 2500);
-    } catch (e) {}
-  }, []);
-
   useEffect(() => {
     if (isOpen) {
       setIsBookClosed(true);
@@ -124,7 +89,6 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
   if (!isOpen) return null;
 
   const handleOpenBook = () => {
-    playBeautifulChime();
     setIsFading(true);
     setTimeout(() => {
       setIsBookClosed(false);
@@ -198,7 +162,7 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
           {FAN_CONTENT.map((item, idx) => (
             <div 
               key={idx}
-              onClick={() => { setSelectedIdx(idx); playBeautifulChime(); }}
+              onClick={() => setSelectedIdx(idx)}
               className="group cursor-pointer animate-in zoom-in-95 duration-500"
               style={{ animationDelay: `${idx * 100}ms` }}
             >
@@ -227,50 +191,50 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
 
       {selectedIdx !== null && (
         <div 
-          className="fixed inset-0 z-[300] bg-black/40 backdrop-blur-[30px] flex items-center justify-center p-4 sm:p-10 animate-in fade-in duration-300"
+          className="fixed inset-0 z-[300] bg-black/98 flex items-center justify-center p-4 sm:p-10 animate-in fade-in duration-300"
           onClick={handleCloseDetail}
         >
-          <button className="absolute top-6 right-6 z-[310] p-4 bg-white/10 rounded-full text-white hover:bg-emerald-600 transition-all active:scale-90 shadow-lg">
+          <button className="absolute top-6 right-6 z-[310] p-4 bg-white/10 rounded-full text-white hover:bg-emerald-600 transition-all active:scale-90">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
 
           <button 
-            onClick={(e) => { e.stopPropagation(); setSelectedIdx(p => p !== null ? (p - 1 + FAN_CONTENT.length) % FAN_CONTENT.length : null); playBeautifulChime(); }}
-            className="absolute left-6 p-5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all hidden sm:block shadow-xl backdrop-blur-md"
+            onClick={(e) => { e.stopPropagation(); setSelectedIdx(p => p !== null ? (p - 1 + FAN_CONTENT.length) % FAN_CONTENT.length : null); }}
+            className="absolute left-6 p-5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all hidden sm:block"
           >
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <button 
-            onClick={(e) => { e.stopPropagation(); setSelectedIdx(p => p !== null ? (p + 1) % FAN_CONTENT.length : null); playBeautifulChime(); }}
-            className="absolute right-6 p-5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all hidden sm:block shadow-xl backdrop-blur-md"
+            onClick={(e) => { e.stopPropagation(); setSelectedIdx(p => p !== null ? (p + 1) % FAN_CONTENT.length : null); }}
+            className="absolute right-6 p-5 bg-white/5 hover:bg-white/10 rounded-full text-white transition-all hidden sm:block"
           >
             <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
           <div className="relative max-w-full max-h-full flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
-            <div className="relative group perspective-1000">
+            <div className="relative group">
               {FAN_CONTENT[selectedIdx].videoUrl ? (
                 <video 
-                  autoPlay loop playsInline 
-                  className="max-w-[90vw] max-h-[75vh] object-contain shadow-[0_0_80px_rgba(0,0,0,0.5)] rounded-xl ring-1 ring-white/10"
+                  autoPlay muted loop playsInline 
+                  className="max-w-[90vw] max-h-[75vh] object-contain shadow-[0_0_100px_rgba(16,185,129,0.1)] rounded-lg"
                 >
                   <source src={FAN_CONTENT[selectedIdx].videoUrl} type="video/mp4" />
                 </video>
               ) : (
                 <img 
                   src={FAN_CONTENT[selectedIdx].imageUrl} 
-                  className="max-w-[90vw] max-h-[75vh] object-contain shadow-[0_0_80px_rgba(0,0,0,0.5)] rounded-xl animate-in zoom-in-95 duration-300 ring-1 ring-white/10" 
+                  className="max-w-[90vw] max-h-[75vh] object-contain shadow-[0_0_100px_rgba(16,185,129,0.1)] rounded-lg animate-in zoom-in-95 duration-300" 
                   alt="Full view"
                 />
               )}
             </div>
 
-            <div className="mt-10 text-center max-w-2xl px-6 animate-in slide-in-from-bottom-4 duration-500">
-               <p className="text-white text-xl sm:text-3xl font-medium italic mb-4 drop-shadow-lg">"{FAN_CONTENT[selectedIdx].caption}"</p>
-               <div className="flex items-center justify-center gap-4">
-                 <span className="w-12 h-[1.5px] bg-gradient-to-r from-transparent to-emerald-500/50"></span>
-                 <p className="text-emerald-400 text-xs sm:text-sm font-bold uppercase tracking-[0.4em] drop-shadow-md">Sahabat {FAN_CONTENT[selectedIdx].sender}</p>
-                 <span className="w-12 h-[1.5px] bg-gradient-to-l from-transparent to-emerald-500/50"></span>
+            <div className="mt-8 text-center max-w-2xl px-6 animate-in slide-in-from-bottom-4 duration-500">
+               <p className="text-white text-xl sm:text-2xl font-medium italic mb-3">"{FAN_CONTENT[selectedIdx].caption}"</p>
+               <div className="flex items-center justify-center gap-3">
+                 <span className="w-8 h-[1px] bg-emerald-500/50"></span>
+                 <p className="text-emerald-400 text-xs sm:text-sm font-bold uppercase tracking-[0.3em]">Sahabat {FAN_CONTENT[selectedIdx].sender}</p>
+                 <span className="w-8 h-[1px] bg-emerald-500/50"></span>
                </div>
             </div>
           </div>

@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+
+import React, { useState, useRef, useEffect } from 'react';
 
 interface BookPage {
   imageUrl: string; 
@@ -82,47 +83,6 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
   const [isFading, setIsFading] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
-  /**
-   * Menghasilkan bunyi dentingan melodi yang beragam (pentatonik)
-   */
-  const playBeautifulChime = useCallback(() => {
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioCtx();
-      
-      // Frekuensi Pentatonik E Major: E5, F#5, G#5, B5, C#6
-      const scale = [659.25, 739.99, 830.61, 987.77, 1108.73];
-      
-      // Pilih 3-4 nada acak untuk membentuk melodi singkat
-      const noteCount = 3 + Math.floor(Math.random() * 2);
-      const selectedNotes = Array.from({ length: noteCount }, () => scale[Math.floor(Math.random() * scale.length)]);
-
-      selectedNotes.forEach((freq, index) => {
-        const startTime = ctx.currentTime + (index * 0.12); // Jeda antar nada
-        const osc = ctx.createOscillator();
-        const gain = ctx.createGain();
-        
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, startTime);
-        
-        // Envelope: Dentingan tajam lalu menghilang lembut
-        gain.gain.setValueAtTime(0, startTime);
-        gain.gain.linearRampToValueAtTime(0.1, startTime + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, startTime + 1.0);
-        
-        osc.connect(gain);
-        gain.connect(ctx.destination);
-        
-        osc.start(startTime);
-        osc.stop(startTime + 1.2);
-      });
-
-      setTimeout(() => ctx.close(), 3000);
-    } catch (e) {
-      console.warn("Audio not supported");
-    }
-  }, []);
-
   useEffect(() => {
     if (isOpen) {
       setIsBookClosed(true);
@@ -137,7 +97,6 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
   const currentContent = TARA_STORY_PAGES[currentPage];
 
   const handleOpenBook = () => {
-    playBeautifulChime();
     setIsFading(true);
     setTimeout(() => {
       setIsBookClosed(false);
@@ -155,14 +114,11 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
       }
       setIsPlaying(true);
       setIsFading(false);
-      playBeautifulChime();
     }, 400);
   };
 
   const handleMediaClick = () => {
-    const nextState = !isPlaying;
-    setIsPlaying(nextState);
-    if (nextState) playBeautifulChime();
+    setIsPlaying(!isPlaying);
   };
 
   if (isBookClosed) {
@@ -228,7 +184,7 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
       <div className={`relative z-10 w-full h-full flex items-center justify-center transition-opacity duration-500 ${isFading ? 'opacity-0' : 'opacity-100'}`}>
         <div className="relative w-full h-full flex items-center justify-center cursor-pointer group" onClick={handleMediaClick}>
           {isPlaying ? (
-            <video ref={videoRef} key={currentContent.videoUrl} autoPlay loop playsInline className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-500">
+            <video ref={videoRef} key={currentContent.videoUrl} autoPlay muted loop playsInline className="max-w-full max-h-full object-contain shadow-2xl animate-in zoom-in-95 duration-500">
               <source src={currentContent.videoUrl} type="video/mp4" />
             </video>
           ) : (

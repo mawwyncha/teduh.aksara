@@ -1,4 +1,3 @@
-
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { AnalysisResult, WritingStyle, WritingContext, TargetLanguage } from "../types";
 
@@ -205,15 +204,26 @@ export const analyzeGrammar = async (
   if (withPlagiarism) {
     const pResponse = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `Cari kemiripan web untuk naskah: "${text}"`,
+      contents: `Cari kemiripan naskah berikut di web: "${text}". 
+      INSTRUKSI PENTING:
+      - Berikan maksimal 3 sumber web yang paling relevan.
+      - Batasi pencarian hanya pada website publik yang dapat diakses bebas.
+      - Pastikan sumber yang ditampilkan ramah anak dan bersifat edukatif.
+      - HINDARI website berbayar (paywall) atau website dengan konten tidak senonoh/dewasa.
+      - Prioritaskan website resmi atau blog komunitas yang aman.`,
       config: { tools: [{ googleSearch: {} }] },
     });
     const chunks = pResponse.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-    const sources = chunks.filter(c => c.web).map(c => ({ uri: c.web!.uri!, title: c.web!.title! }));
+    // Slice to maximum 3 sources as requested
+    const sources = chunks
+      .filter(c => c.web)
+      .map(c => ({ uri: c.web!.uri!, title: c.web!.title! }))
+      .slice(0, 3);
+
     data.plagiarism = {
-      score: sources.length > 0 ? Math.min(sources.length * 20, 98) : 0,
+      score: sources.length > 0 ? Math.min(sources.length * 33, 98) : 0,
       sources,
-      summary: sources.length > 0 ? "Ditemukan kemiripan di dahan web lain." : "Naskahmu murni dan asli."
+      summary: sources.length > 0 ? "Ditemukan beberapa kemiripan di dahan web publik yang aman." : "Naskahmu murni dan asli."
     };
   }
   return data;

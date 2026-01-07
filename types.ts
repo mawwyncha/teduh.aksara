@@ -1,4 +1,3 @@
-
 export type WritingStyle = 'formal' | 'casual' | 'academic' | 'creative';
 export type WritingContext = 'business' | 'education' | 'social_media' | 'general';
 export type TargetLanguage = 
@@ -12,7 +11,6 @@ export interface GrammarSuggestion {
   replacement: string;
   reason: string;
   type: 'Ejaan' | 'Tata Bahasa' | 'Gaya Bahasa' | 'Tanda Baca' | 'Budaya';
-  kbbiLink?: string;
 }
 
 export interface PlagiarismResult {
@@ -24,8 +22,7 @@ export interface PlagiarismResult {
 export interface TranslationResult {
   translatedText: string;
   languageName: string;
-  readingGuide?: string; // Cara membaca dalam fonetik Indonesia
-  note?: string;
+  readingGuide?: string;
 }
 
 export interface AnalysisResult {
@@ -33,10 +30,9 @@ export interface AnalysisResult {
   suggestions: GrammarSuggestion[];
   summary: string;
   styleScore: number;
-  culturalNote?: string;
   plagiarism?: PlagiarismResult;
   translation?: TranslationResult;
-  readingGuideIndo?: string; // Cara baca teks Indonesia (pemenggalan suku kata)
+  readingGuideIndo?: string;
 }
 
 export interface HistoryItem {

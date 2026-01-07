@@ -1,4 +1,3 @@
-
 import React from 'react';
 
 interface ConsentModalProps {
@@ -23,15 +22,6 @@ export const ConsentModal: React.FC<ConsentModalProps> = ({ isOpen, onAccept, on
         </div>
 
         <div className="space-y-4 text-sm text-emerald-900 dark:text-emerald-100 mb-6">
-          <div className="bg-rose-50 dark:bg-rose-900/20 p-4 rounded-2xl border-l-4 border-rose-500">
-            <h3 className="font-bold mb-2 text-rose-900 dark:text-rose-300">🌸 Etika Beraksara (PENTING):</h3>
-            <p className="text-xs text-rose-800 dark:text-rose-200 leading-relaxed font-medium">
-              Tara adalah taman yang teduh. Mohon gunakan kata-kata yang <strong>sopan dan pantas</strong>. 
-              Sistem kami akan mendeteksi penggunaan kata-kata kotor atau tidak senonoh. 
-              Jika melanggar sebanyak <strong>2 kali</strong>, akses Anda ke seluruh fitur akan <strong>ditutup secara permanen</strong> demi menjaga kenyamanan bersama.
-            </p>
-          </div>
-
           <div className="bg-emerald-50 dark:bg-emerald-900/20 p-4 rounded-2xl">
             <h3 className="font-bold mb-2">📋 Data yang Kami Kumpulkan:</h3>
             <ul className="list-disc list-inside space-y-1 text-xs">
@@ -63,7 +53,7 @@ export const ConsentModal: React.FC<ConsentModalProps> = ({ isOpen, onAccept, on
         <div className="flex flex-col gap-3">
           <button
             onClick={onAccept}
-            className="w-full py-4 bg-emerald-700 text-white rounded-2xl font-bold hover:bg-emerald-800 transition-all active:scale-95 shadow-lg"
+            className="w-full py-4 bg-emerald-700 text-white rounded-2xl font-bold hover:bg-emerald-800 transition-all active:scale-95"
           >
             Saya Mengerti dan Setuju
           </button>
@@ -73,6 +63,13 @@ export const ConsentModal: React.FC<ConsentModalProps> = ({ isOpen, onAccept, on
           >
             Tidak, Bawa Saya Keluar
           </button>
+          <a
+            href="/PRIVACY_POLICY.md"
+            target="_blank"
+            className="text-center text-xs text-emerald-600 dark:text-emerald-400 underline"
+          >
+            Baca Kebijakan Privasi Lengkap →
+          </a>
         </div>
       </div>
     </div>

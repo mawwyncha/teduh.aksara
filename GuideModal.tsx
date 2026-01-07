@@ -46,14 +46,6 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
             </p>
           </div>
 
-          {/* New Etika Section */}
-          <div className="bg-rose-50/50 dark:bg-rose-900/10 p-4 rounded-2xl text-xs border border-rose-100 dark:border-rose-900/30">
-            <strong className="text-rose-900 dark:text-rose-300">🌸 Aturan Taman:</strong>
-            <p className="text-rose-800 dark:text-rose-200 mt-1 italic font-medium">
-              Gunakan bahasa yang santun. Penggunaan kata kasar yang berulang (2x) akan mengakibatkan penangguhan akses secara otomatis.
-            </p>
-          </div>
-
           <section className="bg-emerald-50/30 dark:bg-emerald-900/5 rounded-[2rem] p-7 space-y-5">
             {[ "Ketikan naskah di area menulis utama.", "Pilih gaya naskah sesuai kebutuhanmu.", "Klik tombol koreksi untuk penyelarasan instan."].map((step, i) => (
               <div key={i} className="flex gap-5 items-center">

@@ -1,4 +1,3 @@
-
 const DB_NAME = 'TeduhAksaraDB';
 const DB_VERSION = 2;
 const STORES = {
@@ -7,7 +6,6 @@ const STORES = {
   SETTINGS: 'settings'
 };
 
-// Cache koneksi database (Singleton Pattern)
 let dbCache: IDBDatabase | null = null;
 
 export const initDB = (): Promise<IDBDatabase> => {
@@ -61,17 +59,6 @@ export const clearStore = async (storeName: string): Promise<void> => {
     const transaction = db.transaction(storeName, 'readwrite');
     const store = transaction.objectStore(storeName);
     const request = store.clear();
-    request.onsuccess = () => resolve();
-    request.onerror = () => reject(request.error);
-  });
-};
-
-export const deleteData = async (storeName: string, key: string): Promise<void> => {
-  const db = await initDB();
-  return new Promise((resolve, reject) => {
-    const transaction = db.transaction(storeName, 'readwrite');
-    const store = transaction.objectStore(storeName);
-    const request = store.delete(key);
     request.onsuccess = () => resolve();
     request.onerror = () => reject(request.error);
   });
