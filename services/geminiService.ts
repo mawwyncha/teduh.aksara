@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type, Modality } from "@google/genai";
 import { AnalysisResult, WritingStyle, WritingContext, TargetLanguage } from "../types";
 
@@ -160,6 +161,7 @@ export const analyzeGrammar = async (
       2. Berikan 'readingGuideIndo' berupa pemenggalan suku kata teks Indonesia.
       3. Terjemahkan ke dialek target secara otentik.
       4. Berikan 'readingGuide' untuk teks terjemahan tersebut.
+      5. PENTING: Periksa apakah naskah mengandung kata-kata tidak senonoh, kotor, vulgar, atau melanggar etika kesantunan. Jika ya, setel 'isViolation' menjadi true.
       Respon WAJIB JSON sesuai schema.`,
       responseMimeType: "application/json",
       responseSchema: {
@@ -169,6 +171,7 @@ export const analyzeGrammar = async (
           summary: { type: Type.STRING },
           styleScore: { type: Type.INTEGER },
           readingGuideIndo: { type: Type.STRING },
+          isViolation: { type: Type.BOOLEAN, description: "True jika mengandung kata kasar/tidak senonoh" },
           suggestions: {
             type: Type.ARRAY,
             items: {
@@ -191,7 +194,7 @@ export const analyzeGrammar = async (
             required: ["translatedText", "readingGuide"]
           }
         },
-        required: ["correctedText", "summary", "styleScore", "suggestions", "translation", "readingGuideIndo"]
+        required: ["correctedText", "summary", "styleScore", "suggestions", "translation", "readingGuideIndo", "isViolation"]
       }
     },
   });
@@ -214,7 +217,6 @@ export const analyzeGrammar = async (
       config: { tools: [{ googleSearch: {} }] },
     });
     const chunks = pResponse.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-    // Slice to maximum 3 sources as requested
     const sources = chunks
       .filter(c => c.web)
       .map(c => ({ uri: c.web!.uri!, title: c.web!.title! }))

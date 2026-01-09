@@ -1,10 +1,10 @@
-
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 
 interface MascotProps {
   message: string;
   isLoading?: boolean;
   onAskInfo?: () => void;
+  forcedExpression?: Expression;
 }
 
 interface Particle {
@@ -18,11 +18,19 @@ interface Particle {
 
 type Expression = 'normal' | 'embarrassed' | 'happy' | 'shocked' | 'dizzy' | 'cool';
 
-export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo }) => {
+export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo, forcedExpression }) => {
   const [isShaking, setIsShaking] = useState(false);
   const [expression, setExpression] = useState<Expression>('normal');
   const [particles, setParticles] = useState<Particle[]>([]);
   const [reaction, setReaction] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (forcedExpression) {
+      setExpression(forcedExpression);
+    } else {
+      setExpression('normal');
+    }
+  }, [forcedExpression]);
 
   const expressions: { type: Expression; text: string }[] = [
     { type: 'embarrassed', text: "Aduh! Buah kersen dan daunku berjatuhan! 🍒🌿" },
@@ -56,7 +64,7 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo })
   }, []);
 
   const handleClick = () => {
-    if (isShaking) return;
+    if (isShaking || forcedExpression) return;
     
     playTaraSound();
     setIsShaking(true);
@@ -80,7 +88,7 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo })
     setTimeout(() => setIsShaking(false), 600);
     
     setTimeout(() => {
-      setExpression('normal');
+      if (!forcedExpression) setExpression('normal');
       setReaction(null);
       setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
     }, 3500);
@@ -199,7 +207,7 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo })
               <circle cx="50" cy="50" r="28" fill="#388e3c" />
             </g>
 
-            {expression !== 'normal' && (
+            {(expression !== 'normal' || forcedExpression) && (
               <g className="transition-opacity duration-300">
                 <circle cx="35" cy="62" r="6" fill="#f87171" opacity={expression === 'embarrassed' ? "0.6" : "0.3"} />
                 <circle cx="65" cy="62" r="6" fill="#f87171" opacity={expression === 'embarrassed' ? "0.6" : "0.3"} />

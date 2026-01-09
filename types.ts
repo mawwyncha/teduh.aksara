@@ -1,3 +1,4 @@
+
 export type WritingStyle = 'formal' | 'casual' | 'academic' | 'creative';
 export type WritingContext = 'business' | 'education' | 'social_media' | 'general';
 export type TargetLanguage = 
@@ -33,6 +34,7 @@ export interface AnalysisResult {
   plagiarism?: PlagiarismResult;
   translation?: TranslationResult;
   readingGuideIndo?: string;
+  isViolation?: boolean;
 }
 
 export interface HistoryItem {

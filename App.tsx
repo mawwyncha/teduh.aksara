@@ -26,14 +26,17 @@ const KEY_PREF_LANG = 'pref_lang';
 const KEY_DYSLEXIA = 'dyslexia_mode';
 const KEY_USAGE_COUNT = 'daily_usage_count';
 const KEY_USAGE_DATE = 'daily_usage_date';
-const KEY_CONSENT_ACCEPTED = 'consent_accepted';
+const KEY_VIOLATION_COUNT = 'violation_count';
 
 const MAX_DAILY_REQUESTS = 25;
+const MAX_VIOLATIONS = 2;
+const MAX_CHARACTERS = 1000;
 
-// List filter kata kasar sederhana (demonstrasi)
-const KATA_TERLARANG = ['anjing', 'bangsat', 'tolol', 'goblok', 'kontol', 'memek', 'ngentot', 'asu', 'perek', 'lonte', 'bajingan', 'brengsek'];
+/**
+ * DAFTAR KATA TERLARANG (PROFANITY & SECURITY)
+ */
+const FORBIDDEN_PATTERN = /(anjing|babi|bangsat|kontol|memek|jembut|ngentot|peler|asu|bajingan|tempik|tolol|goblok|idiot|perek|lonte|pantek|jablay|pecun|ngewe|itil|ngocok|brengsek|setan|iblis|pelacur|bencong|homo|lesbi|bejat|keparat|biadab|titit|vagina|penis|porn|bokep|lendir|sange|coly|coli|script|javascript:|eval\(|union\s+select|drop\s+table|insert\s+into|delete\s+from|--|<[^>]*>|onerror|onload)/gi;
 
-const LOADING_TRANSITION_MS = 8000; 
 const MESSAGE_ROTATION_MS = 3000;    
 
 const CALMING_MESSAGES = [
@@ -113,6 +116,15 @@ const LANG_OPTIONS = [
   { value: 'pt_tl', label: 'Portugis (Timor Leste) 🇹🇱' }
 ];
 
+const AdSlot: React.FC = () => (
+  <div className="mt-8 bg-emerald-50/30 dark:bg-emerald-900/10 p-5 rounded-[2rem] border border-emerald-100/50 dark:border-emerald-800/10 text-center group transition-all">
+    <span className="text-[9px] font-bold text-emerald-800/20 dark:text-emerald-400/20 uppercase tracking-[0.3em] mb-4 block">Ruang Sponsor</span>
+    <div className="aspect-video bg-emerald-100/20 dark:bg-emerald-950/40 rounded-2xl flex items-center justify-center border border-dashed border-emerald-200 dark:border-emerald-800/40 group-hover:bg-emerald-100/40 transition-all">
+       <p className="text-[10px] text-emerald-800/40 dark:text-emerald-400/30 italic font-medium">Slot Iklan Tersedia</p>
+    </div>
+  </div>
+);
+
 const SkeletonResult: React.FC = () => {
   return (
     <div className="space-y-12 animate-in fade-in duration-700">
@@ -128,19 +140,33 @@ const SkeletonResult: React.FC = () => {
   );
 };
 
+const BannedView: React.FC = () => (
+  <div className="fixed inset-0 z-[999] bg-rose-950 flex flex-col items-center justify-center p-8 text-center animate-in fade-in duration-1000">
+     <div className="w-32 h-32 bg-rose-500 rounded-full flex items-center justify-center mb-10 shadow-[0_0_50px_rgba(244,63,94,0.4)] animate-pulse">
+        <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+     </div>
+     <h1 className="text-4xl sm:text-5xl font-bold text-white mb-6 uppercase tracking-widest leading-tight">Akses Ditutup Permanen</h1>
+     <p className="text-rose-200/60 max-w-lg text-lg leading-relaxed italic mb-10">
+        "Kesantunan adalah akar dari dahan bahasa yang indah. Karena telah melanggar Etika Beraksara di taman Teduh Aksara sebanyak 2 kali, dahan komunikasimu di sini telah kami tutup selamanya."
+     </p>
+     <div className="bg-rose-900/30 border border-rose-500/20 p-6 rounded-3xl text-rose-300 text-sm font-bold uppercase tracking-widest">
+        Pelanggaran Etika Terdeteksi Sistem Otomatis
+     </div>
+  </div>
+);
+
 const App: React.FC = () => {
   const [inputText, setInputText] = useState('');
+  const [isViolationDetected, setIsViolationDetected] = useState(false);
   const [selectedStyle, setSelectedStyle] = useState<WritingStyle>('formal');
   const [selectedContext, setSelectedContext] = useState<WritingContext>('general');
   const [targetLang, setTargetLang] = useState<TargetLanguage>('en_us');
   const [isDyslexiaMode, setIsDyslexiaMode] = useState(false);
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [usageCount, setUsageCount] = useState(0);
+  const [violationCount, setViolationCount] = useState(0); 
   const [isHelpActive, setIsHelpActive] = useState(false);
-  
-  // State filter kata kasar
-  const [profanityCount, setProfanityCount] = useState(0);
-  const [isPermanentlyBlocked, setIsPermanentlyBlocked] = useState(false);
+  const [hasAcceptedConsent, setHasAcceptedConsent] = useState(false);
   
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -160,7 +186,6 @@ const App: React.FC = () => {
   const [isDevModalOpen, setIsDevModalOpen] = useState(false);
   const [isFanGalleryModalOpen, setIsFanGalleryModalOpen] = useState(false);
   const [isCatalogModalOpen, setIsCatalogModalOpen] = useState(false);
-  const [isConsentModalOpen, setIsConsentModalOpen] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
 
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -168,16 +193,55 @@ const App: React.FC = () => {
   const countdownIntervalRef = useRef<number | null>(null);
   const processActiveRef = useRef(false);
   const loadingTimerRef = useRef<number | null>(null);
+  const isCanceledRef = useRef(false);
+  const prevViolationRef = useRef(false);
 
   const isBusy = isAnalyzing || isSpeaking || isRecording || isTranscribing;
   const isLimitReached = usageCount >= MAX_DAILY_REQUESTS;
-  const isBlocked = isPermanentlyBlocked;
+  const isBanned = violationCount >= MAX_VIOLATIONS;
+
+  const playWarningChime = useCallback(() => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+      setTimeout(() => ctx.close(), 500);
+    } catch (e) {
+      console.warn("Audio chime failed", e);
+    }
+  }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const val = e.target.value;
+    setInputText(val);
+    const forbidden = FORBIDDEN_PATTERN.test(val);
+    FORBIDDEN_PATTERN.lastIndex = 0;
+
+    if (forbidden && !prevViolationRef.current) {
+      playWarningChime();
+      setMascotMessage("Dahanku gemetar... mohon gunakan bahasa yang santun, Sahabat.");
+    } else if (!forbidden && prevViolationRef.current) {
+      setMascotMessage("Terima kasih telah merapikan naskahmu kembali.");
+    }
+    setIsViolationDetected(forbidden);
+    prevViolationRef.current = forbidden;
+  };
 
   useEffect(() => {
     (async () => {
       try {
         const today = new Date().toISOString().split('T')[0];
-        const [d, h, s, c, l, dy, savedUsageDate, savedUsageCount, consentAccepted] = await Promise.all([
+        const [d, h, s, c, l, dy, savedUsageDate, savedUsageCount, savedViolations] = await Promise.all([
           getData(STORE_DRAFT, KEY_CURRENT_DRAFT),
           getData(STORE_HISTORY, KEY_HISTORY_LIST),
           getData(STORE_SETTINGS, KEY_PREF_STYLE),
@@ -186,19 +250,22 @@ const App: React.FC = () => {
           getData(STORE_SETTINGS, KEY_DYSLEXIA),
           getData(STORE_SETTINGS, KEY_USAGE_DATE),
           getData(STORE_SETTINGS, KEY_USAGE_COUNT),
-          getData(STORE_SETTINGS, KEY_CONSENT_ACCEPTED)
+          getData(STORE_SETTINGS, KEY_VIOLATION_COUNT)
         ]);
 
-        if (d) setInputText(d);
+        if (d) {
+          setInputText(d);
+          const forbidden = FORBIDDEN_PATTERN.test(d);
+          setIsViolationDetected(forbidden);
+          prevViolationRef.current = forbidden;
+          FORBIDDEN_PATTERN.lastIndex = 0;
+        }
         if (h) setHistory(h);
         if (s) setSelectedStyle(s);
         if (c) setSelectedContext(c);
         if (l) setTargetLang(l);
         if (dy !== undefined) setIsDyslexiaMode(dy);
-
-        if (!consentAccepted) {
-          setIsConsentModalOpen(true);
-        }
+        if (savedViolations !== undefined) setViolationCount(savedViolations);
 
         if (savedUsageDate !== today) {
           setUsageCount(0);
@@ -218,20 +285,14 @@ const App: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const isAnyModalOpen = isHistoryModalOpen || isGuideModalOpen || isDevModalOpen || isLimitModalOpen || isFanGalleryModalOpen || isCatalogModalOpen || !!permissionType || isConsentModalOpen;
-    if (isAnyModalOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
-    return () => {
-      document.body.style.overflow = 'auto';
-    };
-  }, [isHistoryModalOpen, isGuideModalOpen, isDevModalOpen, isLimitModalOpen, isFanGalleryModalOpen, isCatalogModalOpen, permissionType, isConsentModalOpen]);
+    const isAnyModalOpen = !hasAcceptedConsent || isHistoryModalOpen || isGuideModalOpen || isDevModalOpen || isLimitModalOpen || isFanGalleryModalOpen || isCatalogModalOpen || !!permissionType || isBanned;
+    document.body.style.overflow = isAnyModalOpen ? 'hidden' : 'auto';
+    return () => { document.body.style.overflow = 'auto'; };
+  }, [hasAcceptedConsent, isHistoryModalOpen, isGuideModalOpen, isDevModalOpen, isLimitModalOpen, isFanGalleryModalOpen, isCatalogModalOpen, permissionType, isBanned]);
 
   useEffect(() => {
     let interval: number | null = null;
-    if (isAnalyzing && !showSkeleton) {
+    if ((isAnalyzing || isSpeaking) && !showSkeleton) {
       interval = window.setInterval(() => {
         setLoadingMsg(CALMING_MESSAGES[Math.floor(Math.random() * CALMING_MESSAGES.length)]);
         setFunFactMsg(TARA_FUN_FACTS[Math.floor(Math.random() * TARA_FUN_FACTS.length)]);
@@ -240,7 +301,7 @@ const App: React.FC = () => {
     return () => {
       if (interval) window.clearInterval(interval);
     };
-  }, [isAnalyzing, showSkeleton]);
+  }, [isAnalyzing, isSpeaking, showSkeleton]);
 
   const incrementUsage = useCallback(async () => {
     const newCount = usageCount + 1;
@@ -248,26 +309,29 @@ const App: React.FC = () => {
     await saveData(STORE_SETTINGS, KEY_USAGE_COUNT, newCount);
   }, [usageCount]);
 
+  const incrementViolations = useCallback(async () => {
+    const newCount = violationCount + 1;
+    setViolationCount(newCount);
+    await saveData(STORE_SETTINGS, KEY_VIOLATION_COUNT, newCount);
+  }, [violationCount]);
+
   const handleCancelProcess = useCallback((silent = false) => {
+    isCanceledRef.current = true;
     processActiveRef.current = false;
     setIsAnalyzing(false);
     setShowSkeleton(false);
     setIsSpeaking(false);
     setIsTranscribing(false);
     if (loadingTimerRef.current) window.clearTimeout(loadingTimerRef.current);
-    if (mediaRecorderRef.current && isRecording) {
-      mediaRecorderRef.current.stop();
-      setIsRecording(false);
-    }
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') mediaRecorderRef.current.stop();
+    setIsRecording(false);
     if (countdownIntervalRef.current) window.clearInterval(countdownIntervalRef.current);
-    if (!silent) setMascotMessage("Proses dibatalkan sesuai permintaanmu, Sahabat.");
-  }, [isRecording]);
+    if (!silent) setMascotMessage("Proses dibatalkan, Sahabat.");
+  }, []);
 
   useEffect(() => {
     if (!isLoaded) return;
-    const timeoutId = setTimeout(() => {
-      saveData(STORE_DRAFT, KEY_CURRENT_DRAFT, inputText);
-    }, 800);
+    const timeoutId = setTimeout(() => { saveData(STORE_DRAFT, KEY_CURRENT_DRAFT, inputText); }, 800);
     return () => clearTimeout(timeoutId);
   }, [inputText, isLoaded]);
 
@@ -282,14 +346,8 @@ const App: React.FC = () => {
     }
   }, [history, selectedStyle, selectedContext, targetLang, isDyslexiaMode, isLoaded]);
 
-  // Fungsi pengecekan kata kasar
-  const containsProfanity = (text: string) => {
-    const lowerText = text.toLowerCase();
-    return KATA_TERLARANG.some(word => lowerText.includes(word));
-  };
-
   const startMicProcess = async () => {
-    if (isBlocked) return;
+    isCanceledRef.current = false;
     processActiveRef.current = true;
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -298,19 +356,29 @@ const App: React.FC = () => {
       audioChunksRef.current = [];
       mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) audioChunksRef.current.push(e.data); };
       mediaRecorder.onstop = async () => {
+        if (isCanceledRef.current) { stream.getTracks().forEach(track => track.stop()); return; }
         const audioBlob = new Blob(audioChunksRef.current, { type: mediaRecorder.mimeType });
         setIsTranscribing(true);
         const reader = new FileReader();
         reader.readAsDataURL(audioBlob);
         reader.onloadend = async () => {
-          if (!processActiveRef.current) return;
+          if (!processActiveRef.current || isCanceledRef.current) { setIsTranscribing(false); return; }
           const base64Audio = (reader.result as string).split(',')[1];
-          const transcribedText = await transcribeAudio(base64Audio, mediaRecorder.mimeType);
-          if (processActiveRef.current && transcribedText) {
-            setInputText(prev => prev ? `${prev} ${transcribedText}` : transcribedText);
-            setMascotMessage("Aku sudah menyalin suaramu ke kotak aksara.");
-            incrementUsage();
-          }
+          try {
+            const transcribedText = await transcribeAudio(base64Audio, mediaRecorder.mimeType);
+            if (processActiveRef.current && !isCanceledRef.current && transcribedText) {
+              const newText = inputText ? `${inputText} ${transcribedText}` : transcribedText;
+              const finalVal = newText.slice(0, MAX_CHARACTERS);
+              setInputText(finalVal);
+              const forbidden = FORBIDDEN_PATTERN.test(finalVal);
+              if (forbidden && !prevViolationRef.current) playWarningChime();
+              setIsViolationDetected(forbidden);
+              prevViolationRef.current = forbidden;
+              FORBIDDEN_PATTERN.lastIndex = 0;
+              setMascotMessage("Aku sudah menyalin suaramu ke kotak aksara.");
+              incrementUsage();
+            }
+          } catch (e) { setMascotMessage("Gagal menyalin suaramu."); }
           setIsTranscribing(false);
           processActiveRef.current = false;
         };
@@ -334,24 +402,12 @@ const App: React.FC = () => {
   };
 
   const executeAnalysis = async (plagiarism: boolean) => {
-    if (isBlocked) return;
-    
-    // Check profanity before proceeding
-    if (containsProfanity(inputText)) {
-      const newCount = profanityCount + 1;
-      setProfanityCount(newCount);
-      if (newCount >= 2) {
-        setIsPermanentlyBlocked(true);
-        setMascotMessage("Maaf, Sahabat. Dahan bahasaku tidak bisa menerima kata-kata tersebut. Aksesmu ditangguhkan demi menjaga keteduhan taman ini.");
-      } else {
-        setMascotMessage("Aduh! Bahasamu kurang santun, Sahabat. Tara tidak bisa memproses naskah dengan kata-kata tersebut. Mohon dirawat kembali diksimu.");
-      }
-      return;
-    }
-
+    if (isViolationDetected) return; 
+    isCanceledRef.current = false;
     processActiveRef.current = true;
     setIsAnalyzing(true);
-    setShowSkeleton(false);
+    // CRITICAL FIX: Set showSkeleton to false to let the jokes/facts overlay appear
+    setShowSkeleton(false); 
     setLoadingMsg(CALMING_MESSAGES[Math.floor(Math.random() * CALMING_MESSAGES.length)]);
     setFunFactMsg(TARA_FUN_FACTS[Math.floor(Math.random() * TARA_FUN_FACTS.length)]);
     
@@ -361,16 +417,21 @@ const App: React.FC = () => {
        setMascotMessage("Tara sedang menyisir dahan bahasamu...");
     }
 
-    loadingTimerRef.current = window.setTimeout(() => {
-      if (processActiveRef.current) {
-        setShowSkeleton(true);
-        setMascotMessage(plagiarism ? "Penelusuran dahan web hampir selesai..." : "Perapian aksara hampir selesai...");
-      }
-    }, LOADING_TRANSITION_MS);
-
     try {
       const data = await analyzeGrammar(inputText, selectedStyle, selectedContext, targetLang, plagiarism);
-      if (!processActiveRef.current) return;
+      if (!processActiveRef.current || isCanceledRef.current) return;
+
+      if (data.isViolation) {
+        await incrementViolations();
+        playWarningChime();
+        setMascotMessage(violationCount + 1 >= MAX_VIOLATIONS ? "Dahanku berguncang... Etika Beraksara dilanggar." : "Hati-hati, Sahabat. Naskahmu melanggar Etika Beraksara. Ini peringatan pertama.");
+        setIsViolationDetected(true);
+        prevViolationRef.current = true;
+        setIsAnalyzing(false);
+        processActiveRef.current = false;
+        return;
+      }
+
       setResult(data);
       setMascotMessage(data.summary);
       incrementUsage();
@@ -378,65 +439,62 @@ const App: React.FC = () => {
     } catch (error) { if (processActiveRef.current) setMascotMessage("Dahanku berguncang, coba lagi ya."); }
     finally { 
       setIsAnalyzing(false); 
-      setShowSkeleton(false);
       processActiveRef.current = false; 
-      if (loadingTimerRef.current) clearTimeout(loadingTimerRef.current);
     }
   };
 
   const handleMicClick = () => {
-    if (isBusy || isBlocked) return;
+    if (isBusy) return;
     if (isLimitReached) { setIsLimitModalOpen(true); return; }
     setPermissionType('mic');
   };
 
   const handlePlagiarismClick = () => {
-    if (!inputText.trim() || isBusy || isBlocked) return;
+    if (!inputText.trim() || isBusy || isViolationDetected) return;
     if (isLimitReached) { setIsLimitModalOpen(true); return; }
     setPermissionType('plagiarism');
   };
 
   const handleAnalyzeNormal = () => {
-    if (!inputText.trim() || isBusy || isBlocked) return;
+    if (!inputText.trim() || isBusy || isViolationDetected) return;
     if (isLimitReached) { setIsLimitModalOpen(true); return; }
     executeAnalysis(false);
   };
 
   const handleSpeech = async () => {
-    if (isBusy || isBlocked) return;
+    if (isBusy) return;
     if (isLimitReached) { setIsLimitModalOpen(true); return; }
     const textToRead = result?.correctedText || inputText;
     if (!textToRead.trim()) return;
+    isCanceledRef.current = false;
     processActiveRef.current = true;
     setIsSpeaking(true);
+    setLoadingMsg(CALMING_MESSAGES[Math.floor(Math.random() * CALMING_MESSAGES.length)]);
+    setFunFactMsg(TARA_FUN_FACTS[Math.floor(Math.random() * TARA_FUN_FACTS.length)]);
+    setMascotMessage("Tara sedang merangkai suara untuk naskahmu...");
     try {
       await generateSpeech(textToRead, result?.translation?.translatedText);
-      setMascotMessage("Begitulah alunan aksaramu, Sahabat.");
+      if (!isCanceledRef.current) setMascotMessage("Begitulah alunan aksaramu, Sahabat.");
       incrementUsage();
-    } catch (error) { setMascotMessage("Aduh, suaraku tersangkut."); }
+    } catch (error) { if (!isCanceledRef.current) setMascotMessage("Aduh, suaraku tersangkut."); }
     finally { setIsSpeaking(false); processActiveRef.current = false; }
   };
 
   const handleClear = useCallback(() => {
-    if (isBlocked) return;
     setInputText('');
+    setIsViolationDetected(false);
+    prevViolationRef.current = false;
     setResult(null);
     setMascotMessage("Lembaran baru telah siap, mari mulai menulis kembali.");
-  }, [isBlocked]);
-
-  const handleAcceptConsent = () => {
-    saveData(STORE_SETTINGS, KEY_CONSENT_ACCEPTED, true);
-    setIsConsentModalOpen(false);
-  };
-
-  const handleRejectConsent = () => {
-    window.location.href = "https://www.google.com";
-  };
+  }, []);
 
   if (!isLoaded) return null;
+  if (isBanned) return <BannedView />;
 
   const quotaPercent = (usageCount / MAX_DAILY_REQUESTS) * 100;
   const isQuotaLow = MAX_DAILY_REQUESTS - usageCount <= 5;
+  const charCount = inputText.length;
+  const isCharLimitNear = charCount >= MAX_CHARACTERS * 0.9;
 
   const getSuggestionTypeColor = (type: string) => {
     switch(type) {
@@ -451,56 +509,32 @@ const App: React.FC = () => {
   return (
     <Layout 
       activeModal={isHistoryModalOpen ? 'history' : isGuideModalOpen ? 'guide' : isDevModalOpen ? 'dev' : isFanGalleryModalOpen ? 'gallery' : isCatalogModalOpen ? 'catalog' : null}
-      onHistoryClick={() => !isBusy && !isBlocked && setIsHistoryModalOpen(true)}
-      onGuideClick={() => !isBusy && !isBlocked && setIsGuideModalOpen(true)}
-      onDevClick={() => !isBusy && !isBlocked && setIsDevModalOpen(true)}
-      onGalleryClick={() => !isBusy && !isBlocked && setIsFanGalleryModalOpen(true)}
-      onCatalogClick={() => !isBusy && !isBlocked && setIsCatalogModalOpen(true)}
-      onEditorClick={() => { if(!isBusy && !isBlocked) { setIsHistoryModalOpen(false); setIsGuideModalOpen(false); setIsDevModalOpen(false); setIsFanGalleryModalOpen(false); setIsCatalogModalOpen(false); window.scrollTo({top:0, behavior:'smooth'}); }}}
+      onHistoryClick={() => !isBusy && setIsHistoryModalOpen(true)}
+      onGuideClick={() => !isBusy && setIsGuideModalOpen(true)}
+      onDevClick={() => !isBusy && setIsDevModalOpen(true)}
+      onGalleryClick={() => !isBusy && setIsFanGalleryModalOpen(true)}
+      onCatalogClick={() => !isBusy && setIsCatalogModalOpen(true)}
+      onEditorClick={() => { if(!isBusy) { setIsHistoryModalOpen(false); setIsGuideModalOpen(false); setIsDevModalOpen(false); setIsFanGalleryModalOpen(false); setIsCatalogModalOpen(false); window.scrollTo({top:0, behavior:'smooth'}); }}}
       isHelpActive={isHelpActive}
-      onHelpToggle={() => !isBlocked && setIsHelpActive(!isHelpActive)}
+      onHelpToggle={() => setIsHelpActive(!isHelpActive)}
     >
-      {/* Sidebar Buttons */}
       <div className="fixed left-4 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-40">
-        <button 
-          disabled={isBusy || isBlocked} 
-          onClick={() => setIsDyslexiaMode(!isDyslexiaMode)} 
-          className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isDyslexiaMode ? 'bg-amber-600 text-white' : 'bg-white dark:bg-[#1a110c] text-amber-600 hover:scale-110 active:scale-90'} disabled:opacity-20`}
-          data-help="Mode Khusus Disleksia. Mengubah font agar lebih mudah dibaca oleh sahabat dengan kebutuhan khusus."
-        >
-          <span className="font-bold text-xl">D</span>
-        </button>
-        <button 
-          onClick={handleMicClick} 
-          disabled={isBusy || isBlocked} 
-          className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-white dark:bg-[#1a110c] shadow-2xl flex items-center justify-center text-rose-600 transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${isLimitReached || isBlocked ? 'grayscale opacity-20' : ''}`}
-          data-help="Rekam Suaramu. Tara akan mendengarkan naskahmu selama 5 detik dan mengubahnya menjadi aksara secara otomatis."
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
-        </button>
-        <button 
-          onClick={handleSpeech} 
-          disabled={isBusy || isBlocked} 
-          className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-white dark:bg-[#1a110c] shadow-2xl flex items-center justify-center text-emerald-600 transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${isLimitReached || isBlocked ? 'grayscale opacity-20' : ''}`}
-          data-help="Dengarkan Naskah. Biarkan Tara membacakan hasil perbaikan atau naskahmu dengan suara yang menenangkan."
-        >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
-        </button>
+        <button disabled={isBusy} onClick={() => setIsDyslexiaMode(!isDyslexiaMode)} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isDyslexiaMode ? 'bg-amber-600 text-white' : 'bg-white dark:bg-[#1a110c] text-amber-600 hover:scale-110 active:scale-90'}`} data-help="Mode Khusus Disleksia."><span className="font-bold text-xl">D</span></button>
+        <button onClick={handleMicClick} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-white dark:bg-[#1a110c] shadow-2xl flex items-center justify-center text-rose-600 transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${isLimitReached ? 'grayscale opacity-50' : ''}`} data-help="Rekam Suaramu."><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+        <button onClick={handleSpeech} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full bg-white dark:bg-[#1a110c] shadow-2xl flex items-center justify-center text-emerald-600 transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${isLimitReached ? 'grayscale opacity-50' : ''}`} data-help="Dengarkan Naskah."><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 max-w-7xl w-full mx-auto pb-32">
         <div className="lg:col-span-8 space-y-8">
-          <div data-help="Tara si Pohon Kersen. Ketuk dia untuk melihat reaksinya atau minta dia menjelaskan platform ini.">
-            <Mascot message={mascotMessage} isLoading={isBusy} onAskInfo={async () => {
-              if (isBusy || isBlocked) return;
-              if (isLimitReached) { setIsLimitModalOpen(true); return; }
-              const info = await askTaraAboutPlatform();
-              setMascotMessage(info);
-              incrementUsage();
-            }} />
-          </div>
+          <Mascot message={mascotMessage} isLoading={isBusy} forcedExpression={isViolationDetected ? 'shocked' : undefined} onAskInfo={async () => {
+            if (isBusy) return;
+            if (isLimitReached) { setIsLimitModalOpen(true); return; }
+            const info = await askTaraAboutPlatform();
+            setMascotMessage(info);
+            incrementUsage();
+          }} />
 
-          <div className="bg-white dark:bg-forest-900 p-5 rounded-[2rem] border border-emerald-50 dark:border-emerald-800/10 shadow-sm" data-help="Kapasitas Harianmu. Tara punya batas energi 25 permintaan per hari agar dahan bahasanya tetap segar.">
+          <div className="bg-white dark:bg-forest-900 p-5 rounded-[2rem] border border-emerald-50 dark:border-emerald-800/10 shadow-sm">
              <div className="flex justify-between items-center mb-3">
                 <div className="flex items-center gap-2">
                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
@@ -510,191 +544,97 @@ const App: React.FC = () => {
                    {MAX_DAILY_REQUESTS - usageCount} / {MAX_DAILY_REQUESTS} Tersisa
                 </span>
              </div>
-             <div className="quota-bar-container">
-                <div className={`quota-bar-fill ${isLimitReached ? 'bg-rose-500' : isQuotaLow ? 'bg-amber-500' : 'bg-emerald-600'}`} style={{ width: `${quotaPercent}%` }}></div>
-             </div>
+             <div className="quota-bar-container"><div className={`quota-bar-fill ${isLimitReached ? 'bg-rose-500' : isQuotaLow ? 'bg-amber-500' : 'bg-emerald-600'}`} style={{ width: `${quotaPercent}%` }}></div></div>
           </div>
 
           <section className="grid grid-cols-1 md:grid-cols-3 gap-6 bg-white dark:bg-forest-900 p-6 rounded-[2.5rem] shadow-xl border border-emerald-50 dark:border-emerald-800/20">
-            <div className="flex flex-col gap-1.5" data-help="Pilih Gaya Penulisan: Baku (Formal), Luwes (Santai), Ilmiah, atau Kreatif.">
+            <div className="flex flex-col gap-1.5">
               <label className="text-[10px] font-bold text-emerald-800/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] ml-4">Gaya</label>
-              <select disabled={isBusy || isBlocked} value={selectedStyle} onChange={(e) => setSelectedStyle(e.target.value as any)} className="bg-forest-50 dark:bg-forest-950 p-3.5 rounded-2xl font-bold text-emerald-800 dark:text-emerald-200 outline-none border border-transparent focus:border-emerald-200 disabled:opacity-30">
-                {STYLE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
+              <select disabled={isBusy} value={selectedStyle} onChange={(e) => setSelectedStyle(e.target.value as any)} className="bg-forest-50 dark:bg-forest-950 p-3.5 rounded-2xl font-bold text-emerald-800 dark:text-emerald-200 outline-none border border-transparent focus:border-emerald-200">{STYLE_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
             </div>
-            <div className="flex flex-col gap-1.5" data-help="Tentukan Konteks Naskah: Bisnis, Edukasi, Media Sosial, atau Umum agar Tara bisa menyarankan diksi yang tepat.">
-              <label className="text-[10px] font-bold text-emerald-800/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] ml-4">Konteks</label>
-              <select disabled={isBusy || isBlocked} value={selectedContext} onChange={(e) => setSelectedContext(e.target.value as any)} className="bg-forest-50 dark:bg-forest-950 p-3.5 rounded-2xl font-bold text-emerald-800 dark:text-emerald-200 outline-none border border-transparent focus:border-emerald-200 disabled:opacity-30">
-                {CONTEXT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-emerald-800/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] mb-1.5 ml-4">Konteks</label>
+              <select disabled={isBusy} value={selectedContext} onChange={(e) => setSelectedContext(e.target.value as any)} className="bg-forest-50 dark:bg-forest-950 p-3.5 rounded-2xl font-bold text-emerald-800 dark:text-emerald-200 outline-none border border-transparent focus:border-emerald-200">{CONTEXT_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
             </div>
-            <div className="flex flex-col gap-1.5" data-help="Pilih Bahasa Target. Tara bisa menerjemahkan naskahmu ke berbagai dialek Nusantara atau Bahasa Inggris secara otentik.">
-              <label className="text-[10px] font-bold text-emerald-800/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] ml-4">Bahasa Target</label>
-              <select disabled={isBusy || isBlocked} value={targetLang} onChange={(e) => setTargetLang(e.target.value as any)} className="bg-forest-50 dark:bg-forest-950 p-3.5 rounded-2xl font-bold text-emerald-800 dark:text-emerald-200 outline-none border border-transparent focus:border-emerald-200 disabled:opacity-30">
-                {LANG_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}
-              </select>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-[10px] font-bold text-emerald-800/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] mb-1.5 ml-4">Bahasa Target</label>
+              <select disabled={isBusy} value={targetLang} onChange={(e) => setTargetLang(e.target.value as any)} className="bg-forest-50 dark:bg-forest-950 p-3.5 rounded-2xl font-bold text-emerald-800 dark:text-emerald-200 outline-none border border-transparent focus:border-emerald-200">{LANG_OPTIONS.map(o => <option key={o.value} value={o.value}>{o.label}</option>)}</select>
             </div>
           </section>
 
-          <section className="bg-white dark:bg-forest-900 rounded-[3.5rem] p-6 md:p-10 shadow-xl relative border border-emerald-50 dark:border-emerald-800/20">
-            {inputText && !isBusy && !isBlocked && (
-              <button 
-                onClick={handleClear} 
-                className="absolute top-8 right-8 p-3 text-emerald-800/20 hover:text-rose-600 transition-all active:scale-90 z-10" 
-                title="Bersihkan naskah"
-                data-help="Bersihkan Kotak Aksara. Menghapus seluruh tulisanmu untuk mulai dari awal dengan lembaran baru."
-              >
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" /></svg>
-              </button>
-            )}
+          <section className={`bg-white dark:bg-forest-900 rounded-[3.5rem] p-6 md:p-10 shadow-xl relative border transition-all duration-300 ${isViolationDetected ? 'border-rose-500 shadow-rose-500/10 animate-shake' : 'border-emerald-50 dark:border-emerald-800/20'}`}>
+            {inputText && !isBusy && (<button onClick={handleClear} className="absolute top-8 right-8 p-3 text-emerald-800/20 hover:text-rose-600 transition-all active:scale-90 z-10"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" /></svg></button>)}
 
-            {isBusy && !showSkeleton && !isBlocked && (
+            {isBusy && !showSkeleton && (
               <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-white/95 dark:bg-forest-950/95 backdrop-blur-md rounded-[3.5rem] p-8 sm:p-12 text-center animate-in fade-in">
                 {isRecording ? (
-                  <div className="flex flex-col items-center">
-                    <div className="relative w-32 h-32 flex items-center justify-center">
-                      <div className="absolute inset-0 bg-rose-500/20 rounded-full animate-ping"></div>
-                      <div className="w-24 h-24 bg-rose-600 rounded-full flex items-center justify-center shadow-lg"><span className="text-4xl font-bold text-white">{recordingCountdown}</span></div>
-                    </div>
-                    <p className="mt-8 text-rose-800 dark:text-rose-400 font-bold text-2xl uppercase tracking-widest">Mendengarkan...</p>
+                  <div className="flex flex-col items-center w-full max-w-sm">
+                    <div className="relative w-32 h-32 flex items-center justify-center mb-4"><div className="absolute inset-0 bg-rose-500/20 rounded-full animate-ping"></div><div className="w-24 h-24 bg-rose-600 rounded-full flex items-center justify-center shadow-lg"><span className="text-4xl font-bold text-white">{recordingCountdown}</span></div></div>
+                    <p className="text-rose-800 dark:text-rose-400 font-bold text-2xl uppercase tracking-widest mb-6">Mendengarkan...</p>
+                    <button onClick={() => handleCancelProcess()} className="px-10 py-4 bg-rose-50 dark:bg-rose-900/20 border-2 border-rose-200 dark:border-rose-800/30 rounded-full text-base font-bold text-rose-600 dark:text-rose-400 hover:bg-rose-100 transition-all active:scale-95 shadow-sm">Batal Merekam</button>
                   </div>
                 ) : (
                   <div className="max-w-md w-full space-y-8 flex flex-col items-center">
                     <div className="w-16 h-16 border-4 border-emerald-100 border-t-emerald-600 rounded-full animate-spin"></div>
-                    
                     <div className="space-y-6">
-                      <p className="text-emerald-900 dark:text-emerald-50 font-bold italic text-xl leading-relaxed animate-in fade-in slide-in-from-bottom-2 duration-500" key={loadingMsg}>
-                        "{loadingMsg}"
-                      </p>
-                      
+                      <p className="text-emerald-900 dark:text-emerald-50 font-bold italic text-xl leading-relaxed animate-in fade-in slide-in-from-bottom-2 duration-500" key={loadingMsg}>"{loadingMsg}"</p>
                       <div className="bg-emerald-50/50 dark:bg-emerald-900/20 p-6 rounded-[2.5rem] border border-emerald-100 dark:border-emerald-800/20 relative animate-in zoom-in-95 duration-500" key={funFactMsg}>
-                         <div className="flex items-center gap-2 mb-3 justify-center">
-                            <span className="text-sm">💡</span>
-                            <span className="text-[10px] font-bold text-emerald-800/40 uppercase tracking-widest">Tahukah Kamu?</span>
-                         </div>
-                         <p className="text-sm text-emerald-800 dark:text-emerald-200 font-medium leading-relaxed italic">
-                            {funFactMsg}
-                         </p>
+                         <div className="flex items-center gap-2 mb-3 justify-center"><span className="text-sm">💡</span><span className="text-[10px] font-bold text-emerald-800/40 uppercase tracking-widest">Tahukah Kamu?</span></div>
+                         <p className="text-sm text-emerald-800 dark:text-emerald-200 font-medium leading-relaxed italic">{funFactMsg}</p>
                       </div>
                     </div>
-
                     <button onClick={() => handleCancelProcess()} className="px-8 py-3 bg-white dark:bg-forest-900 border-2 border-emerald-100 dark:border-emerald-800 rounded-full text-sm font-bold text-emerald-600 dark:text-emerald-400 hover:bg-emerald-50 transition-all active:scale-95 mt-4">Batalkan Proses</button>
                   </div>
                 )}
               </div>
             )}
             
-            {/* Blocked Overlay */}
-            {isBlocked && (
-               <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-rose-50/90 dark:bg-rose-950/90 backdrop-blur-xl rounded-[3.5rem] p-12 text-center animate-in fade-in">
-                  <div className="w-20 h-20 bg-rose-600 rounded-full flex items-center justify-center text-white mb-6 shadow-xl">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
-                  </div>
-                  <h3 className="text-2xl font-bold text-rose-900 dark:text-rose-100 mb-4">Akses Ditangguhkan</h3>
-                  <p className="text-rose-800/60 dark:text-rose-200/50 font-medium italic max-w-sm leading-relaxed">
-                    Penggunaan kata-kata yang tidak pantas secara berulang telah terdeteksi. Untuk menjaga keteduhan taman aksara ini, akses menulis Anda telah ditutup.
-                  </p>
-               </div>
-            )}
+            <div className="relative">
+              <textarea value={inputText} disabled={isBusy} onChange={handleInputChange} maxLength={MAX_CHARACTERS} placeholder="Tuliskan naskahmu di sini..." className={`w-full min-h-[350px] bg-transparent resize-none border-none outline-none text-xl leading-relaxed placeholder-emerald-100 pr-12 transition-colors ${isViolationDetected ? 'text-rose-600 dark:text-rose-400' : 'text-emerald-950 dark:text-emerald-50'}`} />
+              <div className={`absolute bottom-0 right-0 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-300 ${isViolationDetected ? 'text-rose-600 animate-pulse' : isCharLimitNear ? 'text-rose-500 scale-110' : charCount > MAX_CHARACTERS * 0.7 ? 'text-amber-500' : 'text-emerald-700/30 dark:text-emerald-400/20'}`}>{isViolationDetected ? '⚠️ POLA TERLARANG' : `${charCount} / ${MAX_CHARACTERS}`}</div>
+            </div>
 
-            <textarea 
-              value={inputText} 
-              disabled={isBusy || isBlocked} 
-              onChange={(e) => setInputText(e.target.value)} 
-              placeholder="Tuliskan naskahmu di sini..." 
-              className="w-full min-h-[350px] bg-transparent resize-none border-none outline-none text-emerald-950 dark:text-emerald-50 text-xl leading-relaxed placeholder-emerald-100 pr-12 disabled:opacity-30" 
-              data-help="Kotak Aksara. Ketik atau tempelkan naskah yang ingin kamu rawat di sini."
-            />
             <div className="flex flex-col sm:flex-row gap-4 mt-8">
-              <button 
-                onClick={handleAnalyzeNormal} 
-                disabled={!inputText.trim() || isBusy || isLimitReached || isBlocked} 
-                className={`flex-1 py-5 bg-emerald-700 text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg shadow-emerald-700/20 disabled:opacity-10 ${isLimitReached || isBlocked ? 'grayscale cursor-not-allowed' : ''}`}
-                data-help="Mulai Koreksi. Tara akan menganalisis ejaan, tata bahasa, dan tanda baca sesuai gaya yang kamu pilih."
-              >
-                Koreksi & Terjemahkan
-              </button>
-              <button 
-                onClick={handlePlagiarismClick} 
-                disabled={!inputText.trim() || isBusy || isLimitReached || isBlocked} 
-                className={`flex-1 py-5 premium-shimmer text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg disabled:opacity-10 ${isLimitReached || isBlocked ? 'grayscale cursor-not-allowed' : ''}`}
-                data-help="Cek Plagiarisme. Tara akan menelusuri dahan-dahan web untuk memastikan naskahmu murni dan asli."
-              >
-                Cek Plagiarisme
-              </button>
+              <button onClick={handleAnalyzeNormal} disabled={!inputText.trim() || isBusy || isLimitReached || isViolationDetected} className={`flex-1 py-5 bg-emerald-700 text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg shadow-emerald-700/20 disabled:opacity-30 ${isLimitReached || isViolationDetected ? 'grayscale cursor-not-allowed' : ''}`}>Koreksi & Terjemahkan</button>
+              <button onClick={handlePlagiarismClick} disabled={!inputText.trim() || isBusy || isLimitReached || isViolationDetected} className={`flex-1 py-5 premium-shimmer text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg disabled:opacity-30 ${isLimitReached || isViolationDetected ? 'grayscale cursor-not-allowed' : ''}`}>Cek Plagiarisme</button>
             </div>
           </section>
 
           {showSkeleton && isAnalyzing && <SkeletonResult />}
 
-          {result && !isAnalyzing && !isBlocked && (
+          {result && !isAnalyzing && (
             <div id="result-section" className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-               <div className="bg-emerald-50/40 dark:bg-forest-950/40 p-10 rounded-[3rem] border border-emerald-100 dark:border-emerald-900/30" data-help="Naskah yang telah dirapikan. Tara telah menyesuaikan diksi dan aturan bahasanya untukmu.">
+               <div className="bg-emerald-50/40 dark:bg-forest-950/40 p-10 rounded-[3rem] border border-emerald-100 dark:border-emerald-900/30">
                   <h2 className="text-[10px] font-bold text-emerald-700/40 uppercase tracking-[0.3em] mb-4">Hasil Perbaikan</h2>
                   <p className="text-xl text-emerald-950 dark:text-emerald-50 whitespace-pre-wrap leading-relaxed">{result.correctedText}</p>
-                  
-                  {result.readingGuideIndo && (
-                    <div className="mt-6 pt-6 border-t border-emerald-100/50 dark:border-emerald-900/20">
-                      <h3 className="text-[9px] font-bold text-emerald-700/30 uppercase tracking-[0.2em] mb-2">Panduan Baca (Suku Kata)</h3>
-                      <p className="text-sm text-emerald-800/60 dark:text-emerald-400 font-medium italic">{result.readingGuideIndo}</p>
-                    </div>
-                  )}
+                  {result.readingGuideIndo && (<div className="mt-6 pt-6 border-t border-emerald-100/50 dark:border-emerald-900/20"><h3 className="text-[9px] font-bold text-emerald-700/30 uppercase tracking-[0.2em] mb-2">Panduan Baca (Suku Kata)</h3><p className="text-sm text-emerald-800/60 dark:text-emerald-400 font-medium italic">{result.readingGuideIndo}</p></div>)}
                </div>
-
                {result.suggestions && result.suggestions.length > 0 && (
-                 <div className="space-y-4" data-help="Daftar saran spesifik. Ketahui alasan di balik setiap perapian dahan bahasa yang dilakukan Tara.">
+                 <div className="space-y-4">
                     <h2 className="text-[10px] font-bold text-emerald-700/40 uppercase tracking-[0.3em] ml-6">Analisis Aksara ({result.suggestions.length})</h2>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                        {result.suggestions.map((s, idx) => (
                          <div key={idx} className="bg-white dark:bg-forest-900 p-6 rounded-[2rem] border border-emerald-50 dark:border-emerald-800/10 shadow-sm hover:shadow-md transition-shadow">
-                            <div className="flex justify-between items-start mb-4">
-                               <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-widest ${getSuggestionTypeColor(s.type)}`}>
-                                 {s.type}
-                               </span>
-                            </div>
-                            <div className="flex items-center gap-3 mb-3 text-sm font-bold">
-                               <span className="text-rose-400 line-through decoration-2 opacity-50">{s.original}</span>
-                               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-400"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-                               <span className="text-emerald-600 dark:text-emerald-400">{s.replacement}</span>
-                            </div>
-                            <p className="text-xs text-emerald-900/60 dark:text-emerald-500 font-medium leading-relaxed italic">
-                               "{s.reason}"
-                            </p>
+                            <div className="flex justify-between items-start mb-4"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-widest ${getSuggestionTypeColor(s.type)}`}>{s.type}</span></div>
+                            <div className="flex items-center gap-3 mb-3 text-sm font-bold"><span className="text-rose-400 line-through decoration-2 opacity-50">{s.original}</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="text-emerald-400"><path d="M5 12h14M12 5l7 7-7 7"/></svg><span className="text-emerald-600 dark:text-emerald-400">{s.replacement}</span></div>
+                            <p className="text-xs text-emerald-900/60 dark:text-emerald-500 font-medium leading-relaxed italic">"{s.reason}"</p>
                          </div>
                        ))}
                     </div>
                  </div>
                )}
-
                {result.translation && (
-                 <div className="bg-[#fff9f0] dark:bg-[#1a1410] p-10 rounded-[3rem] border border-amber-100/30" data-help="Naskah dalam bahasa target yang kamu pilih, lengkap dengan panduan pelafalan otentik.">
+                 <div className="bg-[#fff9f0] dark:bg-[#1a1410] p-10 rounded-[3rem] border border-amber-100/30">
                     <h2 className="text-[10px] font-bold text-amber-800/40 uppercase tracking-[0.3em] mb-4">Terjemahan ({result.translation.languageName})</h2>
                     <p className="text-xl text-amber-950 dark:text-amber-50 whitespace-pre-wrap leading-relaxed">{result.translation.translatedText}</p>
-                    {result.translation.readingGuide && (
-                      <div className="mt-6 pt-6 border-t border-amber-100/20">
-                        <h3 className="text-[9px] font-bold text-amber-800/30 uppercase tracking-[0.2em] mb-2">Panduan Pelafalan</h3>
-                        <p className="text-sm text-amber-800/50 dark:text-amber-400 font-medium italic">{result.translation.readingGuide}</p>
-                      </div>
-                    )}
+                    {result.translation.readingGuide && (<div className="mt-6 pt-6 border-t border-amber-100/20"><h3 className="text-[9px] font-bold text-amber-800/30 uppercase tracking-[0.2em] mb-2">Panduan Pelafalan</h3><p className="text-sm text-amber-800/50 dark:text-amber-400 font-medium italic">{result.translation.readingGuide}</p></div>)}
                  </div>
                )}
-
                {result.plagiarism && (
-                 <div className="bg-rose-50/10 dark:bg-rose-900/5 p-10 rounded-[3rem] border border-rose-100/20 dark:border-rose-900/10" data-help="Laporan keaslian. Tara akan merujuk ke sumber web jika ditemukan kesamaan yang signifikan.">
-                    <div className="flex justify-between items-center mb-4">
-                       <h2 className="text-[10px] font-bold text-rose-800/40 uppercase tracking-[0.3em]">Status Keaslian</h2>
-                       <span className="text-lg font-bold text-rose-600">{result.plagiarism.score}% Kemiripan</span>
-                    </div>
+                 <div className="bg-rose-50/10 dark:bg-rose-900/5 p-10 rounded-[3rem] border border-rose-100/20 dark:border-rose-900/10">
+                    <div className="flex justify-between items-center mb-4"><h2 className="text-[10px] font-bold text-rose-800/40 uppercase tracking-[0.3em]">Status Keaslian</h2><span className="text-lg font-bold text-rose-600">{result.plagiarism.score}% Kemiripan</span></div>
                     <p className="text-base text-rose-900/70 dark:text-rose-400 italic font-medium mb-4">{result.plagiarism.summary}</p>
-                    {result.plagiarism.sources.length > 0 && (
-                      <div className="flex flex-wrap gap-2">
-                        {result.plagiarism.sources.map((src, i) => (
-                          <a key={i} href={src.uri} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold px-3 py-1 bg-white dark:bg-white/5 border border-rose-100 dark:border-rose-900/20 rounded-lg text-rose-600 hover:bg-rose-600 hover:text-white transition-all">
-                            {src.title || 'Sumber Web'} ↗
-                          </a>
-                        ))}
-                      </div>
-                    )}
+                    {result.plagiarism.sources.length > 0 && (<div className="flex flex-wrap gap-2">{result.plagiarism.sources.map((src, i) => (<a key={i} href={src.uri} target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold px-3 py-1 bg-white dark:bg-white/5 border border-rose-100 dark:border-rose-900/20 rounded-lg text-rose-600 hover:bg-rose-600 hover:text-white transition-all">{src.title || 'Sumber Web'} ↗</a>))}</div>)}
                  </div>
                )}
             </div>
@@ -702,20 +642,21 @@ const App: React.FC = () => {
         </div>
 
         <aside className="lg:col-span-4">
-          <div className="bg-white dark:bg-forest-900 p-8 rounded-[2.5rem] shadow-xl border border-emerald-50 dark:border-emerald-800/10 sticky top-8" data-help="Jejak Lokal. Tara menyimpan beberapa naskah terakhirmu di memori perangkat agar bisa kamu lihat kembali nanti.">
+          <div className="bg-white dark:bg-forest-900 p-8 rounded-[2.5rem] shadow-xl border border-emerald-50 dark:border-emerald-800/10 sticky top-8">
             <h2 className="text-[10px] font-bold text-emerald-700/30 uppercase tracking-[0.3em] mb-6">Jejak Lokal</h2>
             <div className="space-y-4">
-              {history.slice(0, 4).map(item => <HistoryCard key={item.id} item={item} onSelect={(it) => { if(!isBusy && !isBlocked) { setInputText(it.originalText); setResult(it.result); window.scrollTo({top:0, behavior:'smooth'}); } }} />)}
+              {history.slice(0, 4).map(item => <HistoryCard key={item.id} item={item} onSelect={(it) => { if(!isBusy) { setInputText(it.originalText); setResult(it.result); const forbidden = FORBIDDEN_PATTERN.test(it.originalText); setIsViolationDetected(forbidden); prevViolationRef.current = forbidden; FORBIDDEN_PATTERN.lastIndex = 0; window.scrollTo({top:0, behavior:'smooth'}); } }} />)}
               {history.length === 0 && <p className="text-center py-10 text-emerald-900/10 italic">Kotak jejak masih kosong.</p>}
             </div>
+            <AdSlot />
           </div>
         </aside>
       </div>
 
+      <ConsentModal isOpen={!hasAcceptedConsent} onAccept={() => setHasAcceptedConsent(true)} onReject={() => window.location.href = 'https://google.com'} />
       {permissionType && <PermissionModal type={permissionType} onAccept={() => { if (permissionType === 'mic') startMicProcess(); else if (permissionType === 'plagiarism') executeAnalysis(true); setPermissionType(null); }} onDeny={() => setPermissionType(null)} />}
       <LimitModal isOpen={isLimitReached && isLimitModalOpen} onClose={() => setIsLimitModalOpen(false)} />
-      <ConsentModal isOpen={isConsentModalOpen} onAccept={handleAcceptConsent} onReject={handleRejectConsent} />
-      <HistoryModal isOpen={isHistoryModalOpen} onClose={() => setIsHistoryModalOpen(false)} history={history} onSelectItem={(it) => { if(!isBusy) { setInputText(it.originalText); setResult(it.result); } }} onClearAll={() => { if(!isBusy && confirm("Hapus semua?")) { setHistory([]); clearStore(STORE_HISTORY); } }} />
+      <HistoryModal isOpen={isHistoryModalOpen} onClose={() => setIsHistoryModalOpen(false)} history={history} onSelectItem={(it) => { if(!isBusy) { setInputText(it.originalText); setResult(it.result); const forbidden = FORBIDDEN_PATTERN.test(it.originalText); setIsViolationDetected(forbidden); prevViolationRef.current = forbidden; FORBIDDEN_PATTERN.lastIndex = 0; } }} onClearAll={() => { if(!isBusy && confirm("Hapus semua?")) { setHistory([]); clearStore(STORE_HISTORY); } }} />
       <GuideModal isOpen={isGuideModalOpen} onClose={() => setIsGuideModalOpen(false)} />
       <DeveloperModal isOpen={isDevModalOpen} onClose={() => setIsDevModalOpen(false)} />
       <FanGalleryModal isOpen={isFanGalleryModalOpen} onClose={() => setIsFanGalleryModalOpen(false)} />

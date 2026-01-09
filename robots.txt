@@ -1,0 +1,9 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Menghindari pengindeksan file metadata sensitif jika ada
+Disallow: /metadata.json
+
+# Memberitahu crawler lokasi sitemap (jika nanti dikembangkan)
+# Sitemap: https://teduhaksara.space/sitemap.xml

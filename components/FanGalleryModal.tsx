@@ -275,17 +275,20 @@ export const FanGalleryModal: React.FC<FanGalleryModalProps> = ({ isOpen, onClos
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
 
+          {/* Tombol Panah Kiri - Diaktifkan untuk Mobile */}
           <button 
             onClick={(e) => { e.stopPropagation(); setSelectedIdx(p => p !== null ? (p - 1 + FAN_CONTENT.length) % FAN_CONTENT.length : null); playBeautifulChime(); }}
-            className="absolute left-6 p-5 bg-white/5 md:hover:bg-white/10 rounded-full text-white transition-all hidden sm:block shadow-xl backdrop-blur-md"
+            className="absolute left-4 sm:left-6 p-3 sm:p-5 bg-white/5 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-all shadow-xl z-[320]"
           >
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="15 18 9 12 15 6"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="sm:w-8 sm:h-8"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
+          
+          {/* Tombol Panah Kanan - Diaktifkan untuk Mobile */}
           <button 
             onClick={(e) => { e.stopPropagation(); setSelectedIdx(p => p !== null ? (p + 1) % FAN_CONTENT.length : null); playBeautifulChime(); }}
-            className="absolute right-6 p-5 bg-white/5 md:hover:bg-white/10 rounded-full text-white transition-all hidden sm:block shadow-xl backdrop-blur-md"
+            className="absolute right-4 sm:right-6 p-3 sm:p-5 bg-white/5 hover:bg-white/20 backdrop-blur-md rounded-full text-white transition-all shadow-xl z-[320]"
           >
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polyline points="9 18 15 12 9 6"/></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="sm:w-8 sm:h-8"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
 
           <div className="relative max-w-full max-h-full flex flex-col items-center" onClick={(e) => e.stopPropagation()}>
