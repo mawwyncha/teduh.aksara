@@ -23,7 +23,7 @@ export default defineConfig(({ mode }) => {
         rollupOptions: {
           output: {
             manualChunks: {
-              vendor:['react','react-dom'],
+              vendor:['react','react-dom','loadash'],
             },
           },
         },
