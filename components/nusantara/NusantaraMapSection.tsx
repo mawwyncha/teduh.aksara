@@ -1,0 +1,438 @@
+
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { PROVINCE_DIALECTS, DialectInfo } from './Province';
+import { TargetLanguage } from '../../types';
+import { JavaMap } from './regions/maps/JavaMap';
+import { SumateraMap } from './regions/maps/SumateraMap';
+import { KalimantanMap } from './regions/maps/KalimantanMap';
+import { NusaTenggaraMap } from './regions/maps/NusaTenggaraMap';
+import { SulawesiMap } from './regions/maps/SulawesiMap';
+import { PapuaMap } from './regions/maps/PapuaMap';
+
+interface NusantaraMapSectionProps {
+  currentTheme: 'light' | 'dark' | 'flower';
+  targetLang: TargetLanguage;
+  inputBgClass: string;
+}
+
+export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ currentTheme, inputBgClass }) => {
+  const [isUnfolded, setIsUnfolded] = useState(false);
+  const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
+  const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+  const [showLongDesc, setShowLongDesc] = useState(false);
+  const [songProgress, setSongProgress] = useState(0);
+  const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
+    native: true,
+    community: false,
+    foreign: false
+  });
+
+  const [hoveredDialect, setHoveredDialect] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
+
+  const isFlower = currentTheme === 'flower';
+  const isDark = currentTheme === 'dark';
+  const textColor = isFlower ? 'text-pink-100' : 'text-emerald-950 dark:text-emerald-50';
+  const dotColor = isFlower ? '#FDFFF6' : (isDark ? '#FFD700' : '#D2042D');
+  const accentColor = isFlower ? '#f472b6' : (isDark ? '#fbbf24' : '#059669');
+
+  const chestTheme = isFlower ? {
+    border: "#831843",
+    woodTop: "#9d174d",
+    woodBottom: "#be185d",
+    woodPlankTop: "#ec4899",
+    woodPlankBottom: "#f472b6",
+    goldMain: "#fdf2f8",
+    goldDark: "#fbcfe8",
+    goldBright: "#ffffff",
+    lockCore: "#3d2b1f"
+  } : isDark ? {
+    border: "#064e3b",
+    woodTop: "#065f46",
+    woodBottom: "#047857",
+    woodPlankTop: "#059669",
+    woodPlankBottom: "#10b981",
+    goldMain: "#fbbf24",
+    goldDark: "#b45309",
+    goldBright: "#fef3c7",
+    lockCore: "#1a110c"
+    } : {
+    border: "#4D061C",
+    woodTop: "#801316",
+    woodBottom: "#801316",
+    woodPlankTop: "#D2042D",
+    woodPlankBottom: "#D2042D",
+    goldMain: "#fbbf24",
+    goldDark: "#b45309",
+    goldBright: "#fef3c7",
+    lockCore: "#1a110c"
+  };
+
+  useEffect(() => {
+    if (!selectedRegion) {
+      setShowLongDesc(false);
+      setSongProgress(0);
+      setHoveredDialect(null);
+    }
+  }, [selectedRegion]);
+
+  const toggleUnfold = () => {
+    playSoftChime();
+    setIsUnfolded(!isUnfolded);
+  };
+
+  const handleRegionClick = (name?: string) => {
+    playSoftChime();
+    if (name) setSelectedRegion(name);
+    else setSelectedRegion(null);
+  };
+
+  const handleMouseEnter = (name: string) => {
+    setHoveredRegion(name);
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredRegion(null);
+  };
+
+  const toggleSection = (key: string) => {
+    setExpandedSections(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const playSoftChime = useCallback(() => {
+    try {
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, ctx.currentTime);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+      setTimeout(() => ctx.close(), 500);
+    } catch (e) {}
+  }, []);
+
+  const handleTimeUpdate = () => {
+    if (audioRef.current) {
+      const progress = (audioRef.current.currentTime / audioRef.current.duration) * 100;
+      setSongProgress(progress || 0);
+    }
+  };
+
+  const handleSongEnded = () => {
+    setSongProgress(0);
+  };
+
+  const renderDialectList = (dialects: DialectInfo[], categoryLabel: string, sectionKey: string) => {
+    if (!dialects || dialects.length === 0) return null;
+    const isExpanded = expandedSections[sectionKey];
+
+    return (
+      <div className="mb-6 last:mb-0">
+        <button 
+          onClick={() => toggleSection(sectionKey)}
+          className={`w-full flex items-center justify-between p-5 mb-2 rounded-2xl transition-all border ${isFlower 
+              ? 'bg-petal-900/40 border-pink-500/20 hover:bg-petal-900/60' 
+              : 'bg-emerald-50/50 dark:bg-emerald-950/40 border-emerald-100/50 dark:border-emerald-800/30 hover:bg-emerald-100/50'
+          }`}
+        >
+          <h4 className={`text-[10px] font-bold uppercase tracking-[0.3em] ${isFlower ? 'text-pink-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+            {categoryLabel} ({dialects.length})
+          </h4>
+          <svg 
+            width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" 
+            className={`transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''} ${isFlower ? 'text-pink-50' : 'text-emerald-500'}`}
+          >
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </button>
+
+        {isExpanded && (
+          <div className="space-y-4 mt-4 px-1 animate-in fade-in slide-in-from-top-2 duration-300">
+            {dialects.map((dialect, idx) => (
+              <div key={idx} className="flex flex-col gap-2">
+                <div 
+                  onClick={() => { playSoftChime(); setHoveredDialect(hoveredDialect === dialect.name ? null : dialect.name); }}
+                  className={`flex items-center gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${hoveredDialect === dialect.name ? (isFlower ? 'bg-pink-500 border-pink-400 text-white shadow-lg' : 'bg-emerald-600 border-emerald-500 text-white shadow-lg') : (isFlower ? 'bg-petal-900/20 border-pink-500/10 text-pink-100 hover:translate-x-1' : 'bg-white dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/30 text-emerald-950 dark:text-emerald-100 hover:translate-x-1')}`}
+                >
+                  <span className="text-lg">{isFlower ? '✨' : '🌱'}</span>
+                  <span className="text-sm font-bold tracking-tight">{dialect.name}</span>
+                </div>
+                {hoveredDialect === dialect.name && (
+                  <div className={`p-6 rounded-2xl border animate-in fade-in slide-in-from-top-1 duration-300 ${isFlower ? 'bg-petal-900/60 border-pink-500/10' : 'bg-emerald-50/40 dark:bg-black/40 border-emerald-100 dark:border-emerald-800/20'}`}>
+                    {dialect.endonim && (
+                      <div className="mb-4">
+                        <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isFlower ? 'text-pink-300' : 'text-emerald-500/80 dark:text-emerald-400/80'}`}>Endonim:</h4>
+                        <p className={`text-xs leading-relaxed italic ${isFlower ? 'text-pink-100' : 'text-emerald-900 dark:text-emerald-200'}`}>{dialect.endonim}</p>
+                      </div>
+                    )}
+                    {dialect.makna && (
+                      <div className="mb-4">
+                        <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isFlower ? 'text-pink-300' : 'text-emerald-500/80 dark:text-emerald-400/80'}`}>Asal-Usul Nama:</h4>
+                        <p className={`text-xs leading-relaxed italic ${isFlower ? 'text-pink-100' : 'text-emerald-900 dark:text-emerald-200'}`}>{dialect.makna}</p>
+                      </div>
+                    )}
+                    {dialect.description && (
+                      <div>
+                        <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${isFlower ? 'text-pink-300' : 'text-emerald-500/80 dark:text-emerald-400/80'}`}>Informasi:</h4>
+                        <p className={`text-xs leading-relaxed italic ${isFlower ? 'text-pink-100' : 'text-emerald-900 dark:text-emerald-200'}`}>{dialect.description}</p>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const mapProps = {
+    isFlower,
+    isDark,
+    accentColor,
+    hoveredRegion,
+    handleRegionClick,
+    handleMouseEnter,
+    handleMouseLeave,
+  };
+
+  return (
+    <div className={`w-full p-4 md:p-8 rounded-[2.5rem] border transition-all relative overflow-hidden flex flex-col items-center justify-center ${inputBgClass} min-h-[220px]`}>
+      {!isUnfolded ? (
+        <div onClick={toggleUnfold} className="flex flex-col items-center justify-center cursor-pointer group transition-all duration-500 hover:scale-110 active:scale-95">
+          <div className="relative">
+            <div className={`absolute inset-0 blur-2xl opacity-0 group-hover:opacity-40 transition-opacity duration-700 rounded-full ${isFlower ? 'bg-pink-400' : 'bg-amber-400'}`}></div>
+            <svg width="100" height="90" viewBox="0 0 16 14" fill="none" xmlns="http://www.w3.org/2000/svg" shapeRendering="crispEdges" className="relative z-10 drop-shadow-xl transition-all duration-700">
+              <rect x="1" y="2" width="14" height="10" fill={chestTheme.border} />
+              <rect x="2" y="3" width="12" height="3" fill={chestTheme.woodTop} /> 
+              <rect x="2" y="7" width="12" height="4" fill={chestTheme.woodBottom} /> 
+              <rect x="2" y="4" width="12" height="1" fill={chestTheme.woodPlankTop} />
+              <rect x="2" y="9" width="12" height="1" fill={chestTheme.woodPlankBottom} />
+              <rect x="1" y="2" width="14" height="1" fill={chestTheme.goldMain} />
+              <rect x="1" y="6" width="14" height="1" fill={chestTheme.goldMain} />
+              <rect x="1" y="11" width="14" height="1" fill={chestTheme.goldMain} />
+              <rect x="1" y="2" width="1" height="10" fill={chestTheme.goldDark} />
+              <rect x="14" y="2" width="1" height="10" fill={chestTheme.goldDark} />
+              <rect x="4" y="2" width="1" height="4" fill={chestTheme.goldMain} />
+              <rect x="11" y="2" width="1" height="4" fill={chestTheme.goldMain} />
+              <rect x="4" y="7" width="1" height="4" fill={chestTheme.goldMain} />
+              <rect x="11" y="7" width="1" height="4" fill={chestTheme.goldMain} />
+              <rect x="6" y="5" width="4" height="4" fill={chestTheme.goldDark} />
+              <rect x="7" y="5" width="2" height="3" fill={chestTheme.goldBright} />
+              <rect x="7" y="6" width="2" height="1" fill={chestTheme.lockCore} />
+            </svg>
+          </div>
+          <p className={`mt-6 text-[10px] font-bold uppercase tracking-[0.4em] animate-pulse transition-colors duration-700 ${isFlower ? 'text-pink-400' : 'text-emerald-700 dark:text-amber-400'}`}>
+            Buka Peti Budaya
+          </p>
+        </div>
+      ) : (
+        <div className="w-full animate-in fade-in zoom-in-95 duration-700 flex flex-col items-center">
+          <div className={`w-full max-w-3xl h-4 rounded-t-full shadow-lg z-20 border-b ${isFlower ? 'bg-petal-900 border-pink-500/20' : 'bg-emerald-50 dark:bg-[#1a110c] border-emerald-100 dark:border-emerald-800/30'}`}></div>
+          <div className={`w-full relative py-12 px-4 sm:px-10 border-x transition-all duration-1000 ${isFlower ? 'bg-petal-100/5 border-pink-500/10' : 'bg-white/40 dark:bg-[#0a1a12]/40 border-emerald-50 dark:border-emerald-800/20'}`}>
+            <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+              <h2 className={`text-[11px] font-bold uppercase tracking-[0.6em] font-sans opacity-40 transition-colors duration-700 ${isFlower ? 'text-pink-400' : 'text-emerald-700 dark:text-emerald-400'}`}>Peta Nusantara</h2>
+            </div>
+            <button onClick={toggleUnfold} className={`absolute top-4 right-4 p-2 rounded-full transition-all active:scale-90 z-30 ${isFlower ? 'text-pink-300 hover:text-pink-100' : 'text-emerald-400 hover:text-red-500'}`}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <div className="relative w-full flex flex-col items-center">
+              <svg 
+                baseProfile="tiny" fill={isFlower ? "#d8b4a6" : (isDark ? "#143a28" : "#6f9c76")} 
+                stroke={isDark ? "#064e3b" : "#ffffff"} strokeLinecap="round" strokeLinejoin="round" strokeWidth=".6" 
+                viewBox="0 0 1000 368" width="100%" xmlns="http://www.w3.org/2000/svg"
+                preserveAspectRatio="xMidYMid meet" className="w-full h-auto drop-shadow-sm transition-all duration-1000"
+              >
+                <g transform="translate(5, 5) scale(0.98)">
+                  <g className="transition-opacity duration-300">  
+                  <SumateraMap {...mapProps} />
+                  <JavaMap {...mapProps} />
+                  <KalimantanMap {...mapProps} />
+                  <NusaTenggaraMap {...mapProps} />
+                  <SulawesiMap {...mapProps} />
+                  <PapuaMap {...mapProps} />
+                  {/* CRITICAL FIX: Add pointer-events-none to prevent circles from blocking map clicks */}
+                  <g className="pointer-events-none" id="label_points" stroke="none">
+                    <circle cx="467.7" cy="70" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"North Kalimantan"*/
+                    <circle cx="560.4" cy="306" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Nusa Tenggara Timur"*/
+                    <circle cx="357" cy="139.9" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Kalimantan Barat"*/
+                    <circle cx="919.8" cy="213.1" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Papua"*/
+                    <circle cx="384.3" cy="284.9" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Jawa Timur"*/ 
+                    <circle cx="728.9" cy="194.2" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Maluku"*/
+                    <circle cx="487.1" cy="307.5" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Nusa Tenggara Barat"*/
+                    <circle cx="538.9" cy="205.5" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Sulawesi Selatan"*/
+                    <circle cx="338.4" cy="279.8" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Jawa Tengah“*/
+                    <circle cx="294.6" cy="270.4" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Jawa Barat“*/
+                    <circle cx="279.6" cy="250" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Jakarta Raya“*/
+                    <circle cx="265" cy="262" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Banten“*/
+                    <circle cx="350.1" cy="295" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Yogyakarta“*/
+                    <circle cx="572.9" cy="203.6" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sulawesi Tenggara“*/
+                    <circle cx="792.6" cy="160.1" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Papua Barat“*/
+                    <circle cx="571.3" cy="161" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sulawesi Tengah“*/
+                    <circle cx="693.2" cy="106" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Maluku Utara“*/
+                    <circle cx="306.5" cy="55.3" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Kepulauan Riau“*/
+                    <circle cx="176.1" cy="125.2" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Riau“*/
+                    <circle cx="586.7" cy="118.9" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Gorontalo“*/
+                    <circle cx="624.1" cy="120" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sulawesi Utara“*/
+                    <circle cx="524.1" cy="190.8" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sulawesi Barat“*/
+                    <circle cx="199.1" cy="167.3" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Jambi“*/
+                    <circle cx="223" cy="204.1" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sumatera Selatan“*/
+                    <circle cx="243.9" cy="229.4" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Lampung“*/
+                    <circle cx="193.8" cy="204.9" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Bengkulu“*/
+                    <circle cx="160.4" cy="151.3" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sumatera Barat“*/
+                    <circle cx="126.7" cy="83.9" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sumatera Utara“*/
+                    <circle cx="82.9" cy="45.8" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Aceh“*/
+                    <circle cx="410.5" cy="168.6" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Kalimantan Tengah“*/
+                    <circle cx="448.7" cy="193.7" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Kalimantan Selatan“*/
+                    <circle cx="445.2" cy="299.8" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Bali“*/
+                    <circle cx="262.9" cy="178" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Bangka-Belitung“*/
+                    <circle cx="469.2" cy="125.4" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Kalimantan Timur“*/
+                  </g>
+                  </g>
+                </g>
+              </svg>
+              <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 px-5 py-2 rounded-2xl border backdrop-blur-xl transition-all duration-500 shadow-xl z-20 whitespace-nowrap ${hoveredRegion ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} ${isFlower ? 'bg-petal-900/90 border-pink-500/30' : 'bg-white/90 dark:bg-emerald-950/90 border-emerald-100 dark:border-emerald-800/30'}`}>
+                <p className={`text-[10px] font-bold uppercase tracking-widest ${isFlower ? 'text-pink-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                  Provinsi: <span className={textColor}>{hoveredRegion || '-'}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          <div className={`w-full max-w-3xl h-4 rounded-b-full shadow-inner border-t ${isFlower ? 'bg-petal-900 border-pink-500/20' : 'bg-emerald-50 dark:bg-[#1a110c] border-emerald-100 dark:border-emerald-800/30'}`}></div>
+          <button onClick={toggleUnfold} className={`mt-6 px-8 py-2 rounded-full text-[9px] font-bold uppercase tracking-[0.3em] hover:bg-black/5 ${isFlower ? 'text-pink-400' : 'text-emerald-700 dark:text-emerald-400'}`}>Tutup Peta</button>
+        </div>
+      )}
+
+      {selectedRegion && (
+        <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setSelectedRegion(null)}>
+          <div className={`w-full max-w-2xl rounded-[3rem] shadow-2xl relative border overflow-hidden flex flex-col animate-in zoom-in-95 duration-300 max-h-[85vh] ${isFlower ? 'bg-petal-800 border-pink-500/20' : 'bg-white dark:bg-[#0a1a12] border-emerald-50 dark:border-emerald-800/20'}`} onClick={(e) => e.stopPropagation()}>
+            {PROVINCE_DIALECTS[selectedRegion]?.regionalSong && (
+              <audio 
+                ref={audioRef}
+                src={PROVINCE_DIALECTS[selectedRegion].regionalSong?.audioUrl}
+                onTimeUpdate={handleTimeUpdate}
+                onEnded={handleSongEnded}
+                preload="metadata"
+              />
+            )}
+
+            <div className={`sticky top-0 z-[260] p-8 md:p-10 pb-4 border-b shrink-0 ${isFlower ? 'bg-petal-800 border-pink-500/10' : 'bg-white dark:bg-[#0a1a12] border-emerald-100 dark:border-emerald-800/20'}`}>
+              <div className="flex justify-between items-start mb-4">
+                <div>
+                  <span className={`text-[10px] font-bold uppercase tracking-[0.3em] block mb-2 ${isFlower ? 'text-pink-400' : 'text-emerald-600/60 dark:text-emerald-400/40'}`}>Eksplorasi Aksara</span>
+                  <h3 className={`text-2xl font-bold ${textColor}`}>{selectedRegion}</h3>
+                </div>
+                <button onClick={() => setSelectedRegion(null)} className={`p-2 rounded-full transition-all active:scale-90 ${isFlower ? 'bg-pink-100/10 text-pink-300 hover:text-pink-100' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-400 hover:text-red-500'}`}>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
+                </button>
+              </div>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto no-scrollbar px-8 md:px-10 pb-8 pt-6">
+              <div className="space-y-6">
+                {PROVINCE_DIALECTS[selectedRegion] ? (
+                  <>
+                    <div className={`w-full aspect-[16/10] rounded-3xl overflow-hidden mb-4 border-2 relative group/img transition-all duration-700 hover:scale-[1.01] ${isFlower ? 'border-pink-500/20 shadow-xl' : 'border-emerald-500/10 shadow-lg'}`}>
+                      <img 
+                        src={PROVINCE_DIALECTS[selectedRegion].headerImage} 
+                        alt={`Landskap ${selectedRegion}`}
+                        className="w-full h-full object-cover transition-all duration-1000"
+                        onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=800&auto=format&fit=crop"; }}
+                      />
+                      {PROVINCE_DIALECTS[selectedRegion].headerDescription && (
+                        <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/50 backdrop-blur-md border-t border-white/10 translate-y-full group-hover/img:translate-y-0 transition-transform duration-500">
+                          <p className="text-[11px] text-white font-bold tracking-widest uppercase text-center">
+                            {PROVINCE_DIALECTS[selectedRegion].headerDescription}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+
+                    {PROVINCE_DIALECTS[selectedRegion].headerLongDescription && (
+                      <div className="mb-8">
+                        <button 
+                          onClick={() => { playSoftChime(); setShowLongDesc(!showLongDesc); }}
+                          className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${isFlower ? 'bg-pink-500/10 border-pink-500/20 text-pink-200' : 'bg-emerald-50/30 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/20 text-emerald-800 dark:text-emerald-300'}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg">🌿</span>
+                            <span className="text-xs font-bold uppercase tracking-widest">Apa Yang Ikonik?</span>
+                          </div>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className={`transition-transform duration-500 ${showLongDesc ? 'rotate-180' : ''}`}><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+                        
+                        <div className={`grid transition-all duration-500 ease-in-out ${showLongDesc ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                          <div className="overflow-hidden">
+                            <div className={`p-5 rounded-2xl border italic text-sm leading-relaxed ${isFlower ? 'bg-petal-900/40 border-pink-500/10 text-pink-100/70' : 'bg-emerald-50/10 dark:bg-black/20 border-emerald-50 dark:border-emerald-800/10 text-emerald-900/80 dark:text-emerald-200/60'}`}>
+                              {PROVINCE_DIALECTS[selectedRegion].headerLongDescription}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {PROVINCE_DIALECTS[selectedRegion].regionalSong && (
+                      <div className={`p-6 rounded-[2rem] border transition-all mb-8 relative ${isFlower ? 'bg-pink-900/40 border-pink-500/20' : 'bg-emerald-50/50 dark:bg-emerald-950/40 border-emerald-100 dark:border-emerald-800/30'}`}>
+                        <div className="flex items-center gap-5 relative z-10">
+                          <div className="group/lock relative">
+                            <button 
+                              className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center transition-all shadow-md cursor-help ${isFlower ? 'bg-pink-900/50 text-pink-300 border border-pink-500/10' : 'bg-white dark:bg-emerald-900/30 text-emerald-600'}`}
+                            >
+                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                              </svg>
+                            </button>
+                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-2 bg-black/80 text-white text-[10px] font-bold rounded-lg whitespace-nowrap opacity-0 group-hover/lock:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl border border-white/10">
+                              Fitur dalam pengembangan
+                              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/80"></div>
+                            </div>
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <span className={`text-[9px] font-bold uppercase tracking-[0.3em] block mb-1 opacity-60 ${isFlower ? 'text-pink-300' : 'text-emerald-700 dark:text-emerald-400'}`}>Lagu Daerah</span>
+                            <h4 className={`text-lg font-bold wrap ${textColor}`}>{PROVINCE_DIALECTS[selectedRegion].regionalSong?.title}</h4>
+                            <p className={`text-[11px] italic opacity-60 wrap ${textColor}`}>{PROVINCE_DIALECTS[selectedRegion].regionalSong?.description}</p>
+                          </div>
+                        </div>
+                        
+                        <div className="mt-4 w-full h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden relative">
+                          <div 
+                            className={`h-full transition-all duration-150 ease-linear rounded-full ${isFlower ? 'bg-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.5)]' : 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]'}`}
+                            style={{ width: `${songProgress}%` }}
+                          ></div>
+                        </div>
+                      </div>
+                    )}
+
+                    <p className={`text-[11px] mb-6 italic opacity-70 leading-relaxed ${isFlower ? 'text-pink-100' : 'text-emerald-800 dark:text-emerald-400'}`}>
+                      Klik untuk melihat dahan bahasa di {selectedRegion}:
+                    </p>
+                    {renderDialectList(PROVINCE_DIALECTS[selectedRegion].native, "Bahasa Pribumi", "native")}
+                    {renderDialectList(PROVINCE_DIALECTS[selectedRegion].community, "Bahasa Peranakan Nusantara", "community")}
+                    {renderDialectList(PROVINCE_DIALECTS[selectedRegion].foreign || [], "Bahasa Peranakan Asing", "foreign")}                    
+                  </>
+                ) : (
+                  <div className="py-20 text-center">
+                    <span className="text-4xl block mb-4 opacity-20">🍃</span>
+                    <p className={`text-sm italic opacity-50 ${textColor}`}>Informasi sedang dikumpulkan untuk {selectedRegion}...</p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

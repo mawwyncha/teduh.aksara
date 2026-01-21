@@ -26,6 +26,13 @@ export interface TranslationResult {
   readingGuide?: string;
 }
 
+export interface PronunciationResult {
+  score: number;
+  feedback: string;
+  encouragement: string;
+  transcription: string;
+}
+
 export interface AnalysisResult {
   correctedText: string;
   suggestions: GrammarSuggestion[];

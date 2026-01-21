@@ -1,9 +1,11 @@
 const DB_NAME = 'TeduhAksaraDB';
-const DB_VERSION = 2;
+const DB_VERSION = 3; // Increment version untuk tambah store baru
 const STORES = {
   DRAFT: 'draft',
   HISTORY: 'history',
-  SETTINGS: 'settings'
+  SETTINGS: 'settings',
+  CACHE: 'cache',         // Untuk cache analisis
+  TTS_CACHE: 'tts_cache'  // Untuk cache TTS
 };
 
 let dbCache: IDBDatabase | null = null;
@@ -63,3 +65,5 @@ export const clearStore = async (storeName: string): Promise<void> => {
     request.onerror = () => reject(request.error);
   });
 };
+
+export { STORES };

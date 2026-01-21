@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -12,30 +12,96 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [honeypot, setHoneypot] = useState('');
+  const [recaptchaWidgetId, setRecaptchaWidgetId] = useState<number | null>(null);
+  const captchaContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const initRecaptcha = () => {
+      if (isOpen && mode === 'signup' && window.grecaptcha && window.grecaptcha.render && captchaContainerRef.current && recaptchaWidgetId === null) {
+        try {
+          const id = window.grecaptcha.render(captchaContainerRef.current, {
+            sitekey: "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
+            callback: 'onAuthCaptchaSubmit',
+            size: 'invisible'
+          });
+          setRecaptchaWidgetId(id);
+        } catch (e) {
+          console.warn("Auth reCAPTCHA render failed", e);
+        }
+      }
+    };
+
+    if (isOpen) {
+      setHoneypot('');
+      
+      // Global callback for auth recaptcha
+      (window as any).onAuthCaptchaSubmit = (token: string) => {
+        if (token) {
+           completeAuthProcess();
+        }
+      };
+
+      if (mode === 'signup') {
+        if (window.grecaptcha && window.grecaptcha.render) {
+          initRecaptcha();
+        } else {
+          const timer = setInterval(() => {
+            if (window.grecaptcha && window.grecaptcha.render) {
+              initRecaptcha();
+              clearInterval(timer);
+            }
+          }, 500);
+          return () => clearInterval(timer);
+        }
+      }
+    } else {
+      setRecaptchaWidgetId(null);
+    }
+  }, [isOpen, mode, recaptchaWidgetId]);
 
   if (!isOpen) return null;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Protection 1: Honeypot
+    if (honeypot) {
+      console.warn("Auth blocked - Honeypot filled.");
+      return;
+    }
+
+    // Protection 2: Invisible reCAPTCHA (only for signup)
+    if (mode === 'signup' && window.grecaptcha && recaptchaWidgetId !== null) {
+      window.grecaptcha.execute(recaptchaWidgetId);
+    } else {
+      completeAuthProcess();
+    }
+  };
+
+  const completeAuthProcess = () => {
     const finalName = mode === 'signup' ? name : email.split('@')[0];
     onSuccess(finalName || 'Sahabat Alam');
     onClose();
+    if (window.grecaptcha && recaptchaWidgetId !== null) {
+      window.grecaptcha.reset(recaptchaWidgetId);
+    }
   };
 
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 sm:p-6 bg-emerald-950/40 backdrop-blur-md animate-in fade-in duration-300">
-      <div className="bg-white dark:bg-[#0a1a12] w-full max-w-md rounded-[2.5rem] p-8 sm:p-10 shadow-2xl relative overflow-hidden transition-all duration-500 max-h-[85vh] overflow-y-auto no-scrollbar">
+      <div className="bg-white dark:bg-[#0a1a12] w-full max-w-md rounded-[2.5rem] p-8 sm:p-10 shadow-2xl relative overflow-hidden transition-all duration-500 max-h-[85vh] overflow-y-auto no-scrollbar border border-white/10">
         <button 
           onClick={onClose}
           className="absolute top-6 right-6 p-2 text-emerald-300 dark:text-emerald-700 hover:text-emerald-600 transition-colors"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" cy="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
         </button>
 
         <div className="flex justify-center mb-6 sm:mb-8 mt-4 sm:mt-0">
           <div className="inline-flex p-1.5 bg-emerald-50/50 dark:bg-emerald-900/20 rounded-2xl">
             <button 
-              onClick={() => setMode('login')}
+              onClick={() => { setMode('login'); setRecaptchaWidgetId(null); }}
               className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-base font-bold transition-all ${mode === 'login' ? 'bg-white dark:bg-emerald-800 text-emerald-700 dark:text-emerald-100 shadow-sm' : 'text-emerald-400 dark:text-emerald-600'}`}
             >
               Masuk
@@ -59,6 +125,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+          {/* Honeypot field - Totally hidden */}
+          <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', visibility: 'hidden' }} aria-hidden="true">
+            <input type="text" value={honeypot} onChange={e => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" name="auth_verify_field" />
+          </div>
+
+          {/* reCAPTCHA Invisible Anchor for Auth */}
+          {mode === 'signup' && (
+            <div 
+              ref={captchaContainerRef}
+              className="recaptcha-auth-container"
+            ></div>
+          )}
+
           {mode === 'signup' && (
             <div className="group">
               <label className="block text-base font-bold text-emerald-700/40 dark:text-emerald-400/30 uppercase tracking-[0.2em] mb-1.5 ml-4">Nama Panggilan</label>
