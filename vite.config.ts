@@ -22,11 +22,32 @@ export default defineConfig(({ mode }) => {
       build: {
         rollupOptions: {
           output: {
-            manualChunks: {
-              vendor:['react','react-dom','loadash'],
+            manualChunks: (id) => {
+              // Split node_modules menjadi chunks terpisah
+              if (id.includes('node_modules')) {
+                // Lodash ke chunk terpisah (karena besar)
+                if (id.includes('lodash')) {
+                  return 'lodash-vendor';
+                }
+                
+                // React & React-DOM ke chunk terpisah
+                if (id.includes('react') || id.includes('react-dom')) {
+                  return 'react-vendor';
+                }
+                
+                // Lucide icons jika ada
+                if (id.includes('lucide-react')) {
+                  return 'icons-vendor';
+                }
+                
+                // Semua vendor lainnya
+                return 'vendor';
+              }
             },
           },
         },
+        // Optional: naikkan limit warning
+        chunkSizeWarningLimit: 600,
       }
     };
 });
