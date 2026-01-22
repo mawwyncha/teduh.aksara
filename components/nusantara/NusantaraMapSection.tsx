@@ -8,6 +8,7 @@ import { KalimantanMap } from './regions/maps/KalimantanMap';
 import { NusaTenggaraMap } from './regions/maps/NusaTenggaraMap';
 import { SulawesiMap } from './regions/maps/SulawesiMap';
 import { PapuaMap } from './regions/maps/PapuaMap';
+import { fetchTTSAudio } from '../../services/geminiService';
 
 interface NusantaraMapSectionProps {
   currentTheme: 'light' | 'dark' | 'flower';
@@ -29,6 +30,14 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
 
   const [hoveredDialect, setHoveredDialect] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
+  
+  // Folklore Audio States
+  const [isFolkloreLoading, setIsFolkloreLoading] = useState(false);
+  const [folklorePlaying, setFolklorePlaying] = useState(false);
+  const [folkloreProgress, setFolkloreProgress] = useState(0);
+  const [showFolklore, setShowFolklore] = useState(false);
+  const [isFolkloreVideoActive, setIsFolkloreVideoActive] = useState(false);
+  const folkloreAudioRef = useRef<HTMLAudioElement>(null);
 
   const isFlower = currentTheme === 'flower';
   const isDark = currentTheme === 'dark';
@@ -73,6 +82,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
       setShowLongDesc(false);
       setSongProgress(0);
       setHoveredDialect(null);
+      stopFolklore();
     }
   }, [selectedRegion]);
 
@@ -130,6 +140,98 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
 
   const handleSongEnded = () => {
     setSongProgress(0);
+  };
+
+  // Folklore Audio Handlers
+  const handleFolkloreTimeUpdate = () => {
+    if (folkloreAudioRef.current) {
+      const progress = (folkloreAudioRef.current.currentTime / folkloreAudioRef.current.duration) * 100;
+      setFolkloreProgress(progress || 0);
+    }
+  };
+
+  const handleFolkloreEnded = () => {
+    setFolklorePlaying(false);
+    setFolkloreProgress(0);
+  };
+
+  const createWavBlob = (pcmBase64: string, sampleRate: number) => {
+    const binary = atob(pcmBase64);
+    const pcmData = new Uint8Array(binary.length);
+    for(let i=0; i<binary.length; i++) pcmData[i] = binary.charCodeAt(i);
+
+    const buffer = new ArrayBuffer(44 + pcmData.length);
+    const view = new DataView(buffer);
+    const writeString = (offset: number, string: string) => {
+      for (let i = 0; i < string.length; i++) {
+        view.setUint8(offset + i, string.charCodeAt(i));
+      }
+    };
+    writeString(0, 'RIFF');
+    view.setUint32(4, 36 + pcmData.length, true);
+    writeString(8, 'WAVE');
+    writeString(12, 'fmt ');
+    view.setUint32(16, 16, true);
+    view.setUint16(20, 1, true); // PCM
+    view.setUint16(22, 1, true); // Mono
+    view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true);
+    view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true);
+    writeString(36, 'data');
+    view.setUint32(40, pcmData.length, true);
+    for (let i = 0; i < pcmData.length; i++) {
+      view.setUint8(44 + i, pcmData[i]);
+    }
+    return new Blob([buffer], { type: 'audio/wav' });
+  };
+
+  const toggleFolklore = async (storyText: string) => {
+    if (folklorePlaying) {
+      folkloreAudioRef.current?.pause();
+      setFolklorePlaying(false);
+      return;
+    }
+
+    if (folkloreAudioRef.current && folkloreAudioRef.current.src) {
+      folkloreAudioRef.current.play();
+      setFolklorePlaying(true);
+      return;
+    }
+
+    setIsFolkloreLoading(true);
+    try {
+      const base64 = await fetchTTSAudio(storyText);
+      if (base64 && folkloreAudioRef.current) {
+        const wavBlob = createWavBlob(base64, 24000);
+        const url = URL.createObjectURL(wavBlob);
+        folkloreAudioRef.current.src = url;
+        folkloreAudioRef.current.play();
+        setFolklorePlaying(true);
+      }
+    } catch (e) {
+      console.error("Folklore TTS failed", e);
+    } finally {
+      setIsFolkloreLoading(false);
+    }
+  };
+
+  const stopFolklore = () => {
+    if (folkloreAudioRef.current) {
+      folkloreAudioRef.current.pause();
+      folkloreAudioRef.current.src = "";
+      folkloreAudioRef.current.currentTime = 0;
+    }
+    setFolklorePlaying(false);
+    setFolkloreProgress(0);
+  };
+
+  const handleSeekFolklore = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (folkloreAudioRef.current && folkloreAudioRef.current.duration) {
+      const newTime = (parseFloat(e.target.value) / 100) * folkloreAudioRef.current.duration;
+      folkloreAudioRef.current.currentTime = newTime;
+      setFolkloreProgress(parseFloat(e.target.value));
+    }
   };
 
   const renderDialectList = (dialects: DialectInfo[], categoryLabel: string, sectionKey: string) => {
@@ -245,7 +347,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
               <h2 className={`text-[11px] font-bold uppercase tracking-[0.6em] font-sans opacity-40 transition-colors duration-700 ${isFlower ? 'text-pink-400' : 'text-emerald-700 dark:text-emerald-400'}`}>Peta Nusantara</h2>
             </div>
             <button onClick={toggleUnfold} className={`absolute top-4 right-4 p-2 rounded-full transition-all active:scale-90 z-30 ${isFlower ? 'text-pink-300 hover:text-pink-100' : 'text-emerald-400 hover:text-red-500'}`}>
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" cy="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
             </button>
             <div className="relative w-full flex flex-col items-center">
               <svg 
@@ -262,42 +364,41 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
                   <NusaTenggaraMap {...mapProps} />
                   <SulawesiMap {...mapProps} />
                   <PapuaMap {...mapProps} />
-                  {/* CRITICAL FIX: Add pointer-events-none to prevent circles from blocking map clicks */}
                   <g className="pointer-events-none" id="label_points" stroke="none">
-                    <circle cx="467.7" cy="70" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"North Kalimantan"*/
-                    <circle cx="560.4" cy="306" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Nusa Tenggara Timur"*/
-                    <circle cx="357" cy="139.9" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Kalimantan Barat"*/
-                    <circle cx="919.8" cy="213.1" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Papua"*/
-                    <circle cx="384.3" cy="284.9" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Jawa Timur"*/ 
-                    <circle cx="728.9" cy="194.2" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Maluku"*/
-                    <circle cx="487.1" cy="307.5" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Nusa Tenggara Barat"*/
-                    <circle cx="538.9" cy="205.5" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*"Sulawesi Selatan"*/
-                    <circle cx="338.4" cy="279.8" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Jawa Tengah“*/
-                    <circle cx="294.6" cy="270.4" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Jawa Barat“*/
-                    <circle cx="279.6" cy="250" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Jakarta Raya“*/
-                    <circle cx="265" cy="262" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Banten“*/
-                    <circle cx="350.1" cy="295" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Yogyakarta“*/
-                    <circle cx="572.9" cy="203.6" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sulawesi Tenggara“*/
-                    <circle cx="792.6" cy="160.1" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Papua Barat“*/
-                    <circle cx="571.3" cy="161" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sulawesi Tengah“*/
-                    <circle cx="693.2" cy="106" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Maluku Utara“*/
-                    <circle cx="306.5" cy="55.3" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Kepulauan Riau“*/
-                    <circle cx="176.1" cy="125.2" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Riau“*/
-                    <circle cx="586.7" cy="118.9" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Gorontalo“*/
-                    <circle cx="624.1" cy="120" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sulawesi Utara“*/
-                    <circle cx="524.1" cy="190.8" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sulawesi Barat“*/
-                    <circle cx="199.1" cy="167.3" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Jambi“*/
-                    <circle cx="223" cy="204.1" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sumatera Selatan“*/
-                    <circle cx="243.9" cy="229.4" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Lampung“*/
-                    <circle cx="193.8" cy="204.9" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Bengkulu“*/
-                    <circle cx="160.4" cy="151.3" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sumatera Barat“*/
-                    <circle cx="126.7" cy="83.9" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Sumatera Utara“*/
-                    <circle cx="82.9" cy="45.8" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Aceh“*/
-                    <circle cx="410.5" cy="168.6" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Kalimantan Tengah“*/
-                    <circle cx="448.7" cy="193.7" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Kalimantan Selatan“*/
-                    <circle cx="445.2" cy="299.8" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Bali“*/
-                    <circle cx="262.9" cy="178" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Bangka-Belitung“*/
-                    <circle cx="469.2" cy="125.4" r="4" fill={dotColor} className="opacity-20 animate-pulse" /> /*”Kalimantan Timur“*/
+                    <circle cx="467.7" cy="70" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"North Kalimantan"*/}
+                    <circle cx="560.4" cy="306" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Nusa Tenggara Timur"*/}
+                    <circle cx="357" cy="139.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Kalimantan Barat"*/}
+                    <circle cx="919.8" cy="213.1" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Papua"*/}
+                    <circle cx="384.3" cy="284.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Jawa Timur"*/} 
+                    <circle cx="728.9" cy="194.2" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Maluku"*/}
+                    <circle cx="487.1" cy="307.5" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Nusa Tenggara Barat"*/}
+                    <circle cx="538.9" cy="205.5" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Sulawesi Selatan"*/}
+                    <circle cx="338.4" cy="279.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Jawa Tengah“*/}
+                    <circle cx="294.6" cy="270.4" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Jawa Barat“*/}
+                    <circle cx="279.6" cy="257" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Jakarta Raya“*/}
+                    <circle cx="265" cy="262" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Banten“*/}
+                    <circle cx="350.1" cy="290.6" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Yogyakarta“*/}
+                    <circle cx="572.9" cy="203.6" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sulawesi Tenggara“*/}
+                    <circle cx="792.6" cy="160.1" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Papua Barat“*/}
+                    <circle cx="571.3" cy="161" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sulawesi Tengah“*/}
+                    <circle cx="693.2" cy="106" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Maluku Utara“*/}
+                    <circle cx="306.5" cy="55.3" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Kepulauan Riau“*/}
+                    <circle cx="176.1" cy="125.2" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Riau“*/}
+                    <circle cx="586.7" cy="118.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Gorontalo“*/}
+                    <circle cx="624.1" cy="120" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sulawesi Utara“*/}
+                    <circle cx="524.1" cy="190.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sulawesi Barat“*/}
+                    <circle cx="199.1" cy="167.3" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Jambi“*/}
+                    <circle cx="223" cy="204.1" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sumatera Selatan“*/}
+                    <circle cx="243.9" cy="229.4" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Lampung“*/}
+                    <circle cx="193.8" cy="204.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Bengkulu“*/}
+                    <circle cx="160.4" cy="151.3" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sumatera Barat“*/}
+                    <circle cx="126.7" cy="83.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sumatera Utara“*/}
+                    <circle cx="82.9" cy="45.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Aceh“*/}
+                    <circle cx="410.5" cy="168.6" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Kalimantan Tengah“*/}
+                    <circle cx="448.7" cy="193.7" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Kalimantan Selatan“*/}
+                    <circle cx="445.2" cy="299.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Bali“*/}
+                    <circle cx="262.9" cy="178" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Bangka-Belitung“*/}
+                    <circle cx="469.2" cy="125.4" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Kalimantan Timur“*/}
                   </g>
                   </g>
                 </g>
@@ -317,15 +418,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
       {selectedRegion && (
         <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setSelectedRegion(null)}>
           <div className={`w-full max-w-2xl rounded-[3rem] shadow-2xl relative border overflow-hidden flex flex-col animate-in zoom-in-95 duration-300 max-h-[85vh] ${isFlower ? 'bg-petal-800 border-pink-500/20' : 'bg-white dark:bg-[#0a1a12] border-emerald-50 dark:border-emerald-800/20'}`} onClick={(e) => e.stopPropagation()}>
-            {PROVINCE_DIALECTS[selectedRegion]?.regionalSong && (
-              <audio 
-                ref={audioRef}
-                src={PROVINCE_DIALECTS[selectedRegion].regionalSong?.audioUrl}
-                onTimeUpdate={handleTimeUpdate}
-                onEnded={handleSongEnded}
-                preload="metadata"
-              />
-            )}
+            <audio ref={folkloreAudioRef} onTimeUpdate={handleFolkloreTimeUpdate} onEnded={handleFolkloreEnded} preload="metadata" />
 
             <div className={`sticky top-0 z-[260] p-8 md:p-10 pb-4 border-b shrink-0 ${isFlower ? 'bg-petal-800 border-pink-500/10' : 'bg-white dark:bg-[#0a1a12] border-emerald-100 dark:border-emerald-800/20'}`}>
               <div className="flex justify-between items-start mb-4">
@@ -334,7 +427,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
                   <h3 className={`text-2xl font-bold ${textColor}`}>{selectedRegion}</h3>
                 </div>
                 <button onClick={() => setSelectedRegion(null)} className={`p-2 rounded-full transition-all active:scale-90 ${isFlower ? 'bg-pink-100/10 text-pink-300 hover:text-pink-100' : 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-400 hover:text-red-500'}`}>
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" cy="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
                 </button>
               </div>
             </div>
@@ -344,34 +437,23 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
                 {PROVINCE_DIALECTS[selectedRegion] ? (
                   <>
                     <div className={`w-full aspect-[16/10] rounded-3xl overflow-hidden mb-4 border-2 relative group/img transition-all duration-700 hover:scale-[1.01] ${isFlower ? 'border-pink-500/20 shadow-xl' : 'border-emerald-500/10 shadow-lg'}`}>
-                      <img 
-                        src={PROVINCE_DIALECTS[selectedRegion].headerImage} 
-                        alt={`Landskap ${selectedRegion}`}
-                        className="w-full h-full object-cover transition-all duration-1000"
-                        onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=800&auto=format&fit=crop"; }}
-                      />
+                      <img src={PROVINCE_DIALECTS[selectedRegion].headerImage} alt={`Landskap ${selectedRegion}`} className="w-full h-full object-cover transition-all duration-1000" onError={(e) => { (e.target as HTMLImageElement).src = "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=800&auto=format&fit=crop"; }} />
                       {PROVINCE_DIALECTS[selectedRegion].headerDescription && (
                         <div className="absolute bottom-0 left-0 right-0 p-4 bg-black/50 backdrop-blur-md border-t border-white/10 translate-y-full group-hover/img:translate-y-0 transition-transform duration-500">
-                          <p className="text-[11px] text-white font-bold tracking-widest uppercase text-center">
-                            {PROVINCE_DIALECTS[selectedRegion].headerDescription}
-                          </p>
+                          <p className="text-[11px] text-white font-bold tracking-widest uppercase text-center">{PROVINCE_DIALECTS[selectedRegion].headerDescription}</p>
                         </div>
                       )}
                     </div>
 
                     {PROVINCE_DIALECTS[selectedRegion].headerLongDescription && (
                       <div className="mb-8">
-                        <button 
-                          onClick={() => { playSoftChime(); setShowLongDesc(!showLongDesc); }}
-                          className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${isFlower ? 'bg-pink-500/10 border-pink-500/20 text-pink-200' : 'bg-emerald-50/30 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/20 text-emerald-800 dark:text-emerald-300'}`}
-                        >
+                        <button onClick={() => { playSoftChime(); setShowLongDesc(!showLongDesc); }} className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${isFlower ? 'bg-pink-500/10 border-pink-500/20 text-pink-200' : 'bg-emerald-50/30 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/20 text-emerald-800 dark:text-emerald-300'}`}>
                           <div className="flex items-center gap-3">
                             <span className="text-lg">🌿</span>
                             <span className="text-xs font-bold uppercase tracking-widest">Apa Yang Ikonik?</span>
                           </div>
                           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className={`transition-transform duration-500 ${showLongDesc ? 'rotate-180' : ''}`}><polyline points="6 9 12 15 18 9"></polyline></svg>
                         </button>
-                        
                         <div className={`grid transition-all duration-500 ease-in-out ${showLongDesc ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
                           <div className="overflow-hidden">
                             <div className={`p-5 rounded-2xl border italic text-sm leading-relaxed ${isFlower ? 'bg-petal-900/40 border-pink-500/10 text-pink-100/70' : 'bg-emerald-50/10 dark:bg-black/20 border-emerald-50 dark:border-emerald-800/10 text-emerald-900/80 dark:text-emerald-200/60'}`}>
@@ -385,19 +467,8 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
                     {PROVINCE_DIALECTS[selectedRegion].regionalSong && (
                       <div className={`p-6 rounded-[2rem] border transition-all mb-8 relative ${isFlower ? 'bg-pink-900/40 border-pink-500/20' : 'bg-emerald-50/50 dark:bg-emerald-950/40 border-emerald-100 dark:border-emerald-800/30'}`}>
                         <div className="flex items-center gap-5 relative z-10">
-                          <div className="group/lock relative">
-                            <button 
-                              className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center transition-all shadow-md cursor-help ${isFlower ? 'bg-pink-900/50 text-pink-300 border border-pink-500/10' : 'bg-white dark:bg-emerald-900/30 text-emerald-600'}`}
-                            >
-                              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                              </svg>
-                            </button>
-                            <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-3 px-3 py-2 bg-black/80 text-white text-[10px] font-bold rounded-lg whitespace-nowrap opacity-0 group-hover/lock:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl border border-white/10">
-                              Fitur dalam pengembangan
-                              <div className="absolute top-full left-1/2 -translate-x-1/2 border-4 border-transparent border-t-black/80"></div>
-                            </div>
+                          <div className={`w-12 h-12 shrink-0 rounded-xl flex items-center justify-center transition-all shadow-md ${isFlower ? 'bg-pink-900/50 text-pink-300 border border-pink-500/10' : 'bg-white dark:bg-emerald-900/30 text-emerald-600'}`}>
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
                           </div>
                           <div className="flex-1 min-w-0">
                             <span className={`text-[9px] font-bold uppercase tracking-[0.3em] block mb-1 opacity-60 ${isFlower ? 'text-pink-300' : 'text-emerald-700 dark:text-emerald-400'}`}>Lagu Daerah</span>
@@ -405,16 +476,98 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
                             <p className={`text-[11px] italic opacity-60 wrap ${textColor}`}>{PROVINCE_DIALECTS[selectedRegion].regionalSong?.description}</p>
                           </div>
                         </div>
-                        
-                        <div className="mt-4 w-full h-1 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden relative">
-                          <div 
-                            className={`h-full transition-all duration-150 ease-linear rounded-full ${isFlower ? 'bg-pink-500 shadow-[0_0_10px_rgba(236,72,153,0.5)]' : 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]'}`}
-                            style={{ width: `${songProgress}%` }}
-                          ></div>
-                        </div>
                       </div>
                     )}
 
+                    {/* Folklore / Cerita Rakyat Section - Collapsible */}
+                    {PROVINCE_DIALECTS[selectedRegion].folklore && (
+                      <div className="mb-10">
+                        <button 
+                          onClick={() => { playSoftChime(); setShowFolklore(!showFolklore); }} 
+                          className={`w-full flex items-center justify-between p-4 rounded-2xl border transition-all ${isFlower ? 'bg-pink-500/10 border-pink-500/20 text-pink-200' : 'bg-emerald-50/30 dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/20 text-emerald-800 dark:text-emerald-300'}`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <span className="text-lg">✨</span>
+                            <span className="text-xs font-bold uppercase tracking-widest">Cerita Rakyat</span>
+                          </div>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className={`transition-transform duration-500 ${showFolklore ? 'rotate-180' : ''}`}><polyline points="6 9 12 15 18 9"></polyline></svg>
+                        </button>
+
+                        <div className={`grid transition-all duration-500 ease-in-out ${showFolklore ? 'grid-rows-[1fr] opacity-100 mt-3' : 'grid-rows-[0fr] opacity-0 mt-0'}`}>
+                          <div className="overflow-hidden">
+                            <div className={`p-8 rounded-[2.5rem] border transition-all relative overflow-hidden group/folk ${isFlower ? 'bg-petal-900/60 border-pink-500/30' : 'bg-emerald-950/20 border-emerald-100 dark:border-emerald-800/30'}`}>
+                              <div className="relative z-10">
+                                <div className="flex justify-between items-center mb-6">
+                                  <div>
+                                    <span className={`text-[9px] font-bold uppercase tracking-[0.4em] block mb-1 opacity-60 ${isFlower ? 'text-pink-400' : 'text-emerald-600 dark:text-emerald-400'}`}>Dongeng Nusantara</span>
+                                    <h4 className={`text-xl font-bold ${textColor}`}>{PROVINCE_DIALECTS[selectedRegion].folklore?.title}</h4>
+                                  </div>
+                                  <button onClick={() => toggleFolklore(PROVINCE_DIALECTS[selectedRegion].folklore?.story || "")} disabled={isFolkloreLoading} className={`w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-lg active:scale-90 ${folklorePlaying ? 'bg-red-500 text-white animate-pulse' : (isFlower ? 'bg-pink-500 text-white' : 'bg-emerald-600 text-white')}`}>
+                                    {isFolkloreLoading ? (
+                                      <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                    ) : folklorePlaying ? (
+                                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                                    ) : (
+                                      <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="ml-1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                    )}
+                                  </button>
+                                </div>
+
+                                {/* VIDEO SECTION - Interaktif dengan Poster */}
+                                {PROVINCE_DIALECTS[selectedRegion].folklore?.videoUrl && (
+                                  <div 
+                                    className="w-full aspect-video rounded-3xl overflow-hidden mb-6 border border-white/10 shadow-inner bg-black/20 group/vid relative cursor-pointer"
+                                    onClick={() => !isFolkloreVideoActive && setIsFolkloreVideoActive(true)}
+                                  >
+                                    {!isFolkloreVideoActive ? (
+                                      <>
+                                        <img 
+                                          src={PROVINCE_DIALECTS[selectedRegion].folklore?.videoPosterUrl || PROVINCE_DIALECTS[selectedRegion].headerImage} 
+                                          alt="Sampul Dongeng" 
+                                          className="w-full h-full object-cover transition-all duration-700 md:group-hover/vid:scale-105"
+                                        />
+                                        <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover/vid:bg-black/50 transition-all duration-500">
+                                          <div className={`w-20 h-20 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-500 md:group-hover/vid:scale-110 ${isFlower ? 'bg-pink-500/20 border-pink-500/40 text-white' : 'bg-white/20 border-white/40 text-white'}`}>
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="ml-1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                                          </div>
+                                        </div>
+                                        <div className="absolute bottom-4 left-0 right-0 text-center">
+                                           <span className="text-[10px] text-white/60 font-bold uppercase tracking-[0.2em] bg-black/40 px-4 py-1 rounded-full backdrop-blur-md">Klik untuk Menonton</span>
+                                        </div>
+                                      </>
+                                    ) : (
+                                      <video 
+                                        src={PROVINCE_DIALECTS[selectedRegion].folklore?.videoUrl} 
+                                        autoPlay controls 
+                                        className="w-full h-full object-cover"
+                                      />
+                                    )}
+                                  </div>
+                                )}
+                                
+                                <div className={`p-5 rounded-3xl border mb-6 backdrop-blur-sm transition-all ${isFlower ? 'bg-pink-900/30 border-pink-500/10' : 'bg-white/5 border-white/10'}`}>
+                                  {isFolkloreLoading ? (
+                                    <div className="flex flex-col items-center py-4 gap-3">
+                                       <p className={`text-sm italic animate-pulse ${isFlower ? 'text-pink-300' : 'text-emerald-400'}`}>Tara sedang menyiapkan dongeng ceria untukmu...</p>
+                                    </div>
+                                  ) : (
+                                    <p className={`text-sm leading-relaxed italic font-medium ${isFlower ? 'text-pink-100/80' : 'text-emerald-950/80 dark:text-emerald-100/80'}`}>"{PROVINCE_DIALECTS[selectedRegion].folklore?.story}"</p>
+                                  )}
+                                </div>
+                                <div className={`p-4 rounded-2xl border flex flex-col gap-3 transition-all ${folklorePlaying ? 'opacity-100 translate-y-0' : 'opacity-40 pointer-events-none'} ${isFlower ? 'bg-pink-900/40 border-pink-500/20' : 'bg-black/20 border-white/5'}`}>
+                                  <div className="flex justify-between items-center">
+                                    <span className={`text-[8px] font-bold uppercase tracking-widest ${isFlower ? 'text-pink-300' : 'text-emerald-50'}`}>{folklorePlaying ? 'Sedang Mendongeng...' : 'Dongeng Siap'}</span>
+                                    <span className={`text-[8px] font-mono ${isFlower ? 'text-pink-300/60' : 'text-white/40'}`}>{Math.floor(folkloreProgress)}%</span>
+                                  </div>
+                                  <input type="range" min="0" max="100" step="0.1" value={folkloreProgress} onChange={handleSeekFolklore} className={`w-full h-1.5 rounded-full appearance-none cursor-pointer accent-current ${isFlower ? 'text-pink-500 bg-pink-100/10' : 'text-emerald-500 bg-white/10'}`} />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                    
                     <p className={`text-[11px] mb-6 italic opacity-70 leading-relaxed ${isFlower ? 'text-pink-100' : 'text-emerald-800 dark:text-emerald-400'}`}>
                       Klik untuk melihat dahan bahasa di {selectedRegion}:
                     </p>

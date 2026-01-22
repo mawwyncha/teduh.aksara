@@ -14,6 +14,14 @@ export interface RegionalSong {
   audioUrl: string;
 }
 
+export interface Folklore {
+  title: string;
+  story: string;
+  backgroundImage?: string; // URL gambar transparan/PNG
+  videoUrl?: string; // Properti baru untuk selipan video
+  videoPosterUrl?: string; // Properti baru untuk sampul video
+}
+
 export interface ProvinceData {
   headerImage: string;
   headerDescription?: string;
@@ -22,4 +30,5 @@ export interface ProvinceData {
   community: DialectInfo[];
   foreign?: DialectInfo[];
   regionalSong?: RegionalSong;
+  folklore?: Folklore;
 }

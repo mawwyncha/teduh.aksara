@@ -12,11 +12,11 @@ interface PronunciationModalProps {
 }
 
 const CALMING_WAIT_MESSAGES = [
-  "Tara sedang merangkai nada untukmu, sabar ya Sahabat...",
-  "Dahan suaraku butuh waktu sejenak untuk mekar sempurna...",
+  "Tara sedang merangkai nada ceria untukmu, sabar ya Sahabat...",
+  "Dahan suaraku sedang bersiap untuk mekar sempurna...",
   "Menanti embun suara membasahi naskahmu, tetaplah tenang...",
   "Aksara butuh ketelatenan untuk menjadi suara yang merdu...",
-  "Sabar ya, hembusan angin sedang membawa suaraku padamu..."
+  "Sabar ya, angin sedang membawa suaraku padamu..."
 ];
 
 export const PronunciationModal: React.FC<PronunciationModalProps> = ({ isOpen, onClose, originalText, translation, onSuccess }) => {
@@ -78,7 +78,7 @@ export const PronunciationModal: React.FC<PronunciationModalProps> = ({ isOpen, 
     ttsTimerRef.current = window.setTimeout(() => {
       setCalmingMessage(CALMING_WAIT_MESSAGES[Math.floor(Math.random() * CALMING_WAIT_MESSAGES.length)]);
       setShowCalmingMessage(true);
-    }, 3000);
+    }, 2000); // Pesan muncul lebih cepat
 
     try {
       await generateSpeech(currentTargetText, currentLangName, currentPhoneticGuide);
@@ -162,11 +162,11 @@ export const PronunciationModal: React.FC<PronunciationModalProps> = ({ isOpen, 
           <div className="absolute inset-0 z-[210] flex items-center justify-center p-6 bg-black/40 backdrop-blur-md animate-in fade-in duration-300">
             <div className={`${modalBg} w-full max-w-sm rounded-[2.5rem] p-8 shadow-2xl text-center border border-white/10`}>
               <div className="w-20 h-20 mx-auto mb-6 bg-rose-50 dark:bg-rose-900/20 rounded-full flex items-center justify-center text-rose-600">
-                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                 <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" cy="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
               </div>
               <h3 className={`text-xl font-bold ${textColor} mb-4`}>Izinkan Tara Mendengar?</h3>
-              <p className={`text-xs italic leading-relaxed mb-8 ${theme === 'flower' ? 'text-pink-100/60' : 'text-emerald-900/60 dark:text-emerald-200/40'}`}>
-                Tara perlu meminjam pendengaranmu untuk mengubah suara menjadi aksara. Rekaman suaramu hanya diproses seketika untuk transkripsi dan tidak akan pernah kami simpan di dahan ingatan permanen kami.
+              <p className={`text-xs italic leading-relaxed mb-8 ${theme === 'flower' ? 'text-pink-100/60' : 'text-emerald-950/60 dark:text-emerald-200/40'}`}>
+                Tara perlu meminjam pendengaranmu untuk mengubah suara menjadi aksara. Rekaman suaramu hanya diproses seketika untuk transkripsi.
               </p>
               <div className="flex flex-col gap-2">
                 <button 
@@ -182,13 +182,12 @@ export const PronunciationModal: React.FC<PronunciationModalProps> = ({ isOpen, 
                   Tidak, Lain Kali Saja
                 </button>
               </div>
-              <div className={`mt-6 text-[9px] font-bold uppercase tracking-widest ${theme === 'flower' ? 'text-pink-500/30' : 'text-emerald-500/20'}`}>Keamanan Privasi Sahabat Aksara Diutamakan</div>
             </div>
           </div>
         )}
 
         <button onClick={onClose} className={`absolute top-8 right-8 p-2 transition-colors ${theme === 'flower' ? 'text-pink-300 hover:text-pink-500' : 'text-emerald-300 dark:text-emerald-700 hover:text-red-700'}`}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" cy="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
         </button>
 
         <div className="mb-6">
@@ -221,14 +220,6 @@ export const PronunciationModal: React.FC<PronunciationModalProps> = ({ isOpen, 
             <p className={`text-2xl font-medium leading-relaxed italic ${textColor}`}>
               "{currentTargetText || "Pilih atau tulis naskah di editor terlebih dahulu."}"
             </p>
-            {(activeTab === 'original' ? true : !!translation?.readingGuide) && (
-              <div className="mt-4 pt-4 border-t border-emerald-100/10">
-                <p className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${labelColor}`}>Cara Baca</p>
-                <p className={`text-sm italic ${theme === 'flower' ? 'text-pink-100/40' : 'text-emerald-600/60 dark:text-emerald-400/60'}`}>
-                  {activeTab === 'original' ? "Gunakan pelafalan Bahasa Indonesia baku." : translation?.readingGuide}
-                </p>
-              </div>
-            )}
           </div>
 
           <div className="flex flex-col gap-4">
@@ -254,20 +245,12 @@ export const PronunciationModal: React.FC<PronunciationModalProps> = ({ isOpen, 
                 {isRecording ? `Berhenti (${countdown}s)` : 'Mulai Berlatih'}
               </button>
             </div>
-
             {showCalmingMessage && isTtsLoading && (
               <p className={`text-center text-sm italic animate-in fade-in slide-in-from-top-2 duration-700 ${theme === 'flower' ? 'text-pink-100/40' : 'text-emerald-600/60'}`}>
                 "{calmingMessage}"
               </p>
             )}
           </div>
-
-          {isAnalyzing && (
-            <div className="text-center py-10 animate-in fade-in">
-              <div className={`w-10 h-10 border-4 rounded-full animate-spin mx-auto mb-4 ${theme === 'flower' ? 'border-pink-100/20 border-t-pink-500' : 'border-emerald-100 border-t-emerald-600'}`}></div>
-              <p className={`font-bold italic ${theme === 'flower' ? 'text-pink-100/60' : 'text-emerald-800/60'}`}>Tara sedang mendengarkan rekamanmu...</p>
-            </div>
-          )}
 
           {result && !isAnalyzing && (
             <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500 pb-4">
@@ -276,23 +259,10 @@ export const PronunciationModal: React.FC<PronunciationModalProps> = ({ isOpen, 
                   <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${labelColor}`}>Skor Kelancaran</h4>
                   <p className={`text-4xl font-bold ${theme === 'flower' ? 'text-pink-300' : 'text-emerald-600'}`}>{result.score}%</p>
                 </div>
-                <div className="text-right">
-                  <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-1 ${labelColor}`}>Status</h4>
-                  <p className={`font-bold uppercase tracking-tighter ${result.score > 80 ? (theme === 'flower' ? 'text-emerald-400' : 'text-emerald-600') : 'text-amber-500'}`}>
-                    {result.score > 80 ? 'Sangat Fasih' : result.score > 50 ? 'Cukup Baik' : 'Butuh Latihan'}
-                  </p>
-                </div>
               </div>
-
               <div className={`${boxBg} p-6 rounded-3xl border`}>
-                <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${labelColor}`}>Ulasan Tutur ({currentLangName})</h4>
+                <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${labelColor}`}>Ulasan Tutur</h4>
                 <p className={`font-medium leading-relaxed italic ${textColor}`}>"{result.feedback}"</p>
-              </div>
-
-              <div className={`p-6 rounded-3xl border relative overflow-hidden ${theme === 'flower' ? 'bg-pink-500/10 border-pink-500/20' : 'bg-red-50/30 dark:bg-red-900/5 border-red-100 dark:border-red-900/10'}`}>
-                <div className="absolute -right-4 -bottom-4 opacity-5 rotate-12 scale-150">{theme === 'flower' ? '🌸' : '🍒'}</div>
-                <h4 className={`text-[10px] font-bold uppercase tracking-widest mb-3 ${theme === 'flower' ? 'text-pink-300' : 'text-red-800/40 dark:text-red-400/40'}`}>Embun Penyemangat</h4>
-                <p className={`font-bold leading-relaxed italic ${theme === 'flower' ? 'text-white' : 'text-red-900 dark:text-red-100'}`}>"{result.encouragement}"</p>
               </div>
             </div>
           )}

@@ -32,32 +32,32 @@ const BOOK_THEME = {
 
 const TARA_STORY_PAGES: BookPage[] = [
   { 
-    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/page1.jpeg",
-    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/video1.mp4",
+    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Story/page1.jpeg",
+    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/Story/video1.mp4",
   },
   { 
-    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/page2.jpeg",
-    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/video2.mp4",
+    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Story/page2.jpeg",
+    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/Story/video2.mp4",
   },
   { 
-    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/page3.jpeg",
-    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/video3.mp4",
+    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Story/page3.jpeg",
+    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/Story/video3.mp4",
   },
   { 
-    imageUrl: "https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?q=80&w=2074&auto=format&fit=crop",
-    videoUrl: "https://assets.mixkit.co/videos/preview/mixkit-sunlight-shining-through-the-leaves-of-a-tree-2407-large.mp4",
+    imageUrl: "",
+    videoUrl: "",
   },
   { 
-    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/page5.jpeg",
-    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/video5.mp4",
+    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Story/page5.jpeg",
+    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/Story/video5.mp4",
   },
   { 
-    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/page6.jpeg",
-    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/video6.mp4",
+    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Story/page6.jpeg",
+    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/Story/video6.mp4",
   },
   { 
-    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/page7.jpeg",
-    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/video7.mp4",
+    imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Story/page7.jpeg",
+    videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/Story/video7.mp4",
   }
 ];
 

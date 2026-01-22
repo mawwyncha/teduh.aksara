@@ -20,15 +20,13 @@ const getAI = () => {
   return new GoogleGenAI({ apiKey });
 };
 
-// Security: Sanitization helper to strip potentially dangerous script/injection chars
 const sanitizeInput = (text: string): string => {
   return text
-    .replace(/<[^>]*>?/gm, '') // Strip HTML tags
-    .replace(/[^\x20-\x7E\u00A0-\u00FF\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF]/g, ' ') // Strip non-printable/dangerous chars
+    .replace(/<[^>]*>?/gm, '') 
+    .replace(/[^\x20-\x7E\u00A0-\u00FF\u0100-\u017F\u0180-\u024F\u1E00-\u1EFF]/g, ' ') 
     .trim();
 };
 
-// Internal decoding helpers
 function decode(base64: string) {
   const binaryString = atob(base64);
   const len = binaryString.length;
@@ -60,7 +58,7 @@ async function decodeAudioData(
 
 const sanitizeForTTS = (text: string) => {
   return text
-    .slice(0, 800)
+    .slice(0, 2000) 
     .replace(/[*_#~`>|]/g, ' ')
     .replace(/[^\w\s,.?!;()]/gi, '')
     .trim();
@@ -76,45 +74,6 @@ const hashText = (text: string): string => {
   return Math.abs(hash).toString(36);
 };
 
-const canUseWebSpeech = (languageName: string): string | null => {
-  const webSpeechMap: Record<string, string> = {
-    'Bahasa Indonesia': 'id-ID',
-    'Inggris (AS)': 'en-US',
-    'Inggris (UK)': 'en-GB',
-    'Inggris (AU)': 'en-AU',
-    'Jawa': 'jv-ID',
-    'Sunda': 'su-ID',
-    'Kanton Indo': 'zh-HK',
-    'Portugis TL': 'pt-PT',
-    'Hokkien Medan': 'zh-CN',
-    'Hokkien JKT': 'zh-CN',
-    'Hakka Singkawang': 'zh-CN',
-    'Teochew Pontianak': 'zh-CN'
-  };
-  return webSpeechMap[languageName] || null;
-};
-
-const speakWithWebAPI = (text: string, lang: string): Promise<void> => {
-  return new Promise((resolve, reject) => {
-    if (!('speechSynthesis' in window)) {
-      reject(new Error('WEB_SPEECH_NOT_SUPPORTED'));
-      return;
-    }
-    
-    speechSynthesis.cancel();
-    
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    utterance.rate = 0.95;
-    utterance.pitch = 1.0;
-    
-    utterance.onend = () => resolve();
-    utterance.onerror = (e) => reject(e);
-    
-    speechSynthesis.speak(utterance);
-  });
-};
-
 const playAudioBuffer = (base64: string): Promise<void> => {
   return new Promise(async (resolve) => {
     try {
@@ -124,18 +83,53 @@ const playAudioBuffer = (base64: string): Promise<void> => {
       const src = ctx.createBufferSource();
       src.buffer = buf;
       src.connect(ctx.destination);
-      
-      src.onended = () => {
-        ctx.close();
-        resolve();
-      };
-      
+      src.onended = () => { ctx.close(); resolve(); };
       src.start();
-    } catch (e) {
-      console.error("Playback error:", e);
-      resolve(); 
-    }
+    } catch (e) { resolve(); }
   });
+};
+
+/**
+ * Fix: Added missing export for preloadWebSpeechVoices to resolve compilation error in App.tsx
+ */
+export const preloadWebSpeechVoices = () => {
+  if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+    window.speechSynthesis.getVoices();
+  }
+};
+
+/**
+ * Mendapatkan data audio Base64 untuk pemutar kustom (mendukung fitur geser/seeking)
+ */
+export const fetchTTSAudio = async (text: string, languageName: string = "Bahasa Indonesia"): Promise<string | null> => {
+  const cleanText = sanitizeForTTS(text);
+  if (!cleanText) return null;
+
+  const cacheKey = `tts_raw_puck_${hashText(cleanText + languageName)}`;
+  try {
+    const cached = await getData(STORES.TTS_CACHE, cacheKey);
+    if (cached) return cached;
+  } catch (e) {}
+
+  const ai = getAI();
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash-preview-tts",
+    // Fix: Using standard contents structure with parts
+    contents: { parts: [{ text: `Bacakan dongeng ini dengan gaya anak-anak yang ekspresif dalam logat ${languageName}: "${cleanText}"` }] },
+    config: {
+      responseModalities: [Modality.AUDIO],
+      speechConfig: { 
+        voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Puck' } } 
+      },
+    },
+  });
+
+  const b64 = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+  if (b64) {
+    saveData(STORES.TTS_CACHE, cacheKey, b64).catch(() => {});
+    return b64;
+  }
+  return null;
 };
 
 export const generateSpeech = async (
@@ -145,40 +139,24 @@ export const generateSpeech = async (
 ): Promise<void> => {
   const cleanText = sanitizeForTTS(text);
   if (!cleanText) return;
-
-  const webLang = canUseWebSpeech(languageName);
-  
-  if (webLang && !phoneticGuide) {
-    try {
-      await speakWithWebAPI(cleanText, webLang);
-      return;
-    } catch (e) {
-      console.warn(`Web Speech failed for ${languageName}, falling back to Gemini TTS`);
-    }
-  }
-
-  const cacheKey = `tts_${hashText(cleanText + languageName + (phoneticGuide || ""))}`;
+  const cacheKey = `tts_puck_${hashText(cleanText + languageName + (phoneticGuide || ""))}`;
   try {
     const cached = await getData(STORES.TTS_CACHE, cacheKey);
-    if (cached) {
-      await playAudioBuffer(cached);
-      return;
-    }
+    if (cached) { await playAudioBuffer(cached); return; }
   } catch (e) {}
 
   const ai = getAI();
   const prompt = phoneticGuide 
-    ? `Speak this in ${languageName} accent: "${cleanText}". Phonetic guide: ${phoneticGuide}`
-    : `Speak this in ${languageName} accent: "${cleanText}"`;
+    ? `Speak this cheerfully as a child in ${languageName} accent: "${cleanText}". Phonetic guide: ${phoneticGuide}`
+    : `Speak this cheerfully as a child in ${languageName} accent: "${cleanText}"`;
 
   const response = await ai.models.generateContent({
     model: "gemini-2.5-flash-preview-tts",
-    contents: [{ parts: [{ text: prompt }] }],
+    // Fix: Using standard contents structure with parts
+    contents: { parts: [{ text: prompt }] },
     config: {
       responseModalities: [Modality.AUDIO],
-      speechConfig: { 
-        voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Kore' } } 
-      },
+      speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Puck' } } },
     },
   });
 
@@ -189,50 +167,14 @@ export const generateSpeech = async (
   }
 };
 
-export const preloadWebSpeechVoices = (): Promise<void> => {
-  return new Promise((resolve) => {
-    if (!('speechSynthesis' in window)) {
-      resolve();
-      return;
-    }
-    const loadVoices = () => {
-      const voices = speechSynthesis.getVoices();
-      if (voices.length > 0) resolve();
-    };
-    loadVoices();
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-      speechSynthesis.onvoiceschanged = loadVoices;
-    }
-  });
-};
-
-const LANG_NAME_MAP: Record<TargetLanguage, string> = { 
-  en_us: 'Inggris (AS)', en_uk: 'Inggris (UK)', en_au: 'Inggris (AU)',
-  jv_central: 'Jawa', jv_yogyakarta: 'Jawa Jogja', jv_central_coastal: 'Jawa Pesisir', jv_east: 'Jawa Timur',
-  su: 'Sunda', min: 'Minang', ban: 'Bali', bug: 'Bugis', mad: 'Madura', ace: 'Aceh', bjn: 'Banjar', mk: 'Makassar',
-  bt_toba: 'Batak Toba', bt_karo: 'Batak Karo', lp: 'Lampung', sas: 'Sasak', pap: 'Melayu Papua', amb: 'Melayu Ambon',
-  go: 'Gorontalo', ni: 'Nias', tet: 'Tetum', pt_tl: 'Portugis TL',
-  zh_hokkien_medan: 'Hokkien Medan', zh_hokkien_jakarta: 'Hokkien JKT', zh_hakka_singkawang: 'Hakka Singkawang',
-  zh_hakka_bangka: 'Hakka Bangka', zh_teochew_pontianak: 'Teochew Pontianak', zh_cantonese_id: 'Kanton Indo'
-};
-
-export const analyzeGrammar = async (
-  text: string, 
-  style: WritingStyle, 
-  context: WritingContext,
-  targetLang: TargetLanguage,
-  withPlagiarism: boolean = false
-): Promise<AnalysisResult> => {
+export const analyzeGrammar = async (text: string, style: WritingStyle, context: WritingContext, targetLang: TargetLanguage, withPlagiarism: boolean = false): Promise<AnalysisResult> => {
   const ai = getAI();
-  const langName = LANG_NAME_MAP[targetLang];
-  const safeText = sanitizeInput(text);
-
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: `Analisis teks: "${safeText}". Gaya: ${style}, Konteks: ${context}, Target: ${langName}.`,
+    contents: `Analisis teks: "${sanitizeInput(text)}". Gaya: ${style}, Konteks: ${context}, Target Bahasa: ${targetLang}.`,
     config: {
-      thinkingConfig: { thinkingBudget: 0 },
-      systemInstruction: `Anda Tara, pakar bahasa Indonesia. Tugas: 1. Koreksi EYD. 2. Summary singkat. 3. ReadingGuideIndo. 4. Translation. 5. Suggestions. 6. isViolation detection (kasar/SARA/serangan teknis). Respon JSON murni.`,
+      thinkingConfig: { thinkingBudget: 0 }, // Mempercepat respon
+      systemInstruction: `Anda Tara, pakar bahasa Indonesia. Tugas: 1. Koreksi EYD. 2. Summary singkat. 3. ReadingGuideIndo. 4. Translation. 5. Suggestions. 6. isViolation detection. Respon dalam format JSON murni. Jangan berpura-pura berpikir lama, berikan hasil instan.`,
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
@@ -250,7 +192,7 @@ export const analyzeGrammar = async (
                 original: { type: Type.STRING },
                 replacement: { type: Type.STRING },
                 reason: { type: Type.STRING },
-                type: { type: Type.STRING, enum: ['Ejaan', 'Tata Bahasa', 'Gaya Bahasa', 'Tanda Baca', 'Budaya'] }
+                type: { type: Type.STRING }
               }
             }
           },
@@ -268,59 +210,34 @@ export const analyzeGrammar = async (
   });
 
   const data: AnalysisResult = JSON.parse(response.text || "{}");
-  if (data.translation) data.translation.languageName = langName;
-
   if (withPlagiarism) {
     const pResponse = await ai.models.generateContent({
       model: "gemini-3-flash-preview",
-      contents: `Cek plagiarisme di web untuk: "${safeText}".`,
-      config: { thinkingConfig: { thinkingBudget: 0 }, tools: [{ googleSearch: {} }] },
+      contents: `Cek plagiarisme di web untuk: "${sanitizeInput(text)}".`,
+      config: { tools: [{ googleSearch: {} }], thinkingConfig: { thinkingBudget: 0 } },
     });
     const chunks = pResponse.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
     const sources = chunks.filter(c => c.web).map(c => ({ uri: c.web!.uri!, title: c.web!.title! })).slice(0, 3);
     data.plagiarism = {
       score: sources.length > 0 ? 40 : 0,
       sources,
-      summary: sources.length > 0 ? "Ditemukan beberapa kemiripan dahan di web." : "Naskahmu tampak orisinal."
+      summary: sources.length > 0 ? "Ditemukan kemiripan di dahan web." : "Naskahmu tampak orisinal."
     };
   }
-
   return data;
-};
-
-/**
- * CHAT REGIONAL (Kawan Aksara AI)
- */
-export const chatRegional = async (
-  messages: { role: 'user' | 'model'; text: string }[],
-  targetLang: TargetLanguage
-): Promise<string> => {
-  const ai = getAI();
-  const langName = LANG_NAME_MAP[targetLang];
-  
-  const response = await ai.models.generateContent({
-    model: "gemini-3-flash-preview",
-    contents: messages.map(m => ({ role: m.role, parts: [{ text: sanitizeInput(m.text) }] })),
-    config: {
-      thinkingConfig: { thinkingBudget: 0 },
-      systemInstruction: `Anda adalah "Kawan Aksara", asisten cerdas yang sangat ahli dalam ${langName} dan budaya Indonesia. 
-      Tugas Anda adalah membalas percakapan pengguna HANYA menggunakan ${langName}. 
-      Gunakan nada bicara yang hangat, sopan, puitis (seperti teman lama), dan edukatif. 
-      Jika pengguna bertanya tentang bahasa tersebut, berikan penjelasan singkat yang menarik. 
-      Patuhi Etika Beraksara: Jangan gunakan kata kasar.`
-    }
-  });
-
-  return response.text || "Maaf, dahan pikiranku sedang tersangkut angin.";
 };
 
 export const transcribeAudio = async (base64Audio: string, mimeType: string): Promise<string> => {
   const ai = getAI();
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: [
-      { parts: [{ text: "Transkripsikan audio ini ke teks Bahasa Indonesia." }, { inlineData: { data: base64Audio, mimeType: mimeType.split(';')[0] } }] }
-    ],
+    // Fix: Wrapped parts in a single content object for consistency
+    contents: { 
+      parts: [
+        { text: "Transkripsikan audio ini ke teks Bahasa Indonesia secara cepat." }, 
+        { inlineData: { data: base64Audio, mimeType: mimeType.split(';')[0] } }
+      ] 
+    },
     config: { thinkingConfig: { thinkingBudget: 0 } }
   });
   return (response.text || "").trim();
@@ -333,20 +250,18 @@ export const analyzePronunciation = async (
   languageName: string
 ): Promise<PronunciationResult> => {
   const ai = getAI();
-  const safeTarget = sanitizeInput(targetText);
   const response = await ai.models.generateContent({
     model: "gemini-3-flash-preview",
-    contents: [
-      {
-        parts: [
-          { text: `Evaluasi pelafalan "${safeTarget}" dalam ${languageName}. Berikan skor (0-100), feedback, encouragement, dan transkripsi. Respon JSON.` },
-          { inlineData: { data: base64Audio, mimeType: mimeType.split(';')[0] } }
-        ]
-      }
-    ],
+    // Fix: Wrapped parts in a single content object for consistency
+    contents: {
+      parts: [
+        { text: `Evaluasi pelafalan "${targetText}" dalam ${languageName}. Berikan skor (0-100), feedback, encouragement, dan transkripsi. Respon JSON.` },
+        { inlineData: { data: base64Audio, mimeType: mimeType.split(';')[0] } }
+      ]
+    },
     config: {
-      thinkingConfig: { thinkingBudget: 0 },
       responseMimeType: "application/json",
+      thinkingConfig: { thinkingBudget: 0 },
       responseSchema: {
         type: Type.OBJECT,
         properties: {

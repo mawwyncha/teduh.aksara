@@ -10,6 +10,12 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
       description: "",
       audioUrl: ""
     },
+    folklore: {
+      title: "",
+      story: "",
+      videoUrl: "",
+      videoPosterUrl: ""
+    },
     native: [
       { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
     ],
@@ -28,6 +34,12 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
       title: "",
       description: "",
       audioUrl: ""
+    },
+    folklore: {
+      title: "",
+      story: "",
+      videoUrl: "",
+      videoPosterUrl: ""
     },
     native: [
       { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
@@ -48,6 +60,12 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
       description: "",
       audioUrl: ""
     },
+    folklore: {
+      title: "",
+      story: "",
+      videoUrl: "",
+      videoPosterUrl: ""
+    },
     native: [
       { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
     ],
@@ -66,6 +84,12 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
       title: "",
       description: "",
       audioUrl: ""
+    },
+    folklore: {
+      title: "",
+      story: "",
+      videoUrl: "",
+      videoPosterUrl: ""
     },
     native: [
       { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
@@ -86,6 +110,12 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
       description: "",
       audioUrl: ""
     },
+    folklore: {
+      title: "",
+      story: "",
+      videoUrl: "",
+      videoPosterUrl: ""
+    },
     native: [
       { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
     ],
@@ -104,6 +134,12 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
       title: "",
       description: "",
       audioUrl: ""
+    },
+    folklore: {
+      title: "",
+      story: "",
+      videoUrl: "",
+      videoPosterUrl: ""
     },
     native: [
       { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
