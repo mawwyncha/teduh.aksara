@@ -556,7 +556,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
                                 </div>
                                 <div className={`p-4 rounded-2xl border flex flex-col gap-3 transition-all ${folklorePlaying ? 'opacity-100 translate-y-0' : 'opacity-40 pointer-events-none'} ${isFlower ? 'bg-pink-900/40 border-pink-500/20' : 'bg-black/20 border-white/5'}`}>
                                   <div className="flex justify-between items-center">
-                                    <span className={`text-[8px] font-bold uppercase tracking-widest ${isFlower ? 'text-pink-300' : 'text-emerald-50'}`}>{folklorePlaying ? 'Sedang Mendongeng...' : 'Dongeng Siap'}</span>
+                                    <span className={`text-[8px] font-bold uppercase tracking-widest ${isFlower ? 'text-pink-300' : 'text-emerald-50'}`}>{folklorePlaying ? 'Sedang Mendongeng...' : 'Mulai Mendongeng'}</span>
                                     <span className={`text-[8px] font-mono ${isFlower ? 'text-pink-300/60' : 'text-white/40'}`}>{Math.floor(folkloreProgress)}%</span>
                                   </div>
                                   <input type="range" min="0" max="100" step="0.1" value={folkloreProgress} onChange={handleSeekFolklore} className={`w-full h-1.5 rounded-full appearance-none cursor-pointer accent-current ${isFlower ? 'text-pink-500 bg-pink-100/10' : 'text-emerald-500 bg-white/10'}`} />
