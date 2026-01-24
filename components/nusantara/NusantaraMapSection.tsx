@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { PROVINCE_DIALECTS, DialectInfo } from './Province';
+import { PROVINCE_DIALECTS, DialectInfo, MelodyNote } from './Province';
 import { TargetLanguage } from '../../types';
 import { JavaMap } from './regions/maps/JavaMap';
 import { SumateraMap } from './regions/maps/SumateraMap';
@@ -9,6 +9,7 @@ import { NusaTenggaraMap } from './regions/maps/NusaTenggaraMap';
 import { SulawesiMap } from './regions/maps/SulawesiMap';
 import { PapuaMap } from './regions/maps/PapuaMap';
 import { fetchTTSAudio } from '../../services/geminiService';
+import * as Tone from 'tone';
 
 interface NusantaraMapSectionProps {
   currentTheme: 'light' | 'dark' | 'flower';
@@ -38,6 +39,9 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
   const [showFolklore, setShowFolklore] = useState(false);
   const [isFolkloreVideoActive, setIsFolkloreVideoActive] = useState(false);
   const folkloreAudioRef = useRef<HTMLAudioElement>(null);
+  const [isMelodyPlaying, setIsMelodyPlaying] = useState(false);
+  const [activeNote, setActiveNote] = useState<string | null>(null);
+  const synthRef = useRef<Tone.PolySynth | null>(null);
 
   const isFlower = currentTheme === 'flower';
   const isDark = currentTheme === 'dark';
@@ -76,13 +80,32 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
     goldBright: "#fef3c7",
     lockCore: "#1a110c"
   };
+  
+  // Cleanup effect
+useEffect(() => {
+  return () => {
+    stopMelody();
+    stopFolklore();
+    
+    Tone.getTransport().stop();
+    Tone.getTransport().cancel();
+    
+    // Revoke URL Blob untuk mencegah memory leak
+    if (folkloreAudioRef.current?.src && folkloreAudioRef.current.src.startsWith('blob:')) {
+      URL.revokeObjectURL(folkloreAudioRef.current.src);
+    }
+  };
+}, []);
 
+  // Handle modal closing: Stop all audio and reset states
   useEffect(() => {
     if (!selectedRegion) {
       setShowLongDesc(false);
       setSongProgress(0);
       setHoveredDialect(null);
+      setIsFolkloreVideoActive(false);
       stopFolklore();
+      stopMelody();
     }
   }, [selectedRegion]);
 
@@ -131,16 +154,72 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
     } catch (e) {}
   }, []);
 
-  const handleTimeUpdate = () => {
-    if (audioRef.current) {
-      const progress = (audioRef.current.currentTime / audioRef.current.duration) * 100;
-      setSongProgress(progress || 0);
+    const stopMelody = useCallback(() => {
+    Tone.getTransport().stop();
+    Tone.getTransport().cancel();
+    if (synthRef.current) {
+      synthRef.current.releaseAll();
+      synthRef.current.dispose(); // Menghapus instance synth dari memori
+      synthRef.current = null;
     }
-  };
+    setIsMelodyPlaying(false);
+    setActiveNote(null);
+  }, []);
 
-  const handleSongEnded = () => {
-    setSongProgress(0);
-  };
+    const playMelody = useCallback(async (melodyNotes: MelodyNote[]) => {
+  if (isMelodyPlaying) {
+    stopMelody();
+    return;
+  }
+
+  try {
+    await Tone.start();
+    setIsMelodyPlaying(true);
+    
+    Tone.getTransport().stop();
+    Tone.getTransport().cancel();
+    Tone.getTransport().bpm.value = 110; 
+
+    if (!synthRef.current) {
+      synthRef.current = new Tone.PolySynth(Tone.Synth, {
+        oscillator: { type: "sine" },
+        envelope: { attack: 0.1, decay: 0.2, sustain: 0.2, release: 1.2 }
+      }).toDestination();
+    }
+    
+    const synth = synthRef.current;
+
+    melodyNotes.forEach((noteData) => {
+      Tone.getTransport().schedule((time) => {
+        Tone.Draw.schedule(() => {
+          if (synthRef.current) {
+            setActiveNote(noteData.note);
+          }
+        }, time);
+        
+        if (synthRef.current) {
+          synth.triggerAttackRelease(noteData.note, noteData.duration, time);
+        }
+      }, noteData.time);
+    });
+
+    const lastNote = melodyNotes[melodyNotes.length - 1];
+    const totalDurationSeconds = Tone.Time(lastNote.time).toSeconds() + Tone.Time(lastNote.duration).toSeconds();
+
+    Tone.getTransport().schedule((t) => {
+      Tone.Draw.schedule(() => {
+        if (synthRef.current) {
+          stopMelody();
+        }
+      }, t);
+    }, totalDurationSeconds + 0.5);
+
+    Tone.getTransport().start();
+  } catch (e) {
+    console.error("Melody playback failed", e);
+    stopMelody();
+  }
+}, [isMelodyPlaying, stopMelody]);
 
   // Folklore Audio Handlers
   const handleFolkloreTimeUpdate = () => {
@@ -159,80 +238,97 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
     const binary = atob(pcmBase64);
     const pcmData = new Uint8Array(binary.length);
     for(let i=0; i<binary.length; i++) pcmData[i] = binary.charCodeAt(i);
-
     const buffer = new ArrayBuffer(44 + pcmData.length);
     const view = new DataView(buffer);
     const writeString = (offset: number, string: string) => {
-      for (let i = 0; i < string.length; i++) {
-        view.setUint8(offset + i, string.charCodeAt(i));
-      }
+      for (let i = 0; i < string.length; i++) view.setUint8(offset + i, string.charCodeAt(i));
     };
     writeString(0, 'RIFF');
     view.setUint32(4, 36 + pcmData.length, true);
-    writeString(8, 'WAVE');
-    writeString(12, 'fmt ');
-    view.setUint32(16, 16, true);
-    view.setUint16(20, 1, true); // PCM
-    view.setUint16(22, 1, true); // Mono
-    view.setUint32(24, sampleRate, true);
-    view.setUint32(28, sampleRate * 2, true);
-    view.setUint16(32, 2, true);
-    view.setUint16(34, 16, true);
-    writeString(36, 'data');
+    writeString(8, 'WAVE'); writeString(12, 'fmt ');
+    view.setUint32(16, 16, true); view.setUint16(20, 1, true); 
+    view.setUint16(22, 1, true); view.setUint32(24, sampleRate, true);
+    view.setUint32(28, sampleRate * 2, true); view.setUint16(32, 2, true);
+    view.setUint16(34, 16, true); writeString(36, 'data');
     view.setUint32(40, pcmData.length, true);
-    for (let i = 0; i < pcmData.length; i++) {
-      view.setUint8(44 + i, pcmData[i]);
-    }
+    for (let i = 0; i < pcmData.length; i++) view.setUint8(44 + i, pcmData[i]);
     return new Blob([buffer], { type: 'audio/wav' });
   };
 
   const toggleFolklore = async (storyText: string) => {
-    if (folklorePlaying) {
-      folkloreAudioRef.current?.pause();
-      setFolklorePlaying(false);
-      return;
-    }
+  // ✅ Early return dengan check null
+  if (!folkloreAudioRef.current) {
+    console.error("Folklore audio ref not available");
+    return;
+  }
 
-    if (folkloreAudioRef.current && folkloreAudioRef.current.src) {
-      folkloreAudioRef.current.play();
-      setFolklorePlaying(true);
-      return;
-    }
-
-    setIsFolkloreLoading(true);
-    try {
-      const base64 = await fetchTTSAudio(storyText);
-      if (base64 && folkloreAudioRef.current) {
-        const wavBlob = createWavBlob(base64, 24000);
-        const url = URL.createObjectURL(wavBlob);
-        folkloreAudioRef.current.src = url;
-        folkloreAudioRef.current.play();
-        setFolklorePlaying(true);
-      }
-    } catch (e) {
-      console.error("Folklore TTS failed", e);
-    } finally {
-      setIsFolkloreLoading(false);
-    }
-  };
-
-  const stopFolklore = () => {
-    if (folkloreAudioRef.current) {
-      folkloreAudioRef.current.pause();
-      folkloreAudioRef.current.src = "";
-      folkloreAudioRef.current.currentTime = 0;
-    }
+  if (folklorePlaying) {
+    folkloreAudioRef.current.pause();
     setFolklorePlaying(false);
-    setFolkloreProgress(0);
-  };
+    return;
+  }
+
+  if (folkloreAudioRef.current.src) {
+    folkloreAudioRef.current.play();
+    setFolklorePlaying(true);
+    return;
+  }
+    setIsFolkloreLoading(true);
+  let blobUrl: string | null = null; // ✅ Track blob URL
+
+  try {
+    const base64 = await fetchTTSAudio(storyText);
+    
+    if (base64 && folkloreAudioRef.current) {
+      const wavBlob = createWavBlob(base64, 24000);
+      blobUrl = URL.createObjectURL(wavBlob);
+      folkloreAudioRef.current.src = blobUrl;
+      await folkloreAudioRef.current.play();
+      setFolklorePlaying(true);
+    }
+  } catch (e) {
+    console.error("Folklore TTS failed", e);
+    
+    // ✅ Cleanup blob URL saat error
+    if (blobUrl) {
+      URL.revokeObjectURL(blobUrl);
+    }
+  } finally {
+    setIsFolkloreLoading(false);
+  }
+};
+
+  const stopFolklore = useCallback(() => {
+  if (folkloreAudioRef.current) {
+    if (folkloreAudioRef.current.src.startsWith('blob:')) {
+      URL.revokeObjectURL(folkloreAudioRef.current.src);
+    }
+    folkloreAudioRef.current.pause();
+    folkloreAudioRef.current.src = "";
+  }
+  setFolklorePlaying(false);
+  setFolkloreProgress(0);
+}, []);
 
   const handleSeekFolklore = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (folkloreAudioRef.current && folkloreAudioRef.current.duration) {
-      const newTime = (parseFloat(e.target.value) / 100) * folkloreAudioRef.current.duration;
-      folkloreAudioRef.current.currentTime = newTime;
-      setFolkloreProgress(parseFloat(e.target.value));
-    }
-  };
+  if (!folkloreAudioRef.current) return;
+  
+  const audio = folkloreAudioRef.current;
+  
+  // ✅ Check duration valid
+  if (!audio.duration || !isFinite(audio.duration)) {
+    console.warn("Audio duration not available yet");
+    return;
+  }
+  
+  const newTime = (parseFloat(e.target.value) / 100) * audio.duration;
+  
+  // ✅ Validate newTime
+  if (isFinite(newTime) && newTime >= 0 && newTime <= audio.duration) {
+    audio.currentTime = newTime;
+    setFolkloreProgress(parseFloat(e.target.value));
+  }
+};  
 
   const renderDialectList = (dialects: DialectInfo[], categoryLabel: string, sectionKey: string) => {
     if (!dialects || dialects.length === 0) return null;
@@ -357,13 +453,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
                 preserveAspectRatio="xMidYMid meet" className="w-full h-auto drop-shadow-sm transition-all duration-1000"
               >
                 <g transform="translate(5, 5) scale(0.98)">
-                  <g className="transition-opacity duration-300">  
-                  <SumateraMap {...mapProps} />
-                  <JavaMap {...mapProps} />
-                  <KalimantanMap {...mapProps} />
-                  <NusaTenggaraMap {...mapProps} />
-                  <SulawesiMap {...mapProps} />
-                  <PapuaMap {...mapProps} />
+                  <g className="transition-opacity duration-300" style={{ pointerEvents: 'auto' }}>
                   <g className="pointer-events-none" id="label_points" stroke="none">
                     <circle cx="467.7" cy="70" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"North Kalimantan"*/}
                     <circle cx="560.4" cy="306" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Nusa Tenggara Timur"*/}
@@ -400,6 +490,12 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
                     <circle cx="262.9" cy="178" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Bangka-Belitung“*/}
                     <circle cx="469.2" cy="125.4" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Kalimantan Timur“*/}
                   </g>
+                  <SumateraMap {...mapProps} />
+                  <JavaMap {...mapProps} />
+                  <KalimantanMap {...mapProps} />
+                  <NusaTenggaraMap {...mapProps} />
+                  <SulawesiMap {...mapProps} />
+                  <PapuaMap {...mapProps} />
                   </g>
                 </g>
               </svg>
@@ -477,6 +573,26 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
                           </div>
                         </div>
                       </div>
+                    )}
+
+                    {/* Tombol Tone.js Melody */}
+                    {PROVINCE_DIALECTS[selectedRegion].regionalSong?.melodyNotes && (
+                      <button 
+                        onClick={() => playMelody(PROVINCE_DIALECTS[selectedRegion].regionalSong?.melodyNotes || [])}
+                        className={`w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${isMelodyPlaying ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/20' : (isFlower ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/20' : 'bg-emerald-700 text-white shadow-lg shadow-emerald-700/20')}`}
+                      >
+                        {isMelodyPlaying ? (
+                          <>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+                            Berhenti Memutar: {activeNote}
+                          </>
+                        ) : (
+                          <>
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+                            Dengar Melodi Instrumen
+                          </>
+                        )}
+                      </button>
                     )}
 
                     {/* Folklore / Cerita Rakyat Section - Collapsible */}

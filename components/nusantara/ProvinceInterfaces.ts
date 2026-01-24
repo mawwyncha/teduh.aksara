@@ -8,10 +8,16 @@ export interface DialectInfo {
   dialek?: string;
 }
 
+export interface MelodyNote {
+  time: string;
+  note: string;
+  duration: string;
+}
+
 export interface RegionalSong {
   title: string;
   description: string;
-  audioUrl: string;
+  melodyNotes?: MelodyNote[]; // Tambahkan properti opsional untuk melodi detail
 }
 
 export interface Folklore {

@@ -9,7 +9,67 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Bungong Jeumpa",
       description: "Pencipta lagu Bungong Jeumpa adalah Ibrahim Abduh. Arti Nama 'Bungong Jeumpa' berarti bunga cempaka, yang merupakan bunga kebanggaan sekaligus simbol keindahan bagi masyarakat Aceh.",
-      audioUrl: "https://www.youtube.com/watch?v=JdVUvtY1eVk"
+      melodyNotes: [
+      // --- Bait 1: Bungong jeumpa, meugah di Aceh ---
+      { time: "0:0:0", note: "A4", duration: "8n" },
+      { time: "0:0:2", note: "A4", duration: "16n" },
+      { time: "0:0:3", note: "B4", duration: "16n" },
+      { time: "0:1:0", note: "A4", duration: "8n" },
+      { time: "0:1:2", note: "G#4", duration: "4n" },
+      { time: "0:2:2", note: "A4", duration: "8n" },
+      { time: "0:3:0", note: "A4", duration: "16n" },
+      { time: "0:3:1", note: "B4", duration: "16n" },
+      { time: "0:3:2", note: "A4", duration: "8n" },
+      { time: "1:0:0", note: "G#4", duration: "4n" },
+      { time: "1:1:0", note: "A4", duration: "16n" },
+      { time: "1:1:1", note: "B4", duration: "16n" },
+      { time: "1:1:2", note: "C5", duration: "8n" },
+      { time: "1:2:0", note: "B4", duration: "8n" },
+      { time: "1:2:2", note: "C5", duration: "4n" },
+
+      // --- Bait 2: Bungong teuleubeh, indah lagoina ---
+      { time: "1:3:2", note: "C5", duration: "8n" },
+      { time: "2:0:0", note: "C5", duration: "16n" },
+      { time: "2:0:1", note: "D5", duration: "16n" },
+      { time: "2:0:2", note: "C5", duration: "8n" },
+      { time: "2:1:0", note: "B4", duration: "4n" },
+      { time: "2:2:0", note: "C5", duration: "8n" },
+      { time: "2:2:2", note: "C5", duration: "8n" },
+      { time: "2:3:0", note: "D5", duration: "8n" },
+      { time: "2:3:2", note: "C5", duration: "8n" },
+      { time: "3:0:0", note: "B4", duration: "8n" },
+      { time: "3:0:2", note: "C5", duration: "8n" },
+      { time: "3:1:0", note: "B4", duration: "16n" },
+      { time: "3:1:1", note: "A4", duration: "16n" },
+      { time: "3:1:2", note: "G#4", duration: "8n" },
+      { time: "3:2:0", note: "A4", duration: "4n" },
+
+      // --- Refrain: Puteh kuning, meujampu mirah ---
+      { time: "3:3:0", note: "E5", duration: "4n" },
+      { time: "4:0:0", note: "E5", duration: "16n" },
+      { time: "4:0:1", note: "D5", duration: "16n" },
+      { time: "4:0:2", note: "C5", duration: "8n" },
+      { time: "4:1:0", note: "B4", duration: "4n" },
+      { time: "4:2:0", note: "D5", duration: "16n" },
+      { time: "4:2:1", note: "E5", duration: "16n" },
+      { time: "4:2:2", note: "C5", duration: "8n" },
+      { time: "4:3:0", note: "B4", duration: "8n" },
+      { time: "4:3:2", note: "A4", duration: "4n" },
+
+      // --- Refrain: Bungong si ulah, indah lagoina ---
+      { time: "5:0:2", note: "C5", duration: "8n" },
+      { time: "5:1:0", note: "C5", duration: "8n" },
+      { time: "5:1:2", note: "B4", duration: "16n" },
+      { time: "5:1:3", note: "A4", duration: "16n" },
+      { time: "5:2:0", note: "G#4", duration: "8n" },
+      { time: "5:2:2", note: "A4", duration: "16n" },
+      { time: "5:2:3", note: "B4", duration: "16n" },
+      { time: "5:3:0", note: "C5", duration: "4n" },
+      { time: "6:0:0", note: "B4", duration: "8n" },
+      { time: "6:0:2", note: "A4", duration: "8n" },
+      { time: "6:1:0", note: "G#4", duration: "8n" },
+      { time: "6:1:2", note: "A4", duration: "2n" }
+    ]
     },
     folklore: {
       title: "Kisah Si Parkit Raja Parakeet",
@@ -47,13 +107,70 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Alusi Au",
       description: "Lagu Alusi Au adalah lagu daerah dari Sumatera Utara yang diciptakan oleh komponis ternama Batak, Nahum Situmorang. Secara harfiah, judul lagu ini berarti 'Jawablah Aku' (alusi berarti jawab, au berarti aku). ",
-      audioUrl: "https://www.youtube.com/watch?v=usv-Yr2d-dU"
+      melodyNotes: [
+      // --- INTRO (Bagian 1) ---
+      { time: "0:1:0", note: "G4", duration: "8n" },   // 5
+      { time: "0:1:2", note: "A4", duration: "16n" },  // 6
+      { time: "0:1:3", note: "G4", duration: "16n" },  // 5
+      { time: "0:2:0", note: "F4", duration: "16n" },  // 4
+      { time: "0:2:1", note: "G4", duration: "16n" },  // 5
+      { time: "1:0:0", note: "D5", duration: "1n" },   // 2' (Sustain sampai bar 2)
+      { time: "3:0:0", note: "C5", duration: "2n" },   // 1'
+      { time: "3:2:0", note: "E5", duration: "2n" },   // 3' (Intro 1 selesai di bar 4)
+
+      // --- INTRO (Bagian 2 - Pengulangan sesuai permintaan "Alusiau dua kali") ---
+      { time: "4:0:0", note: "G4", duration: "8n" },   // Digeser ke bar 4 agar tidak menimpa
+      { time: "4:0:2", note: "A4", duration: "16n" },
+      { time: "4:0:3", note: "G4", duration: "16n" },
+      { time: "4:1:0", note: "F4", duration: "16n" },
+      { time: "4:1:1", note: "G4", duration: "16n" },
+      { time: "5:0:0", note: "D5", duration: "1n" },   // Sustain sampai bar 6
+      { time: "7:0:0", note: "C5", duration: "2n" },
+      { time: "7:2:0", note: "E2", duration: "2n" },   // Intro 2 selesai di bar 8
+
+      // --- BAIT 1: "Maragam ragam do..." (Dimulai setelah Intro 2) ---
+      { time: "8:0:0", note: "G4", duration: "16n" },  // 5 5 5 (Anakrusis digeser ke bar 8)
+      { time: "8:0:1", note: "G4", duration: "16n" },
+      { time: "8:0:2", note: "G4", duration: "16n" },
+      { time: "8:1:0", note: "E4", duration: "8n" },   // 3
+      { time: "8:1:2", note: "G4", duration: "8n" },   // 5
+      { time: "8:2:0", note: "G4", duration: "8n" },   // 5
+      { time: "8:2:2", note: "G4", duration: "8n" },   // 5
+      { time: "8:3:0", note: "G4", duration: "8n" },   // 5
+      { time: "8:3:2", note: "G4", duration: "8n" },   // 5
+      { time: "9:0:0", note: "G4", duration: "8n" },   // 5
+      { time: "9:1:0", note: "G4", duration: "8n" },   // 5
+      { time: "9:2:0", note: "G4", duration: "8n" },   // 5
+      { time: "9:3:0", note: "F4", duration: "8n" },   // 4
+      { time: "10:0:0", note: "A4", duration: "4n" },  // 6
+      { time: "10:1:0", note: "G4", duration: "2n" },  // 5
+
+      // --- LANJUTAN / BRIDGE ("Tung ho long ni ro ham") ---
+      { time: "12:2:0", note: "E5", duration: "16n" }, // Nada 3' 3' 3' 3'
+      { time: "12:2:1", note: "E5", duration: "16n" },
+      { time: "12:2:2", note: "E5", duration: "16n" },
+      { time: "12:2:3", note: "E5", duration: "16n" },
+      { time: "13:0:0", note: "E5", duration: "2n" },  // 3'
+      { time: "13:2:0", note: "D5", duration: "16n" }, // 2' 3' 2'
+      { time: "13:2:1", note: "E5", duration: "16n" },
+      { time: "13:2:2", note: "D5", duration: "16n" },
+      { time: "13:3:0", note: "C5", duration: "4n" },  // 1'
+      { time: "14:0:0", note: "C5", duration: "8n" },  // 1'
+      { time: "14:0:2", note: "B4", duration: "8n" },  // 7
+      { time: "14:1:0", note: "B4", duration: "8n" },  // 7
+      { time: "14:1:2", note: "A4", duration: "8n" },  // 6
+      { time: "14:2:0", note: "G4", duration: "8n" },  // 5
+      { time: "14:2:2", note: "F4", duration: "8n" },  // 4
+      { time: "14:3:0", note: "E4", duration: "8n" },  // 3
+      { time: "14:3:2", note: "F4", duration: "8n" },  // 4
+      { time: "15:0:0", note: "G4", duration: "1n" },  // 5 (Sustain penutup bridge)
+    ]
     },
     folklore: {
       title: "Legenda Danau Toba",
       story: "Dahulu kala, di wilayah Sumatera Utara, hiduplah seorang pemuda bernama Toba. Ia adalah seorang petani yang rajin namun hidup sebatang kara. Suatu hari, saat sedang memancing, Toba mendapatkan seekor ikan mas besar yang sangat indah. Namun, keajaiban terjadi saat ia membawa pulang ikan tersebut; ikan mas itu perlahan berubah menjadi seorang wanita cantik jelita. Wanita itu mengaku bahwa dirinya adalah seorang putri yang dikutuk. Karena Toba telah menyelamatkannya, ia bersedia menjadi istri Toba dengan satu syarat mutlak: Toba tidak boleh pernah mengungkit asal-usulnya bahwa ia adalah jelmaan seekor ikan. Toba setuju, dan mereka hidup bahagia hingga dikaruniai seorang anak laki-laki bernama Samosir. Samosir tumbuh menjadi anak yang sedikit nakal dan sering merasa lapar. Suatu siang, Samosir diminta ibunya mengantarkan bekal makanan untuk Toba di ladang. Namun, di tengah jalan, Samosir malah memakan sebagian besar isi bekal tersebut. Saat Toba menerima bekal yang hampir habis, ia kehilangan kesabaran dan berteriak marah, 'Dasar anak ikan!' Seketika, langit mendung dan hujan lebat turun tanpa henti. Toba menyadari kesalahannya telah melanggar janji, namun semuanya sudah terlambat. Istri dan anaknya menghilang, sementara lembah tempat mereka tinggal tenggelam oleh air yang meluap sangat deras. Luapan air itu akhirnya membentuk sebuah danau besar yang kini kita kenal sebagai Danau Toba, dengan sebuah pulau di tengahnya yang dinamai Pulau Samosir. Pesan Moral: Jagalah setiap janji yang telah diucapkan, karena sekali janji diingkari, ia dapat membawa penyesalan yang mendalam. Selain itu, belajarlah untuk mengendalikan amarah agar tidak mengeluarkan kata-kata yang dapat menyakiti hati orang lain. Pengarang: Anonim (Sastra Lisan/Tradisi Tutur Masyarakat Batak). (Beberapa penulis yang pernah membukukan kisah ini untuk anak-anak antara lain Yudhistira Ikranegara dan Gibran Maulana).",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Sumut%20-%20Legenda%20Danau%20Toba.jpg"
     },
     native: [
       { name: "Bahasa Batak Toba", endonim: "Hata Batak Toba", makna: "", dialek: "Multidialek: Samosir, Silindung, Humbang, dan Toba. Variasi muncul karena isolasi geografis di sekitar kaldera (ref: Kemendikbud).", detail: "Toba, Samosir, Humbang Hasundutan, Tapanuli Utara.", description: "Memiliki aksara sendiri (Surat Batak). Status: Sangat mantap dan digunakan secara luas." },
@@ -81,13 +198,72 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Ayam Den Lapeh",
       description: "Ayam Den Lapeh adalah lagu ciptaan Nuskan Syarif. Judulnya berarti “ayam saya lepas” yang melambangkan kehilangan sesuatu yang sangat berharga. Lagu ini menceritakan kesedihan dan penyesalan akibat kehilangan orang yang dicintai atau kegagalan dalam cinta.",
-      audioUrl: ""
+      melodyNotes: [
+      // --- Bait 1: Luruilah jalan (1 2 3 3 1) ---
+      { time: "0:0:0", note: "D4", duration: "8n" },
+      { time: "0:0:2", note: "E4", duration: "8n" },
+      { time: "0:1:0", note: "F#4", duration: "8n" },
+      { time: "0:1:2", note: "F#4", duration: "8n" },
+      { time: "0:2:0", note: "D4", duration: "4n" },
+
+      // --- Payakumbua babelok jalan (2 3 2 1 2 7 1) ---
+      { time: "1:0:0", note: "E4", duration: "8n" },
+      { time: "1:0:2", note: "F#4", duration: "8n" },
+      { time: "1:1:0", note: "E4", duration: "8n" },
+      { time: "1:1:2", note: "D4", duration: "8n" },
+      { time: "1:2:0", note: "E4", duration: "8n" },
+      { time: "1:2:2", note: "C#4", duration: "8n" },
+      { time: "1:3:0", note: "D4", duration: "4n" },
+
+      // --- Kayu jati (1 2 1 7 1) ---
+      { time: "2:0:0", note: "D4", duration: "8n" },
+      { time: "2:0:2", note: "E4", duration: "8n" },
+      { time: "2:1:0", note: "D4", duration: "8n" },
+      { time: "2:1:2", note: "C#4", duration: "8n" },
+      { time: "2:2:0", note: "D4", duration: "4n" },
+
+      // --- Di maati indak karusuah (6 7 1 2 1 7 1 6) ---
+      { time: "3:0:0", note: "B3", duration: "8n" },
+      { time: "3:0:2", note: "C#4", duration: "8n" },
+      { time: "3:1:0", note: "D4", duration: "8n" },
+      { time: "3:1:2", note: "E4", duration: "8n" },
+      { time: "3:2:0", note: "D4", duration: "8n" },
+      { time: "3:2:2", note: "C#4", duration: "8n" },
+      { time: "3:3:0", note: "D4", duration: "8n" },
+      { time: "3:3:2", note: "B3", duration: "8n" },
+
+      // --- Ayam den lapeh (Bagian 1: 6 2 1 7 6) ---
+      { time: "4:0:0", note: "B3", duration: "8n" },
+      { time: "4:0:2", note: "E4", duration: "8n" },
+      { time: "4:1:0", note: "D4", duration: "8n" },
+      { time: "4:1:2", note: "C#4", duration: "8n" },
+      { time: "4:2:0", note: "B3", duration: "4n" },
+
+      // --- Ai ai (Bagian 1: 7 2 7 1) ---
+      { time: "5:0:0", note: "C#4", duration: "8n" },
+      { time: "5:0:2", note: "E4", duration: "8n" },
+      { time: "5:1:0", note: "C#4", duration: "8n" },
+      { time: "5:1:2", note: "D4", duration: "4n" },
+
+      // --- Ayam den lapeh (Bagian 2: Pengulangan diatur ke Bar 6) ---
+      { time: "6:0:0", note: "B3", duration: "8n" },
+      { time: "6:0:2", note: "E4", duration: "8n" },
+      { time: "6:1:0", note: "D4", duration: "8n" },
+      { time: "6:1:2", note: "C#4", duration: "8n" },
+      { time: "6:2:0", note: "B3", duration: "4n" },
+
+      // --- Ai ai (Bagian 2: Pengulangan diatur ke Bar 7) ---
+      { time: "7:0:0", note: "C#4", duration: "8n" },
+      { time: "7:0:2", note: "E4", duration: "8n" },
+      { time: "7:1:0", note: "C#4", duration: "8n" },
+      { time: "7:1:2", note: "D4", duration: "4n" },
+    ]
     },
     folklore: {
       title: "Legenda Malin Kundang",
       story: "Di pesisir pantai Sumatera Barat, hiduplah seorang janda tua bersama anak laki-lakinya yang bernama Malin Kundang. Mereka hidup dalam kemiskinan, namun sangat saling menyayangi. Demi mengubah nasib, Malin memutuskan untuk merantau dengan menumpang kapal saudagar besar. Ibunya melepas Malin dengan berat hati, sambil terus mendoakan keselamatannya setiap hari di tepi pantai. Bertahun-tahun berlalu, Malin berhasil menjadi saudagar kaya raya dan memiliki istri yang cantik. Suatu hari, kapalnya yang megah bersandar di kampung halamannya. Sang ibu yang mendengar kabar itu segera berlari ke pelabuhan dengan hati yang berbunga-bunga. Namun, melihat ibunya yang tua, berpakaian lusuh, dan miskin, Malin merasa malu di hadapan istrinya. Ia membentak dan mengusir wanita tua itu sambil berkata bahwa ibunya telah lama meninggal. Ibu Malin sangat terluka hatinya. Sambil bersimpuh di atas pasir, ia berdoa dengan isak tangis yang dalam. Seketika, langit yang cerah berubah menjadi gelap gulita, badai besar datang menghantam kapal Malin hingga hancur berkeping-keping. Di tengah kilatan petir, Malin yang sedang bersimpuh memohon ampun perlahan-lahan berubah menjadi batu. Hingga kini, bongkahan batu yang menyerupai orang bersujud itu diyakini masih bisa ditemukan di Pantai Air Manis, Padang. Pesan Moral: Hormatilah orang tua, terutama ibu, dalam keadaan apa pun. Kesuksesan dan kekayaan di dunia tidak akan ada artinya jika kita melupakan jasa orang yang telah melahirkan dan membesarkan kita dengan penuh kasih sayang. Pengarang: Anonim (Sastra Lisan/Tradisi Tutur Masyarakat Minangkabau). (Cerita ini telah banyak diadaptasi ke dalam bentuk buku cerita anak oleh berbagai penulis, salah satunya A.A. Navis yang merupakan sastrawan besar asal Sumatera Barat).",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Sumbar%20-%20Legenda%20Malin%20Kundang.jpg"
     },
     native: [
       { name: "Bahasa Minangkabau", endonim: "Baso Minang", makna: "Merujuk pada identitas etnis ‘Minang’ (Menang) dan ‘Kabau’ (Kerbau); secara linguistik berkerabat dekat dengan bahasa Melayu.", dialek: "Multidialek: Agam, Tanah Datar, Lima Puluh Kota, Pesisir, dan lainnya. Variasi sangat tinggi karena faktor geografis ‘Luhak nan Tigo’ (ref: Kemendikbud).", detail: "Seluruh wilayah daratan Sumatera Barat.", description: "Memiliki sistem kekerabatan Matrilineal terbesar di dunia. Status: Stabil namun terancam oleh penggunaan Bahasa Indonesia di perkotaan (ref: Badan Bahasa)." },
@@ -110,13 +286,93 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Soleram",
       description: "Soleram adalah lagu daerah dari Provinsi Riau yang berasal dari tradisi Melayu, dengan pencipta yang tidak diketahui karena diwariskan secara turun-temurun. Judul Soleram merupakan ungkapan lembut khas Melayu yang digunakan sebagai pengantar nasihat. Lagu ini menceritakan pesan moral tentang kasih sayang, sopan santun, dan budi pekerti yang diajarkan orang tua kepada anak.",
-      audioUrl: ""
+      melodyNotes: [
+      // --- Bait 1: Soleram so le ram (Bar 0-2) ---
+      { time: "0:0:0", note: "C4", duration: "4n" },   // 1
+      { time: "0:1:0", note: "D4", duration: "4n" },   // 2
+      { time: "0:2:0", note: "E4", duration: "4n" },   // 3
+      { time: "0:3:0", note: "E4", duration: "4n" },   // 3
+      { time: "1:0:0", note: "F4", duration: "4n" },   // 4
+      { time: "1:1:0", note: "G4", duration: "4n" },   // 5
+      { time: "1:2:0", note: "F4", duration: "4n" },   // 4
+      { time: "1:3:0", note: "E4", duration: "4n" },   // 3
+      { time: "2:0:0", note: "D4", duration: "2n" },   // 2 (Sustain sampai Bar 3)
+
+      // --- Bait 2: Soleram anak yang manis (Bar 3-4) ---
+      { time: "3:0:0", note: "E4", duration: "4n" },   // 3
+      { time: "3:1:0", note: "F4", duration: "4n" },   // 4
+      { time: "3:2:0", note: "G4", duration: "4n" },   // 5
+      { time: "3:3:0", note: "G4", duration: "4n" },   // 5
+      { time: "4:0:0", note: "A4", duration: "8n" },   // 6
+      { time: "4:0:2", note: "G4", duration: "8n" },   // 5
+      { time: "4:1:0", note: "F4", duration: "4n" },   // 4
+      { time: "4:2:0", note: "A4", duration: "4n" },   // 6
+      { time: "4:3:0", note: "G4", duration: "4n" },   // 5
+
+      // --- Refrain 1: Anak manis janganlah dicium (Bar 5-7) ---
+      { time: "5:0:0", note: "G4", duration: "8n" },   // 5
+      { time: "5:0:2", note: "A4", duration: "8n" },   // 6
+      { time: "5:1:0", note: "B4", duration: "4n" },   // 7
+      { time: "5:2:0", note: "C5", duration: "4n" },   // 1'
+      { time: "5:3:0", note: "G4", duration: "4n" },   // 5
+      { time: "6:0:0", note: "A4", duration: "4n" },   // 6
+      { time: "6:1:0", note: "G4", duration: "4n" },   // 5
+      { time: "6:2:0", note: "F4", duration: "8n" },   // 4
+      { time: "6:2:2", note: "A4", duration: "8n" },   // 6
+      { time: "6:3:0", note: "G4", duration: "8n" },   // 5
+      { time: "6:3:2", note: "F4", duration: "8n" },   // 4
+      { time: "7:0:0", note: "E4", duration: "4n" },   // 3
+      { time: "7:1:0", note: "D4", duration: "4n" },   // 2
+      { time: "7:2:0", note: "C4", duration: "2n" },   // 1 (Sustain sampai Bar 8)
+
+      // --- Refrain 1: Kalau dicium merahlah pipinya (Bar 8-10) ---
+      { time: "8:0:0", note: "G4", duration: "4n" },   // 5
+      { time: "8:1:0", note: "G4", duration: "4n" },   // 5
+      { time: "8:2:0", note: "G4", duration: "4n" },   // 5
+      { time: "8:3:0", note: "A4", duration: "4n" },   // 6
+      { time: "9:0:0", note: "F4", duration: "4n" },   // 4
+      { time: "9:1:0", note: "D4", duration: "4n" },   // 2
+      { time: "9:2:0", note: "B3", duration: "4n" },   // 7 rendah
+      { time: "9:3:0", note: "C4", duration: "4n" },   // 1
+      { time: "10:0:0", note: "E4", duration: "4n" },  // 3
+      { time: "10:1:0", note: "D4", duration: "4n" },  // 2
+      { time: "10:2:0", note: "C4", duration: "2n" },  // 1 (Sustain sampai Bar 11)
+
+      // --- PENGULANGAN (Refrain 2 - Dimulai dari Bar 11) ---
+      { time: "11:0:0", note: "G4", duration: "8n" },
+      { time: "11:0:2", note: "A4", duration: "8n" },
+      { time: "11:1:0", note: "B4", duration: "4n" },
+      { time: "11:2:0", note: "C5", duration: "4n" },
+      { time: "11:3:0", note: "G4", duration: "4n" },
+      { time: "12:0:0", note: "A4", duration: "4n" },
+      { time: "12:1:0", note: "G4", duration: "4n" },
+      { time: "12:2:0", note: "F4", duration: "8n" },
+      { time: "12:2:2", note: "A4", duration: "8n" },
+      { time: "12:3:0", note: "G4", duration: "8n" },
+      { time: "12:3:2", note: "F4", duration: "8n" },
+      { time: "13:0:0", note: "E4", duration: "4n" },
+      { time: "13:1:0", note: "D4", duration: "4n" },
+      { time: "13:2:0", note: "C4", duration: "2n" },
+
+      // --- Pengulangan Penutup: Kalau dicium (Bar 14-16) ---
+      { time: "14:0:0", note: "G4", duration: "4n" },
+      { time: "14:1:0", note: "G4", duration: "4n" },
+      { time: "14:2:0", note: "G4", duration: "4n" },
+      { time: "14:3:0", note: "A4", duration: "4n" },
+      { time: "15:0:0", note: "F4", duration: "4n" },
+      { time: "15:1:0", note: "D4", duration: "4n" },
+      { time: "15:2:0", note: "B3", duration: "4n" },
+      { time: "15:3:0", note: "C4", duration: "4n" },
+      { time: "16:0:0", note: "E4", duration: "4n" },
+      { time: "16:1:0", note: "D4", duration: "4n" },
+      { time: "16:2:0", note: "C4", duration: "2n" },
+    ]
     },
     folklore: {
       title: "Legenda Putri Tujuh",
       story: "Pada zaman dahulu, di daerah Dumai, berdirilah sebuah kerajaan bernama Seri Bunga Tanjung yang dipimpin oleh Ratu Cik Sima. Ia memiliki tujuh orang putri yang sangat cantik jelita, namun yang paling memukau adalah putri bungsunya yang bernama Putri Mayang Sari. Kecantikannya begitu masyhur hingga terdengar ke telinga Pangeran Empang Kuala dari kerajaan tetangga. Suatu hari, Pangeran Empang Kuala datang untuk meminang Putri Mayang Sari. Namun, sesuai adat yang berlaku, putri tertualah yang harus menikah lebih dahulu. Karena lamarannya untuk putri bungsu ditolak, Pangeran merasa terhina dan menyatakan perang. Untuk melindungi ketujuh putrinya, Ratu Cik Sima menyembunyikan mereka di dalam sebuah lubang perlindungan di tengah hutan dan membekali mereka dengan makanan yang cukup untuk tiga bulan. Peperangan berlangsung sangat sengit dan lama. Setelah lewat dari tiga bulan, perang akhirnya berakhir. Ratu Cik Sima segera berlari ke hutan untuk menjemput putri-putrinya. Namun, ia sangat terpukul saat mendapati ketujuh putrinya telah meninggal dunia karena kehabisan bekal makanan. Kesedihan mendalam menyelimuti kerajaan, dan konon kata ‘Dumai’ diambil dari gumaman pangeran saat pertama kali melihat kecantikan putri di lubuk tersebut (‘D'umai’). Hingga kini, kisah ini menjadi legenda yang sangat melekat di hati masyarakat Riau. Pesan Moral: Kendalikanlah amarah dan jangan memaksakan kehendak hanya karena ambisi pribadi. Keputusan yang diambil saat sedang emosi sering kali membawa penyesalan yang tidak hanya merugikan diri sendiri, tetapi juga orang-orang yang kita cintai. Pengarang: Anonim (Sastra Lisan/Tradisi Tutur Masyarakat Melayu Riau). (Kisah ini telah disadur ke dalam buku oleh beberapa penulis, di antaranya Ahmad Ijazi H. dan Yenny Maulina).",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Riau%20-%20Legenda%20Putri%20Tujuh.jpg"
     },    
     native: [
       { name: "Bahasa Melayu", endonim: "Bahaso Melayu", makna: "Berasal dari kata ‘Layuh’ (rendah hati) atau sungai Melayu. (ref: Kemendikbud)", dialek: "Dialek Riau Pesisir, Riau Daratan, Kampar, Rokan, Lingga.", detail: "Seluruh Kabupaten/Kota di Riau.", description: "Menjadi dasar Bahasa Indonesia. Memiliki tradisi Sastra Lisan ‘Sijobang’ di wilayah Kampar. (ref: Kemendikbud)" },
@@ -140,15 +396,62 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     headerDescription: "Gonggong",
     headerLongDescription: "Gonggong khas Kepulauan Riau memiliki rasa gurih alami laut yang segar, dengan daging siput yang kenyal namun lembut saat dikunyah. Disajikan sederhana dengan cara direbus, cita rasa aslinya semakin menonjol ketika dicocol sambal pedas atau saus khas. Hidangan laut ikonik ini menggugah selera sebagai sajian autentik yang sederhana, segar, dan penuh kelezatan pesisir.",
     regionalSong: {
-      title: "Gurindam Dua Belas",
-      description: "Gurindam Dua Belas merupakan karya daerah yang paling terkenal dan dianggap mewakili Kepulauan Riau. Karya ini diciptakan oleh Raja Ali Haji, sastrawan besar Melayu dari Pulau Penyengat. Meskipun berbentuk sastra gurindam, karya ini sering dilagukan dan digunakan dalam acara adat serta pendidikan sebagai simbol nilai moral budaya Melayu Kepulauan Riau.",
-      audioUrl: ""
+      title: "Pulau Bintan",
+      description: "Lagu Pulau Bintan merupakan karya musik Melayu klasik dari Kepulauan Riau yang sering dikaitkan dengan gubahan seniman lokal legendaris seperti H. Raja Hamzah. Judul lagu ini merujuk pada identitas geografis Pulau Bintan yang dikenal sebagai jantung sejarah kesultanan Melayu dan simbol kebanggaan wilayah tersebut. Secara mendalam, liriknya bermakna sebagai ungkapan kekaguman terhadap bentang alam laut biru dan gunung yang tinggi, sekaligus menyampaikan rasa rindu yang pilu serta penghormatan bagi para pahlawan Melayu yang bersemayam di sana.",
+      melodyNotes: [
+      { time: "0:0:0", note: "A4", duration: "4n" },   // Pu-
+      { time: "0:1:0", note: "C5", duration: "4n" },   // lau
+      { time: "0:2:0", note: "E5", duration: "4n" },   // Bin-tan
+      { time: "0:3:0", note: "G4", duration: "8n" },   // a-
+      { time: "0:3:2", note: "E4", duration: "8n" },   // la
+      { time: "1:0:0", note: "G4", duration: "4n" },   // sa-
+      { time: "1:1:0", note: "B4", duration: "4n" },   // yang
+      { time: "1:2:0", note: "A4", duration: "4n" },   // laut-
+      { time: "1:3:0", note: "B4", duration: "8n" },   // nya
+      { time: "1:3:2", note: "C5", duration: "8n" },   // bi-
+      { time: "2:0:0", note: "A4", duration: "2n" },   // ru... (alahai adik)
+
+      // --- Bait 1: Pulau Penyengat ala sayang luas membentang (Dm - Am - Em) ---
+      { time: "3:0:0", note: "D5", duration: "4n" },   // Pu-
+      { time: "3:1:0", note: "F5", duration: "4n" },   // lau
+      { time: "3:2:0", note: "A5", duration: "4n" },   // Pe-nye-ngat
+      { time: "3:3:0", note: "C5", duration: "8n" },   // a-
+      { time: "3:3:2", note: "A4", duration: "8n" },   // la
+      { time: "4:0:0", note: "C5", duration: "4n" },   // sa-
+      { time: "4:1:0", note: "E5", duration: "4n" },   // yang
+      { time: "4:2:0", note: "B4", duration: "4n" },   // lu-
+      { time: "4:3:0", note: "G4", duration: "8n" },   // as
+      { time: "4:3:2", note: "E4", duration: "8n" },   // mem-
+      { time: "5:0:0", note: "E4", duration: "2n" },   // ben-tang
+
+      // --- Refrain: Hiu-hiu dilautan biru (C - Am) ---
+      { time: "6:0:0", note: "C5", duration: "8n" },   // Hi-
+      { time: "6:0:2", note: "C5", duration: "8n" },   // u-
+      { time: "6:1:0", note: "C5", duration: "8n" },   // hi-
+      { time: "6:1:2", note: "C5", duration: "8n" },   // u
+      { time: "6:2:0", note: "B4", duration: "8n" },   // di-
+      { time: "6:2:2", note: "A4", duration: "8n" },   // lau-
+      { time: "6:3:0", note: "G4", duration: "4n" },   // tan
+      { time: "7:0:0", note: "C5", duration: "8n" },   // bi-
+      { time: "7:0:2", note: "C5", duration: "8n" },   // ru
+      { time: "7:1:0", note: "B4", duration: "4n" },   // a-
+      { time: "7:2:0", note: "A4", duration: "2n" },   // la sayang
+
+      // --- Refrain: Hatiku rindu apakah obatnya (Dm - Em - Am) ---
+      { time: "8:0:0", note: "D5", duration: "8n" },   // Ha-
+      { time: "8:0:2", note: "D5", duration: "8n" },   // ti-
+      { time: "8:1:0", note: "D5", duration: "4n" },   // ku
+      { time: "8:2:0", note: "C5", duration: "8n" },   // rin-
+      { time: "8:2:2", note: "B4", duration: "8n" },   // du
+      { time: "8:3:0", note: "G4", duration: "4n" },   // a-
+      { time: "9:0:0", note: "A4", duration: "2n" },   // pa obatnya
+    ]
     },
     folklore: {
       title: "Kisah Jenang Perkasa",
       story: "Di Kerajaan Pulau Galang, hiduplah seorang pemuda bernama Jenang Perkasa. Ia adalah anak bungsu dari Raja Pulau Galang yang dikenal karena kebaikan hatinya dan kejujurannya. Namun, ketenangan hidup Jenang terusik saat kakaknya sendiri, Megat Julela, merasa iri dan memfitnahnya di hadapan sang ayah. Karena fitnah yang kejam itu, Jenang Perkasa akhirnya terbuang dari istana dan harus mengembara menyusuri lautan yang tenang. Dalam pengembaraannya, Jenang Perkasa berteman dengan seekor gajah mina yang ajaib. Gajah tersebut membimbingnya menuju Kerajaan Batin Lagoi di Pulau Bintan. Di saat yang sama, Kerajaan Bintan sedang dilanda kesedihan karena Putri Bintan, putri kesayangan Raja Batin Lagoi, diculik oleh sekelompok bajak laut yang kejam. Mendengar kabar tersebut, Jenang Perkasa yang berhati mulia memutuskan untuk menolong tanpa mengharapkan imbalan. Dengan ketenangan dan keberaniannya, Jenang Perkasa berhasil menemukan persembunyian para bajak laut dan menyelamatkan sang putri. Ia membawa Putri Bintan kembali ke istana dengan selamat. Raja Batin Lagoi yang merasa sangat bersyukur kemudian menikahkan Jenang Perkasa dengan putrinya. Jenang pun hidup bahagia di Pulau Bintan dan dikenal sebagai pemimpin yang bijaksana, membuktikan bahwa ketulusan hati akan selalu menemukan jalan menuju kebahagiaan meskipun pernah terzalimi. Pesan Moral: Janganlah pernah merasa putus asa saat menghadapi fitnah atau cobaan hidup. Tetaplah menjadi pribadi yang jujur dan baik hati, karena kebenaran dan ketulusan pada akhirnya akan membawa kita pada kehormatan dan kebahagiaan yang sejati. Pengarang: Anonim (Sastra Lisan Rakyat Kepulauan Riau). '(Kisah ini pernah ditulis kembali secara populer oleh Medri Osno dalam buku seri cerita rakyat Kepulauan Riau)'.",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Kepri%20-%20Legenda%20Jenang%20Perkasa.jpg"
     },
     native: [
       { name: "Bahasa Melayu", endonim: "Bahaso Melayu", makna: "Merujuk pada kata ‘Layuh’ (Rendah hati) atau ‘Mula’ (asal). (ref: Kemendikbud)", dialek: "Dialek Penyengat, Lingga, Bintan, Karimun.", detail: "Seluruh wilayah Kepri (Batam, Bintan, Lingga).", description: "Dialek Penyengat merupakan standar bahasa Melayu Tinggi yang menjadi dasar Bahasa Indonesia. (ref: Kemendikbud)" },
@@ -177,13 +480,55 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Nyok Miak",
       description: "Lagu daerah yang paling terkenal dari Provinsi Kepulauan Bangka Belitung adalah “Nyok Miak” atau “Yok Miak”. Lagu ini menjadi simbol budaya dan tradisi masyarakat saat bekerja bersama di ladang. Sebagai lagu rakyat, penciptanya tidak diketahui dan diwariskan secara turun-temurun.",
-      audioUrl: ""
+      melodyNotes: [
+      // --- Bait 1: Yok miak kite tegi (Bar 0-1) ---
+      { time: "0:0:0", note: "A3", duration: "4n" },   // Yok (6 rendah)
+      { time: "0:1:0", note: "B3", duration: "8n" },   // mi-
+      { time: "0:1:2", note: "C4", duration: "8n" },   // ak
+      { time: "0:2:0", note: "D4", duration: "8n" },   // ki-
+      { time: "0:2:2", note: "B3", duration: "8n" },   // te
+      { time: "0:3:0", note: "C4", duration: "4n" },   // te-
+      { time: "1:0:0", note: "A3", duration: "4n" },   // gi
+
+      // --- Bait 1: ke kebun ke hume (Bar 1-2) ---
+      { time: "1:1:0", note: "B3", duration: "8n" },   // ke
+      { time: "1:1:2", note: "C4", duration: "16n" },  // ke-
+      { time: "1:1:3", note: "B3", duration: "16n" },  // bun
+      { time: "1:2:0", note: "C4", duration: "8n" },   // ke
+      { time: "1:2:2", note: "D4", duration: "8n" },   // hu-
+      { time: "1:3:0", note: "E4", duration: "2n" },   // me (3)
+
+      // --- Bait 1: Mawak suyak mikol pacul (Bar 3-5) ---
+      { time: "3:0:0", note: "A4", duration: "4n" },   // Ma- (6)
+      { time: "3:1:0", note: "G4", duration: "8n" },   // wak
+      { time: "3:1:2", note: "F4", duration: "16n" },  // su-
+      { time: "3:1:3", note: "E4", duration: "16n" },  // yak
+      { time: "3:2:0", note: "D4", duration: "2n" },   // mi...
+      { time: "4:2:0", note: "G#4", duration: "8n" },  // kol (triplet 5#)
+      { time: "4:2:2", note: "A4", duration: "8n" },   // (6)
+      { time: "4:3:0", note: "G#4", duration: "8n" },  // (5#)
+      { time: "5:0:0", note: "F4", duration: "8n" },   // pa-
+      { time: "5:0:2", note: "E4", duration: "8n" },   // cul
+      { time: "5:1:0", note: "D4", duration: "4n" },   // (hold)
+
+      // --- Refrain: Kite begawe bersama-sama (Bar 6-7) ---
+      { time: "6:0:0", note: "F4", duration: "8n" },   // Ki-
+      { time: "6:0:2", note: "E4", duration: "8n" },   // te
+      { time: "6:1:0", note: "D4", duration: "8n" },   // be-
+      { time: "6:1:2", note: "C4", duration: "8n" },   // ga-
+      { time: "6:2:0", note: "B3", duration: "8n" },   // we
+      { time: "6:2:2", note: "B3", duration: "8n" },   // sa-
+      { time: "6:3:0", note: "B3", duration: "8n" },   // me
+      { time: "6:3:2", note: "C4", duration: "8n" },   // sa-
+      { time: "7:0:0", note: "D4", duration: "8n" },   // me
+      { time: "7:0:2", note: "A3", duration: "2n" },   // (hold)
+    ]
     },
     folklore: {
       title: "Kisah Legenda Pohon Pelawan",
       story: "Dahulu kala di sebuah desa di Bangka Belitung, hiduplah sepasang suami istri yang sangat baik hati namun belum dikaruniai anak. Mereka sangat rajin merawat hutan di sekitar tempat tinggal mereka. Suatu malam, sang istri bermimpi bertemu dengan seorang kakek tua yang memberitahunya untuk menanam sebuah biji pohon unik di tengah hutan. Keesokan harinya, mereka benar-benar menemukan biji tersebut dan menanamnya dengan penuh kasih sayang. Seiring berjalannya waktu, biji itu tumbuh menjadi pohon yang sangat cantik dengan batang berwarna merah cerah yang disebut Pohon Pelawan. Keajaiban muncul ketika desa mereka dilanda musim kemarau yang sangat panjang dan banyak tanaman kering. Namun, di bawah naungan Pohon Pelawan tersebut, muncul sebuah mata air jernih yang tidak pernah surut. Pohon itu seolah menjadi pelindung bagi penduduk desa dari kekeringan. Masyarakat setempat percaya bahwa pohon ini tumbuh subur karena ketulusan hati pasangan tersebut dalam menjaga alam. Pohon Pelawan pun menjadi simbol ketangguhan dan kebaikan. Hingga saat ini, kayu pohon ini dikenal sangat kuat dan menjadi tempat favorit bagi lebah madu untuk bersarang, memberikan manfaat bagi banyak orang. Kisah ini selalu diceritakan untuk mengingatkan betapa alam akan membalas kebaikan setiap manusia yang merawatnya dengan tulus. Pesan Moral: Kebaikan dan ketulusan dalam menjaga alam serta sesama akan membuahkan hasil yang indah pada waktunya. Seperti Pohon Pelawan, jadilah pribadi yang kuat dan bermanfaat bagi orang banyak, meskipun harus menghadapi ujian yang berat. Pengarang: Anonim (Sastra Lisan Rakyat Kepulauan Bangka Belitung). '(Kisah mengenai kearifan lokal ini sering diceritakan kembali dalam kumpulan dongeng daerah oleh para penulis lokal seperti Dian Kristiani atau Taufik Hidayat)'.",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Kep%20Bangka%20Belitung%20-%20Kisah%20Legenda%20Pohon%20Pelawan.jpg"
     },
     native: [
       { name: "Bahasa Melayu Bangka", endonim: "Cakap Bangke", makna: "Merujuk pada identitas pulau ‘Bangka’ (berasal dari kata 'Wangka' yang berarti timah). (ref: Kemendikbud)", dialek: "Dialek Mentok, Belinyu, Sungailiat, Toboali, Pangkalpinang.", detail: "Seluruh Pulau Bangka.", description: "Memiliki ciri khas penggunaan vokal ‘e’ pepet yang kental di akhir kata pada dialek tertentu. (ref: Kemendikbud)" },
@@ -209,13 +554,75 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Injit-Injit Semut",
       description: "Injit-Injit Semut adalah lagu daerah khas Provinsi Jambi; judulnya berarti “menginjak semut” yang menjadi simbol peringatan akan akibat dari perbuatan menyakiti orang lain. Makna lagu ini menyampaikan pesan moral tentang keadilan, sebab setiap perbuatan buruk akan mendapat balasan. Lagu ini merupakan lagu rakyat Melayu, sehingga penciptanya tidak diketahui dan diwariskan secara turun-temurun.",
-      audioUrl: ""
+      melodyNotes: [
+      // --- Bait 1: Jalan-jalan ke tanah Deli ---
+      { time: "0:1:0", note: "D4", duration: "8n" },
+      { time: "0:1:2", note: "D4", duration: "8n" },
+      { time: "1:0:0", note: "D4", duration: "4n" },
+      { time: "1:1:0", note: "C#5", duration: "4n" },
+      { time: "1:3:0", note: "D4", duration: "4n" },
+      { time: "2:0:0", note: "C#5", duration: "4n" },
+      { time: "2:2:0", note: "C#5", duration: "4n" },
+      { time: "2:3:0", note: "B4", duration: "8n" },
+      { time: "2:3:2", note: "A4", duration: "8n" },
+
+      // --- Bait 1: Sungguh indah si puta-masu ---
+      { time: "3:1:0", note: "B4", duration: "8n" },
+      { time: "3:1:2", note: "B4", duration: "8n" },
+      { time: "4:0:0", note: "B4", duration: "8n" },
+      { time: "4:0:2", note: "B4", duration: "8n" },
+      { time: "4:1:0", note: "B4", duration: "8n" },
+      { time: "4:1:2", note: "B4", duration: "8n" },
+      { time: "4:2:0", note: "A4", duration: "8n" },
+      { time: "4:2:2", note: "G4", duration: "8n" },
+      { time: "4:3:0", note: "A4", duration: "4n" },
+
+      // --- Bait 1: Naik perahu ke pulau Sribu ---
+      { time: "5:0:0", note: "A4", duration: "4n" },
+      { time: "5:3:0", note: "A4", duration: "4n" },
+      { time: "6:0:0", note: "E4", duration: "8n" },
+      { time: "6:0:2", note: "E4", duration: "8n" },
+      { time: "6:1:0", note: "E4", duration: "8n" },
+      { time: "6:1:2", note: "E4", duration: "8n" },
+      { time: "6:2:2", note: "E4", duration: "8n" },
+      { time: "6:3:0", note: "F#4", duration: "8n" },
+      { time: "6:3:2", note: "G4", duration: "8n" },
+
+      // --- Bait 1: Sungguh malang nasibuku ---
+      { time: "7:1:0", note: "C#5", duration: "8n" },
+      { time: "7:1:2", note: "C#5", duration: "8n" },
+      { time: "8:0:0", note: "C#5", duration: "8n" },
+      { time: "8:0:2", note: "C#5", duration: "8n" },
+      { time: "8:1:0", note: "C#5", duration: "8n" },
+      { time: "8:1:2", note: "D4", duration: "8n" },
+      { time: "8:2:0", note: "C#5", duration: "8n" },
+      { time: "8:3:0", note: "B4", duration: "8n" },
+      { time: "8:3:2", note: "A4", duration: "8n" },
+
+      // --- Reff: Injit-injit semut siapa sakit (Contoh Pengulangan) ---
+      { time: "28:0:0", note: "D4", duration: "8n" },
+      { time: "28:0:2", note: "D4", duration: "8n" },
+      { time: "28:1:0", note: "D4", duration: "8n" },
+      { time: "28:1:2", note: "D4", duration: "8n" },
+      { time: "28:2:2", note: "C#5", duration: "8n" },
+      { time: "28:3:0", note: "D4", duration: "8n" },
+      { time: "28:3:2", note: "C#5", duration: "8n" },
+
+      // --- Penutup: Jangan dilepas ---
+      { time: "30:0:0", note: "B4", duration: "8n" },
+      { time: "30:0:2", note: "B4", duration: "8n" },
+      { time: "30:1:0", note: "B4", duration: "8n" },
+      { time: "30:1:2", note: "B4", duration: "8n" },
+      { time: "30:2:0", note: "A4", duration: "8n" },
+      { time: "30:2:2", note: "G4", duration: "8n" },
+      { time: "30:3:0", note: "A4", duration: "4n" }
+    ]
     },
     folklore: {
       title: "Legenda Angso Duo",
       story: "Dahulu kala di Tanah Pilih, yang kini dikenal sebagai Kota Jambi, hiduplah seorang putri cantik bernama Putri Mayang Mangurai yang merupakan putri dari Raja Jambi. Sang putri dilamar oleh seorang pangeran bijaksana dari Kerajaan Palembang yang bernama Orang Kayo Hitam. Namun, sebelum pernikahan dilangsungkan, Raja Jambi memberikan sebuah syarat yang unik sebagai panduan untuk menemukan tempat tinggal baru bagi sepasang pengantin tersebut. Raja memberikan sepasang angsa putih yang dilepaskan di Sungai Batanghari. Syaratnya adalah pangeran dan putri harus mengikuti ke mana pun angsa tersebut berenang dan berhenti. Jika sepasang angsa itu naik ke daratan dan berdiam di sana selama dua hari dua malam, maka di situlah mereka harus membangun istana dan memulai kehidupan baru. Dengan penuh kesabaran, Orang Kayo Hitam dan Putri Mayang Mangurai mengikuti perjalanan sepasang angsa tersebut menggunakan perahu menyusuri aliran sungai yang tenang. Setelah perjalanan yang panjang, sepasang angsa itu akhirnya naik ke daratan di sebuah wilayah yang subur dan tetap berada di sana sesuai dengan waktu yang ditentukan. Tempat itulah yang kemudian menjadi pusat pemerintahan Kerajaan Jambi. Kisah ini berakhir bahagia dengan berdirinya kerajaan yang makmur, dan sepasang angsa tersebut kini diabadikan sebagai lambang Kota Jambi yang melambangkan kebersamaan dan arah tujuan yang benar dalam hidup. Pesan Moral: Kesabaran dan ketekunan dalam mengikuti petunjuk yang benar akan membawa kita pada tempat terbaik untuk membangun masa depan. Selain itu, keharmonisan dan kesetiaan di antara pasangan adalah kunci utama untuk menciptakan kedamaian dalam sebuah keluarga maupun kepemimpinan. Pengarang: Anonim (Sastra Lisan Rakyat Jambi). '(Kisah sejarah yang melegenda ini sering dituliskan kembali dalam berbagai buku literatur budaya Jambi oleh penulis sejarah lokal seperti Junaidi T. Noor)'.",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Jambi%20-%20Legenda%20Angso%20Duo.jpg"
     },
     native: [
       { name: "Bahasa Melayu Jambi", endonim: "Baso Jambi", makna: "Merujuk pada identitas wilayah kesultanan Jambi.", dialek: "Dialek Kota Jambi, Batanghari, Sarolangun, dll.", detail: "Hampir seluruh Kabupaten/Kota di Jambi.", description: "Memiliki ciri khas akhiran 'o' (seperti bahasa Minang namun berbeda fonologi). Digunakan sebagai lingua franca antar etnis. (ref: kemendikbud)" },
@@ -240,24 +647,65 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Gending Sriwijaya",
       description: "Gending Sriwijaya merupakan lagu daerah Sumatera Selatan dengan lirik karya Mahdi Yazid dan musik ciptaan Arraniry. Secara linguistik, gending berarti nyanyian atau iringan, sedangkan Sriwijaya merujuk pada kerajaan besar yang pernah berjaya di wilayah tersebut. Makna lagu ini menggambarkan kejayaan, kemegahan, dan kebesaran Kerajaan Sriwijaya sebagai simbol kebanggaan budaya Palembang.",
-      audioUrl: ""
+      melodyNotes: [
+      // --- Intro (G) ---
+      { time: "0:0:0", note: "G4", duration: "2n" },
+      { time: "0:2:0", note: "B4", duration: "4n" },
+      { time: "0:3:0", note: "D5", duration: "4n" },
+
+      // --- Bait 1: Di kala ku merindukan (C - D - Em) ---
+      { time: "1:0:0", note: "E5", duration: "8n" },   // Di
+      { time: "1:0:2", note: "E5", duration: "8n" },   // ka-
+      { time: "1:1:0", note: "D5", duration: "4n" },   // la
+      { time: "1:2:0", note: "B4", duration: "8n" },   // ku
+      { time: "1:2:2", note: "C5", duration: "8n" },   // me-
+      { time: "1:3:0", note: "D5", duration: "4n" },   // rin-
+      { time: "2:0:0", note: "G4", duration: "4n" },   // du-
+      { time: "2:1:0", note: "A4", duration: "4n" },   // kan (D)
+      { time: "2:2:0", note: "B4", duration: "2n" },   // (Em)
+
+      // --- Bait 1: Keluhuran dahulu kala (D - Am) ---
+      { time: "3:0:0", note: "A4", duration: "8n" },   // ke-
+      { time: "3:0:2", note: "B4", duration: "8n" },   // lu-
+      { time: "3:1:0", note: "C5", duration: "4n" },   // hu-
+      { time: "3:2:0", note: "E4", duration: "4n" },   // ran
+      { time: "3:3:0", note: "A4", duration: "4n" },   // da-
+      { time: "4:0:0", note: "G4", duration: "4n" },   // hu-
+      { time: "4:1:0", note: "F#4", duration: "4n" },  // lu
+      { time: "4:2:0", note: "E4", duration: "2n" },   // ka-la
+
+      // --- Bait 1: Kutembangkan nyanyian lagu (C - G) ---
+      { time: "5:0:0", note: "C5", duration: "4n" },   // Ku-
+      { time: "5:1:0", note: "B4", duration: "4n" },   // tem-
+      { time: "5:2:0", note: "A4", duration: "8n" },   // bang-
+      { time: "5:2:2", note: "G4", duration: "8n" },   // kan
+      { time: "5:3:0", note: "B4", duration: "4n" },   // nya-
+      { time: "6:0:0", note: "D4", duration: "2n" },   // nyi-an
+
+      // --- Bait 1: Gending Sriwijaya (Em - C - G) ---
+      { time: "7:0:0", note: "G4", duration: "4n" },   // Gen-
+      { time: "7:1:0", note: "E4", duration: "4n" },   // ding
+      { time: "7:2:0", note: "C4", duration: "4n" },   // Sri-
+      { time: "7:3:0", note: "D4", duration: "4n" },   // wi-
+      { time: "8:0:0", note: "G3", duration: "1n" },   // ja-ya
+    ]
     },
     folklore: {
       title: "Legenda Pulau Kemaro",
       story: "Dahulu kala di Kerajaan Palembang, hiduplah seorang putri cantik bernama Siti Fatimah. Ia menjalin kasih dengan seorang pangeran dari Tiongkok bernama Tan Bun An. Cinta mereka sangat dalam hingga pangeran memutuskan untuk meminang sang putri. Sebagai syarat pernikahan, pangeran meminta restu orang tuanya di Tiongkok dan kembali membawa tujuh buah guci berisi emas sebagai hadiah untuk keluarga sang putri. Dalam perjalanan pulang melintasi Sungai Musi, Tan Bun An membuka guci-guci tersebut untuk memeriksa emasnya. Namun, ia terkejut karena yang ia lihat di permukaan guci hanyalah sayuran sawi asin yang membusuk. Karena marah dan malu, pangeran membuang satu per satu guci tersebut ke sungai. Saat guci terakhir pecah di lantai kapal, ia baru menyadari bahwa emas itu sengaja disembunyikan orang tuanya di dasar guci agar tidak dicuri perompak. Tanpa pikir panjang, pangeran terjun ke sungai untuk mengambil emasnya, namun ia tak kunjung muncul. Siti Fatimah yang menyaksikan kejadian itu dengan sedih kemudian ikut terjun ke sungai untuk menyusul kekasihnya sambil membawa pengawal. Konon, di tempat mereka tenggelam, muncul sebuah pulau kecil yang tidak pernah tenggelam meski air sungai sedang pasang. Pulau itu kini dikenal sebagai Pulau Kemaro, yang berarti 'Pulau Kemarau' karena selalu kering. Di sana berdiri sebuah pohon cinta yang melambangkan kesetiaan abadi di antara keduanya, menjadi pengingat bagi setiap orang tentang ketulusan sebuah perasaan. Pesan Moral: Janganlah mengambil keputusan dengan terburu-buru saat sedang dikuasai oleh rasa marah atau emosi yang sesaat. Kesabaran dan ketelitian sangat diperlukan agar kita tidak menyesali tindakan yang merugikan diri sendiri maupun orang-orang yang kita cintai. Pengarang: Anonim (Sastra Lisan Rakyat Sumatera Selatan). '(Kisah ini telah banyak dibukukan dalam berbagai kumpulan cerita rakyat Nusantara, salah satunya oleh penulis Siti Zaleha)'.",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Sumsel%20-%20Legenda%20Pulau%20Kemaro.jpg"
     },
     native: [
-      { name: "Bahasa ", endonim: "Baso Plembang", makna: "Merujuk pada identitas pusat peradaban di Palembang.", dialek: "Dialek Palembang Alus & Palembang Sari-sari.", detail: "Kota Palembang, Kab. Banyuasin, Ogan Ilir.", description: "Memiliki strata bahasa ‘Alus’ untuk bangsawan (pengaruh Jawa) dan ‘Sari-sari’. Dituturkan hampir di seluruh wilayah Sumsel sebagai lingua franca. (ref: petabahasa.kemendikbud)" },
-      { name: "Bahasa ", endonim: "Bahasa Kumoring", makna: "Merujuk pada nama sungai (Way Komering) di wilayah asal suku ini.", dialek: "Dialek Komering Ilir & Komering Ulu.", detail: "Kab. OKU Timur, OKU Selatan, OKI.", description: "Berkerabat dekat dengan bahasa Lampung (Kelompok Lampungik). Memiliki tradisi sastra lisan Warahan. (ref: kemdikbud.go.id)" },
-      { name: "Bahasa ", endonim: "Baso Musi", makna: "Merujuk pada aliran Sungai Musi yang membelah wilayah tersebut.", dialek: "Dialek Sekayu, Jejawi, Belide, dll.", detail: "Kab. Musi Banyuasin, Musi Rawas, Banyuasin.", description: "Penuturnya sering disebut sebagai ‘Orang Musi’. Bahasa ini memiliki sebaran geografis terluas di Sumsel setelah Palembang. (ref: petabahasa.kemendikbud)" },
-      { name: "Bahasa ", endonim: "Baso Kayu Agung", makna: "Merujuk pada pusat wilayah adat dan pemukiman ‘Kayu Agung’.", dialek: "Tunggal.", detail: "Kab. Ogan Komering Ilir (Kec. Kayu Agung).", description: "Secara linguistik unik karena memiliki fonologi yang berbeda dari Melayu sekitarnya, lebih dekat ke rumpun Lampungik/Komering. (ref: badanbahasa.kemdikbud)" },
-      { name: "Bahasa ", endonim: "Baso Ogan", makna: "Merujuk pada identitas wilayah di sepanjang aliran Sungai Ogan.", dialek: "Dialek Ogan Ulu & Ogan Ilir.", detail: "Kab. Ogan Komering Ulu, Ogan Ilir.", description: "Dialeknya kental dengan akhiran ‘e’ pepet atau ‘a’, berbeda dengan dialek Palembang yang berakhiran ‘o’. (ref: kemendikbud)" },
-      { name: "Bahasa ", endonim: "Baso Pedamar", makna: "Merujuk pada sejarah masyarakat pencari damar atau wilayah pemukiman.", dialek: "Tunggal", detail: "Kab. Ogan Komering Ilir (Kec. Pedamar).", description: "Sering dianggap sebagai bahasa isolat lokal karena perbedaan leksikal yang kontras dengan bahasa di sekitarnya. (ref: petabahasa.kemendikbud)" },
-      { name: "Bahasa ", endonim: "Baso Lematang", makna: "Merujuk pada wilayah di sepanjang aliran Sungai Lematang.", dialek: "Dialek Lematang Ulu & Lematang Ilir.", detail: "Kab. Muara Enim, Penukal Abab Lematang Ilir (PALI).", description: "Memiliki tradisi ‘Melemang’ yang erat kaitannya dengan acara adat pengguna bahasa ini. (ref: kemdikbud.go.id)" },
-      { name: "Bahasa ", endonim: "Baso Besemah", makna: "Merujuk pada dataran tinggi di kaki Gunung Dempo.", dialek: "Dialek Pagaralam, Jarai, Tanjung Sakti.", detail: "Kota Pagar Alam, Kab. Lahat, Empat Lawang.", description: "Masyarakatnya adalah pembuat megalitikum masa lampau. Bahasa ini memiliki intonasi yang tegas. (ref: petabahasa.kemendikbud)" },
-      { name: "Bahasa ", endonim: "Baso Semende", makna: "Berasal dari kata ‘Seme’ (Sama) dan ‘Nde’ (Induk/Satu).", dialek: "Dialek Semende Darat Tengah/Ulu.", detail: "Kab. Muara Enim (Semende), OKU Selatan.", description: "Terkenal dengan tradisi ‘Tunggu Tubang’, yakni sistem warisan yang jatuh kepada anak perempuan tertua. (ref: ditsmp.kemdikbud)" },
+      { name: "Bahasa Melayu (Palembang)", endonim: "Baso Plembang", makna: "Merujuk pada identitas pusat peradaban di Palembang.", dialek: "Dialek Palembang Alus & Palembang Sari-sari.", detail: "Kota Palembang, Kab. Banyuasin, Ogan Ilir.", description: "Memiliki strata bahasa ‘Alus’ untuk bangsawan (pengaruh Jawa) dan ‘Sari-sari’. Dituturkan hampir di seluruh wilayah Sumsel sebagai lingua franca. (ref: petabahasa.kemendikbud)" },
+      { name: "Bahasa Komering", endonim: "Bahasa Kumoring", makna: "Merujuk pada nama sungai (Way Komering) di wilayah asal suku ini.", dialek: "Dialek Komering Ilir & Komering Ulu.", detail: "Kab. OKU Timur, OKU Selatan, OKI.", description: "Berkerabat dekat dengan bahasa Lampung (Kelompok Lampungik). Memiliki tradisi sastra lisan Warahan. (ref: kemdikbud.go.id)" },
+      { name: "Bahasa Musirawas (Musi)", endonim: "Baso Musi", makna: "Merujuk pada aliran Sungai Musi yang membelah wilayah tersebut.", dialek: "Dialek Sekayu, Jejawi, Belide, dll.", detail: "Kab. Musi Banyuasin, Musi Rawas, Banyuasin.", description: "Penuturnya sering disebut sebagai ‘Orang Musi’. Bahasa ini memiliki sebaran geografis terluas di Sumsel setelah Palembang. (ref: petabahasa.kemendikbud)" },
+      { name: "Bahasa Kayu Agung", endonim: "Baso Kayu Agung", makna: "Merujuk pada pusat wilayah adat dan pemukiman ‘Kayu Agung’.", dialek: "Tunggal.", detail: "Kab. Ogan Komering Ilir (Kec. Kayu Agung).", description: "Secara linguistik unik karena memiliki fonologi yang berbeda dari Melayu sekitarnya, lebih dekat ke rumpun Lampungik/Komering. (ref: badanbahasa.kemdikbud)" },
+      { name: "Bahasa Ogan", endonim: "Baso Ogan", makna: "Merujuk pada identitas wilayah di sepanjang aliran Sungai Ogan.", dialek: "Dialek Ogan Ulu & Ogan Ilir.", detail: "Kab. Ogan Komering Ulu, Ogan Ilir.", description: "Dialeknya kental dengan akhiran ‘e’ pepet atau ‘a’, berbeda dengan dialek Palembang yang berakhiran ‘o’. (ref: kemendikbud)" },
+      { name: "Bahasa Pedamar", endonim: "Baso Pedamar", makna: "Merujuk pada sejarah masyarakat pencari damar atau wilayah pemukiman.", dialek: "Tunggal", detail: "Kab. Ogan Komering Ilir (Kec. Pedamar).", description: "Sering dianggap sebagai bahasa isolat lokal karena perbedaan leksikal yang kontras dengan bahasa di sekitarnya. (ref: petabahasa.kemendikbud)" },
+      { name: "Bahasa Lematang", endonim: "Baso Lematang", makna: "Merujuk pada wilayah di sepanjang aliran Sungai Lematang.", dialek: "Dialek Lematang Ulu & Lematang Ilir.", detail: "Kab. Muara Enim, Penukal Abab Lematang Ilir (PALI).", description: "Memiliki tradisi ‘Melemang’ yang erat kaitannya dengan acara adat pengguna bahasa ini. (ref: kemdikbud.go.id)" },
+      { name: "Bahasa Besemah (Pasemah)", endonim: "Baso Besemah", makna: "Merujuk pada dataran tinggi di kaki Gunung Dempo.", dialek: "Dialek Pagaralam, Jarai, Tanjung Sakti.", detail: "Kota Pagar Alam, Kab. Lahat, Empat Lawang.", description: "Masyarakatnya adalah pembuat megalitikum masa lampau. Bahasa ini memiliki intonasi yang tegas. (ref: petabahasa.kemendikbud)" },
+      { name: "Bahasa Semende", endonim: "Baso Semende", makna: "Berasal dari kata ‘Seme’ (Sama) dan ‘Nde’ (Induk/Satu).", dialek: "Dialek Semende Darat Tengah/Ulu.", detail: "Kab. Muara Enim (Semende), OKU Selatan.", description: "Terkenal dengan tradisi ‘Tunggu Tubang’, yakni sistem warisan yang jatuh kepada anak perempuan tertua. (ref: ditsmp.kemdikbud)" },
     ],
     community: [
       { name: "Bahasa Jawa", endonim: "Boso Jowo", makna: "Merujuk pada asal-usul etnis dari Pulau Jawa.", dialek: "Dialek Jawa Timuran & Jawa Tengah.", detail: "Wilayah Belitang (OKUT), Musi Rawas, Banyuasin.", description: "Hadir melalui program transmigrasi sejak zaman Kolonial Belanda. Bahasa Jawa di Sumsel sering mengalami asimilasi kosa kata lokal. (ref: kemendikbud)" },
@@ -276,15 +724,55 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     headerDescription: "Pendap",
     headerLongDescription: "Pendap adalah makanan khas Bengkulu yang terbuat dari ikan berbumbu rempah dan kelapa parut, dibungkus daun talas serta daun pisang lalu dimasak perlahan di atas bara api selama berjam-jam. Proses ini menghasilkan rasa gurih pedas yang kuat dengan tekstur ikan yang sangat lembut dan aroma khas yang menggugah selera. Pendap dikenal sebagai hidangan spesial dan oleh-oleh khas Bengkulu, bahkan menjadi makanan favorit Presiden Soekarno saat diasingkan di daerah tersebut.",
     regionalSong: {
-      title: "Bumi Rafflesia",
-      description: "Bumi Rafflesia adalah lagu daerah Bengkulu yang memiliki lirik dan kerap dinyanyikan dalam acara resmi sebagai simbol daerah. Secara linguistik, judul Bumi Rafflesia berarti “tanah tempat bunga rafflesia tumbuh”, merujuk pada Bengkulu yang dikenal sebagai habitat bunga Rafflesia arnoldii. Makna lagu ini menggambarkan keindahan alam, kekayaan budaya, serta rasa cinta dan kebanggaan masyarakat terhadap Provinsi Bengkulu.",
-      audioUrl: ""
+      title: "Ikan Pais",
+      description: "Lagu Ikan Pais merupakan lagu daerah legendaris dari Bengkulu yang diciptakan oleh seniman lokal bernama H. Syamlan. Judul lagu ini secara harfiah merujuk pada hidangan tradisional 'Pepes Ikan', yakni kuliner berbumbu rempah dan kelapa yang dibungkus rapi dengan daun talas sebelum dikukus. Secara mendalam, liriknya bermakna sebagai ungkapan kegembiraan serta kenikmatan menyantap kuliner khas tersebut bersama keluarga, sekaligus menjadi simbol kebanggaan terhadap identitas budaya kuliner masyarakat setempat.",
+      melodyNotes: [
+      { time: "0:0:0", note: "G4", duration: "4n" },   // I-
+      { time: "0:1:0", note: "B4", duration: "4n" },   // kan
+      { time: "0:2:0", note: "B4", duration: "8n" },   // pa-
+      { time: "0:2:2", note: "G4", duration: "8n" },   // is
+      { time: "1:0:0", note: "B4", duration: "8n" },   // ke-
+      { time: "1:0:2", note: "D5", duration: "8n" },   // la-
+      { time: "1:1:0", note: "C5", duration: "8n" },   // po-
+      { time: "1:1:2", note: "B4", duration: "8n" },   // nyo
+      { time: "1:2:0", note: "A4", duration: "4n" },   // mu-
+      { time: "1:3:0", note: "G4", duration: "4n" },   // do
+
+      // --- Bait 1: dibungkus daun talas rapih-rapih (D) ---
+      { time: "2:0:0", note: "F#4", duration: "8n" },  // di-
+      { time: "2:0:2", note: "A4", duration: "8n" },   // bung-
+      { time: "2:1:0", note: "A4", duration: "4n" },   // kus
+      { time: "2:2:0", note: "A4", duration: "8n" },   // da-
+      { time: "2:2:2", note: "B4", duration: "8n" },   // un
+      { time: "2:3:0", note: "C5", duration: "4n" },   // ta-
+      { time: "3:0:0", note: "B4", duration: "8n" },   // las
+      { time: "3:1:0", note: "A4", duration: "8n" },   // ra-
+      { time: "3:1:2", note: "F#4", duration: "8n" },  // pih
+      { time: "3:2:0", note: "A4", duration: "2n" },   // rapih
+
+      // --- Reff: Rasonyo oii lemak nian (C - D - G) ---
+      { time: "5:0:0", note: "C5", duration: "4n" },   // Ra-
+      { time: "5:1:0", note: "E5", duration: "4n" },   // so-
+      { time: "5:2:0", note: "D5", duration: "4n" },   // nyo
+      { time: "5:3:0", note: "C5", duration: "4n" },   // oii
+      { time: "6:0:0", note: "B4", duration: "4n" },   // le-
+      { time: "6:1:0", note: "A4", duration: "4n" },   // mak
+      { time: "6:2:0", note: "G4", duration: "2n" },   // ni-an
+
+      // --- Reff: makan sebungkus samo samo (G - Em) ---
+      { time: "7:0:0", note: "G4", duration: "8n" },   // ma-
+      { time: "7:0:2", note: "B4", duration: "8n" },   // kan
+      { time: "7:1:0", note: "D5", duration: "4n" },   // se-
+      { time: "7:2:0", note: "B4", duration: "8n" },   // bung-
+      { time: "7:2:2", note: "G4", duration: "8n" },   // kus
+      { time: "7:3:0", note: "E4", duration: "2n" },   // sa-mo sa-mo
+    ]
     },
     folklore: {
       title: "Legenda Putri Gading Cempaka",
       story: "Dahulu kala di Kerajaan Sungai Serut, hiduplah seorang putri bungsu bernama Putri Gading Cempaka. Ia dikenal bukan hanya karena kecantikannya yang luar biasa, tetapi juga karena suaranya yang lembut dan hatinya yang sangat pemaaf. Kerajaan itu dipimpin oleh ayahnya, Raja Ratu Agung, yang sangat bijaksana. Sebelum wafat, sang Raja berpesan kepada tujuh anaknya agar selalu bersatu dan tidak membiarkan keserakahan menghancurkan persaudaraan mereka. Suatu hari, seorang pangeran dari kerajaan tetangga datang untuk melamar sang putri, namun lamaran tersebut ditolak secara halus oleh saudara-saudara lelaki sang putri demi menjaga amanah ayah mereka. Penolakan ini memicu peperangan besar yang membuat keluarga kerajaan harus mengungsi ke pedalaman hutan Gunung Bungkuk yang tenang. Di dalam hutan yang sunyi dan sejuk itu, Putri Gading Cempaka tetap menunjukkan ketabahan dan kesetiaan dengan merawat saudara-saudaranya tanpa mengeluh sedikit pun. Kesabaran dan kelembutan hati sang putri akhirnya membawa kedamaian kembali. Singkat cerita, seorang bangsawan yang bijaksana bernama Maharaja Sakti datang dan terpesona oleh kebaikan hati sang putri. Mereka kemudian menikah dan mendirikan Kerajaan Bangkahulu yang baru. Putri Gading Cempaka menjadi lambang kemuliaan wanita Bengkulu yang mampu menjaga kerukunan keluarga dan membawa ketenangan di masa tersulit sekalipun. Pesan Moral: Kesabaran dan kelembutan hati adalah kekuatan yang sesungguhnya untuk meredam konflik dan membawa kedamaian. Persaudaraan yang kuat dan kepatuhan pada pesan orang tua akan membimbing kita menuju kebahagiaan sejati meskipun harus melalui masa-masa yang berat. Pengarang: Anonim (Sastra Lisan Rakyat Bengkulu). '(Kisah klasik ini sering diceritakan kembali dalam berbagai buku sastra daerah oleh penulis seperti Saraswati P. atau dalam catatan kebudayaan Bengkulu)'.",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Bengkulu%20-%20Legenda%20Putri%20Gading%20Cempaka.jpg"
     },
     native: [
       { name: "Bahasa Rejang", endonim: "Baso Hejang", makna: "Berasal dari kata ‘Rejang’ yang merujuk pada identitas etnis asli di pegunungan.", dialek: "Pesisir, Musi, Lebong, Kepahiang.", detail: "Kab. Rejang Lebong, Kepahiang, Lebong, Bengkulu Utara.", description: "Memiliki aksara sendiri bernama Kaganga. Statusnya merupakan bahasa dengan jumlah penutur asli terbesar di Bengkulu. (ref: petabahasa.kemendikbud)" },
@@ -316,13 +804,58 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Lipang Lipang Dang",
       description: "Lagu ini merupakan lagu hiburan yang menggunakan judul berupa onomatope keceriaan untuk menggambarkan suasana hati yang riang. Liriknya berisi nasihat jenaka yang dikemas dalam bentuk pantun untuk mengingatkan para pemuda agar lebih berhati-hati dalam urusan asmara. Secara keseluruhan, lagu ini berpesan agar seseorang tidak mudah terbuai oleh janji manis atau penampilan luar semata agar tidak mengalami kekecewaan di kemudian hari.",
-      audioUrl: ""
+      melodyNotes: [
+      // --- Intro (C - G - C - G) ---
+      { time: "0:0:0", note: "C4", duration: "8n" },
+      { time: "0:0:2", note: "E4", duration: "8n" },
+      { time: "0:1:0", note: "G4", duration: "8n" },
+      { time: "0:1:2", note: "E4", duration: "8n" },
+      { time: "0:2:0", note: "D4", duration: "4n" },
+      { time: "0:3:0", note: "G3", duration: "4n" },
+
+      // --- Bait: Pang lipang dang pang lipang dang (Bar 1-2) ---
+      { time: "1:0:0", note: "C4", duration: "8n" },   // Pang
+      { time: "1:0:2", note: "C4", duration: "8n" },   // li-
+      { time: "1:1:0", note: "C4", duration: "4n" },   // pang dang
+      { time: "1:2:0", note: "C4", duration: "8n" },   // pang
+      { time: "1:2:2", note: "C4", duration: "8n" },   // li-
+      { time: "1:3:0", note: "C4", duration: "8n" },   // pang dang
+      { time: "1:3:2", note: "D4", duration: "8n" },   // ki
+
+      // --- Bait: ki lidang sakik lipang jak kundang (Bar 2-4) ---
+      { time: "2:0:0", note: "E4", duration: "4n" },   // li-
+      { time: "2:1:0", note: "D4", duration: "4n" },   // dang
+      { time: "2:2:0", note: "B3", duration: "8n" },   // sa-
+      { time: "2:2:2", note: "D4", duration: "8n" },   // kik
+      { time: "2:3:0", note: "D4", duration: "4n" },   // li-pang
+      { time: "3:0:0", note: "D4", duration: "8n" },   // jak
+      { time: "3:1:0", note: "B3", duration: "8n" },   // kun-
+      { time: "3:2:0", note: "C4", duration: "2n" },   // dang
+
+      // --- Chorus: Api penggali lawas (Bar 5-6) ---
+      { time: "5:0:0", note: "E4", duration: "4n" },   // A-
+      { time: "5:1:0", note: "G4", duration: "4n" },   // pi
+      { time: "5:2:0", note: "F4", duration: "8n" },   // peng-
+      { time: "5:2:2", note: "E4", duration: "8n" },   // ga-
+      { time: "5:3:0", note: "D4", duration: "4n" },   // li
+      { time: "6:0:0", note: "F4", duration: "4n" },   // la-
+      { time: "6:1:0", note: "E4", duration: "4n" },   // was
+
+      // --- Chorus: Mekhanai awas awas (Bar 7-8) ---
+      { time: "7:0:0", note: "D4", duration: "8n" },   // Me-
+      { time: "7:0:2", note: "D4", duration: "8n" },   // kha-
+      { time: "7:1:0", note: "D4", duration: "4n" },   // nai
+      { time: "7:2:0", note: "B3", duration: "8n" },   // a-
+      { time: "7:2:2", note: "B3", duration: "8n" },   // was
+      { time: "7:3:0", note: "B3", duration: "4n" },   // a-was
+      { time: "8:0:0", note: "C4", duration: "1n" },   // (Sustain penutup)
+    ]
     },
     folklore: {
       title: "Legenda Buay Tumi dan Kisah Sekala Brak",
       story: "Dahulu kala di puncak Gunung Pesagi yang selalu diselimuti kabut tipis, terdapat sebuah kerajaan kuno bernama Sekala Brak. Di sana hiduplah masyarakat Buay Tumi yang hidup berdampingan dengan alam yang sangat asri. Suasana di lereng gunung itu sangat tenang, dengan kicauan burung dan gemericik air sungai yang jernih. Di tengah ketenangan itu, muncul seorang pemuda bijaksana yang dikenal memiliki hati yang sangat bersih dan tekad yang kuat untuk membawa kedamaian bagi seluruh penduduk. Pemuda ini bersama saudara-saudaranya mengajarkan cara bercocok tanam yang baik dan bagaimana cara menghormati hutan yang mereka tinggali. Mereka meyakini bahwa alam adalah titipan yang harus dijaga dengan penuh kasih sayang. Karena kebijaksanaan dan kelembutan hatinya, ia sangat dihormati oleh seluruh penduduk desa. Kisah ini berlanjut dengan masa keemasan di mana kerukunan menjadi landasan utama kehidupan mereka. Meskipun terdapat tantangan dari luar, kedamaian di Sekala Brak tetap terjaga karena penduduknya selalu mengutamakan musyawarah dan saling menghargai. Kisah ini sering diceritakan sebagai pengantar tidur untuk memberikan rasa aman dan damai, membayangkan sebuah negeri di atas awan di mana semua orang hidup rukun dan bahagia. Keindahan Gunung Pesagi yang digambarkan dalam cerita ini menjadi simbol perlindungan dan ketenangan abadi bagi masyarakat Lampung. Hingga saat ini, nilai-nilai kebersamaan dari masa Sekala Brak tetap tertanam kuat dalam adat istiadat Lampung yang dikenal sangat terbuka dan ramah kepada siapa pun. Pesan Moral: Kerukunan dan rasa hormat terhadap alam serta sesama adalah kunci utama untuk menciptakan kedamaian yang abadi. Dengan hati yang bersih dan pikiran yang bijaksana, kita dapat membangun lingkungan yang harmonis dan menjadi tempat yang aman bagi semua orang. Pengarang: Anonim (Sastra Lisan Rakyat Lampung). '(Kisah mengenai asal-usul Sekala Brak ini sering dibukukan dan diteliti oleh sejarawan serta budayawan lokal Lampung seperti Hilman Hadikusuma dalam catatan hukum adat dan budaya)'.",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Lampung%20-%20Legenda%20Buay%20Tumi%20dan%20Kisah%20Sekala%20Brak.jpg"
     },
     native: [
       { name: "Bahasa Lampung Api", endonim: "Cawa Lampung Api", makna: "‘Api’ berarti ‘apa’ dalam dialek pesisir/peminggir.", dialek: "Dialek Pesisir, Pubian, Sungkai, Way Kanan.", detail: "Lampung Barat, Pesisir Barat, Tanggamus, Lampung Selatan.", description: "Memiliki tradisi sastra lisan Pisaan dan Ringget. Secara fonologi cenderung menggunakan vokal [a]. (ref: petabahasa.kemendikbud)" },

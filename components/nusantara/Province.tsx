@@ -16,4 +16,4 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
   ...PAPUA_DIALECTS,
 };
 
-export type { DialectInfo, ProvinceData, RegionalSong } from './ProvinceInterfaces';
+export type { DialectInfo, ProvinceData, RegionalSong, MelodyNote } from './ProvinceInterfaces';

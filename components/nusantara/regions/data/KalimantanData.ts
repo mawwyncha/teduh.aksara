@@ -8,22 +8,45 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Aek Kapuas",
       description: "Aek Kapuas secara linguistik berarti “air atau Sungai Kapuas”, dengan aek berasal dari kosakata Melayu lokal. Lagu ciptaan Paul Putra Frederick ini menggambarkan Sungai Kapuas sebagai sumber kehidupan utama masyarakat Kalimantan Barat. Makna liriknya menegaskan rasa cinta tanah kelahiran dan ikatan emosional masyarakat dengan sungai sebagai pusat sejarah dan budaya.",
-      audioUrl: ""  
+      melodyNotes: [
+      { time: "0:0:0", note: "G4", duration: "8n" },
+      { time: "0:0:2", note: "G4", duration: "8n" },
+      { time: "0:1:0", note: "A4", duration: "8n" },
+      { time: "0:1:2", note: "B4", duration: "4n" },
+      { time: "0:2:0", note: "G4", duration: "8n" },
+      { time: "0:2:2", note: "G4", duration: "8n" },
+      { time: "0:3:0", note: "A4", duration: "8n" },
+      { time: "0:3:2", note: "B4", duration: "4n" },
+      { time: "1:0:0", note: "A4", duration: "8n" },
+      { time: "1:0:2", note: "B4", duration: "8n" },
+      { time: "1:1:0", note: "G4", duration: "8n" },
+      { time: "1:1:2", note: "E4", duration: "4n" },
+    ]  
     },
     folklore: {
       title: "Legenda Batu Menangis",
       story: "Dahulu kala, di sebuah bukit yang jauh dari pedesaan di Kalimantan Barat, hiduplah seorang janda miskin bersama anak gadisnya yang sangat cantik jelita. Namun sayang, kecantikan gadis itu tidak sejalan dengan sifatnya. Ia sangat pemalas dan memiliki sifat yang sangat manja. Suatu hari, sang ibu mengajak gadis itu pergi ke pasar untuk berbelanja. Di sepanjang jalan, sang gadis berdandan sangat cantik dengan pakaian yang indah, sementara ibunya berjalan di belakang dengan pakaian yang kumal dan membawa keranjang. Banyak orang yang bertanya kepada gadis itu, 'Hai gadis cantik, siapakah orang yang berjalan di belakangmu itu? Apakah dia ibumu?' Gadis itu dengan angkuh menjawab, 'Bukan, dia adalah pembantuku!' Mendengar hal itu berkali-kali, hati sang ibu terasa sangat perih dan hancur. Sang ibu akhirnya berhenti melangkah, berlutut, dan berdoa dengan air mata berlinang, 'Ya Tuhan, hamba sudah tidak kuat lagi menahan hinaan ini. Berikanlah hukuman yang adil kepada anak hamba yang durhaka ini.' Seketika itu juga, langit menjadi mendung dan petir menggelegar. Perlahan-lahan, tubuh sang gadis mulai mengeras dari kaki hingga ke atas. Gadis itu ketakutan dan berteriak memohon ampun, 'Ibu, maafkan aku! Tolong aku, Ibu!' Namun segalanya sudah terlambat. Meskipun seluruh tubuhnya telah berubah menjadi batu, orang-orang masih bisa melihat air mata yang terus mengalir dari matanya. Itulah sebabnya batu itu dinamakan Batu Menangis. Pesan Moral: Hormatilah orang tua, terutama ibu, karena doa orang tua memiliki kekuatan yang sangat besar. Kecantikan fisik tidak akan ada artinya jika tidak disertai dengan kecantikan hati dan akhlak yang baik. Pengarang: Anonim (Sastra Lisan/Tradisi Tutur Masyarakat Kalimantan Barat).",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Kalbar%20-%20Legenda%20Batu%20Menangis.jpg"
     },
     native: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Melayu Kalimantan", endonim: "Bahase Melayu", makna: "Melayu' kemungkinan berasal dari kata 'Malaya' (Sanskerta: tanah berbukit); merujuk pada identitas etnis pesisir.", dialek: "Pontianak, Sambas, Ketapang.", detail: "Kota Pontianak, Sambas, Ketapang, Kayong Utara.", description: "Dialek Sambas memiliki ciri khas vokal yang sangat berbeda (vowel shift) dan sering digunakan dalam tradisi lisan 'Tandak'." },
+      { name: "Bahasa Dayak Kanayatn", endonim: "Bahasa Kanayatn", makna: "Kanayatn' merujuk pada identitas masyarakat Dayak di wilayah darat; secara lokal diartikan sebagai 'orang daratan'.", dialek: "Ahe, Banana', Karangan.", detail: "Kabupaten Landak, Mempawah, Kubu Raya.", description: "Menjadi bahasa utama dalam ritual 'Naik Dango' (syukur panen); memiliki kedekatan leksikal dengan bahasa Melayu namun struktur berbeda." },
+      { name: "Bahasa Dayak Iban", endonim: "Bahasa Iban", makna: "Iban' dalam bahasa Kayan berarti 'manusia' atau 'pengembara'; merujuk pada sifat suku yang gemar berpindah.", dialek: "Batang Lupar, Kantuk, Desa.", detail: "Kabupaten Kapuas Hulu dan Sintang.", description: "Suku penuturnya terkenal dengan tradisi menenun 'Tenun Ikat' dan sejarah panjang sebagai pelaut sungai yang tangguh." },
+      { name: "Bahasa Dayak Bidayuh", endonim: "Bahasa Bidayuh", makna: "Bi' berarti orang dan 'Dayuh' berarti daratan atau interior; bermakna 'orang yang tinggal di pedalaman'.", dialek: "Jagoi, Biatah, Bukar-Sadong.", detail: "Kabupaten Sanggau dan Bengkayang.", description: "Tersebar lintas negara hingga ke Sarawak, Malaysia; bahasa ini memiliki fonologi yang sangat khas dengan banyak bunyi vokal tertutup." },
+      { name: "Bahasa Dayak Kayan", endonim: "Bahasa Kayan", makna: "Merujuk pada nama sungai Kayan; identitas masyarakat yang mendiami hulu sungai besar.", dialek: "Kayan Mendalam, Kayan Busang.", detail: "Kabupaten Kapuas Hulu.", description: "Masyarakatnya dikenal memiliki strata sosial yang kuat di masa lalu yang tercermin dalam penggunaan beberapa kosa kata halus." },
+      { name: "Bahasa Dayak Bakati'", endonim: "Bahasa Bakati'", makna: "Bakati' secara linguistik merujuk pada identitas kelompok penutur di wilayah pegunungan dan lembah.", dialek: "Bakati' Rara, Bakati' Sara.", detail: "Kabupaten Bengkayang dan Sambas.", description: "Merupakan bahasa yang berbatasan langsung dengan wilayah Malaysia; penggunaannya masih sangat kuat di wilayah pedalaman Bengkayang." },
     ],
     community: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Madura", endonim: "Kemungkinan berasal dari 'Madu-Dara'; identitas etnis asal Pulau Madura.", makna: "Kemungkinan berasal dari 'Madu-Dara'; identitas etnis asal Pulau Madura.", dialek: "Dialek pesisir.", detail: "Pontianak, Kubu Raya, dan Sambas.", description: "Digunakan secara aktif oleh komunitas agraris dan pedagang; telah berasimilasi dalam beberapa istilah lokal Kalimantan." },
+      { name: "Bahasa Bugis", endonim: "Merujuk pada leluhur 'La Sattumpugi'; 'Ugi' adalah identitas pengikut sang pemimpin.", makna: "Merujuk pada leluhur 'La Sattumpugi'; 'Ugi' adalah identitas pengikut sang pemimpin.", dialek: "Bugis Pesisir.", detail: "Mempawah, Kubu Raya, dan Ketapang.", description: "Komunitas Bugis tiba sejak masa kesultanan dan berperan penting dalam sejarah maritim serta politik lokal di Kalimantan Barat." },
+      { name: "Bahasa Jawa", endonim: "Jowo' merujuk pada asal pulau Jawa yang subur (Yava/jelai).", makna: "Jowo' merujuk pada asal pulau Jawa yang subur (Yava/jelai).", dialek: "Jawa Ngoko (Transmigrasi).", detail: "Rasau Jaya (Kubu Raya) dan area transmigrasi lainnya.", description: "Dibawa oleh gelombang transmigrasi besar; bahasa ini tetap lestari dalam upacara adat seperti 'Bersih Desa' di lingkungan transmigran." },
+      { name: "Bahasa Sunda", endonim: "Sunda' berarti cahaya, murni, atau putih; merujuk pada identitas etnis Jawa Barat.", makna: "Sunda' berarti cahaya, murni, atau putih; merujuk pada identitas etnis Jawa Barat.", dialek: "Sunda Standar.", detail: "Kantong-kantong transmigrasi di Landak dan Sintang.", description: "Digunakan oleh komunitas transmigran asal Jawa Barat; sering berakulturasi dengan bahasa lokal dalam aktivitas pertanian." },
     ],
     foreign: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Hakka (Khek)", endonim: "Kyak-fa", makna: "Kyak' (tamu) dan 'Fa' (bahasa); secara harfiah bermakna 'bahasa orang pendatang/tamu'.", dialek: "Dialek Lufeng (Singkawang).", detail: "Kota Singkawang dan Kabupaten Bengkayang.", description: "Menjadi bahasa mayoritas di Singkawang; kota ini terkenal dengan perayaan 'Tatung' yang menarik wisatawan mancanegara." },
+      { name: "Bahasa Teochew", endonim: "Tie-chiu-ue", makna: "Merujuk pada wilayah asal 'Chaozhou' di Tiongkok; 'Ue' berarti bahasa atau suara.", dialek: "Dialek Teochew Pontianak.", detail: "Kota Pontianak dan sekitarnya.", description: "Digunakan secara luas oleh komunitas pedagang di Pontianak; memiliki intonasi yang berbeda secara signifikan dengan dialek Hakka." },
+      { name: "Bahasa Arab (Peranakan)", endonim: "Lughah al-Arabiyyah", makna: "Arab' merujuk pada identitas etnis dan geografis semenanjung Arab.", dialek: "Arab Hadrami.", detail: "Kawasan Keraton Kadriyah, Pontianak.", description: "Digunakan oleh keturunan Sultan Pontianak (Alkadrie) dan habaib; sangat berpengaruh pada serapan kosa kata religius dalam Melayu Pontianak." },
     ]
   },
   "Kalimantan Tengah": {
@@ -31,24 +54,47 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     headerDescription: "Kalumpe",
     headerLongDescription: "Kalumpe khas Provinsi Kalimantan Tengah memiliki rasa gurih dan segar dari daun singkong tumbuk yang dimasak dengan santan serta bumbu tradisional. Teksturnya lembut dengan cita rasa khas sayuran yang berpadu nikmat bersama aroma rempah sederhana. Hidangan tradisional Dayak ini menggugah selera sebagai sajian alami, sehat, dan mencerminkan kekayaan kuliner Kalimantan Tengah.",
     regionalSong: {
-      title: "",
-      description: "",
-      audioUrl: ""
+      title: "Manasai",
+      description: "Lagu ini merupakan manifestasi budaya yang mengajak masyarakat dari berbagai lapisan untuk menyatukan langkah dalam tarian melingkar yang simbolis. Liriknya menekankan nilai filosofis Huma Betang, yaitu semangat kebersamaan dan toleransi meskipun hidup dalam perbedaan latar belakang. Melalui irama yang ceria, lagu ini berfungsi sebagai perekat sosial yang mengubah suasana pertemuan menjadi momen persaudaraan yang penuh kegembiraan.",
+      melodyNotes: [
+      { time: "0:0:0", note: "G4", duration: "8n" },
+      { time: "0:0:2", note: "G4", duration: "8n" },
+      { time: "0:1:0", note: "A4", duration: "8n" },
+      { time: "0:1:2", note: "B4", duration: "4n" },
+      { time: "0:2:0", note: "G4", duration: "8n" },
+      { time: "0:2:2", note: "G4", duration: "8n" },
+      { time: "0:3:0", note: "A4", duration: "8n" },
+      { time: "0:3:2", note: "B4", duration: "4n" },
+      { time: "1:0:0", note: "A4", duration: "8n" },
+      { time: "1:0:2", note: "B4", duration: "8n" },
+      { time: "1:1:0", note: "G4", duration: "8n" },
+      { time: "1:1:2", note: "E4", duration: "4n" },
+    ]
     },
     folklore: {
       title: "Ular Namar dan Pemuda yang Baik Hati",
       story: "Di sebuah desa yang tenang di tepi hutan Kalimantan, hiduplah seorang pemuda yatim piatu yang sangat penyayang binatang. Suatu malam saat ia sedang mencari kayu bakar, ia menemukan seekor ular kecil yang terjepit di antara dahan pohon. Ular itu memiliki sisik yang indah, berkilau seperti perak di bawah cahaya bulan. Bukannya takut, pemuda itu justru merasa iba. Dengan sangat hati-hati, ia melepaskan dahan yang menjepit tubuh ular tersebut. 'Tenanglah manis, kau sudah aman sekarang,' bisiknya lembut. Ia kemudian membawa ular itu pulang dan merawat lukanya hingga sembuh. Ia memberi nama ular itu 'Namar'. Anehnya, setiap kali pemuda itu tertidur, ia bermimpi melihat seorang kakek tua yang bijak. Dalam mimpinya, kakek itu berkata, 'Kebaikanmu akan membuahkan hasil yang indah. Teruslah berkasih sayang kepada sesama makhluk.' Beberapa waktu berlalu, Namar tumbuh menjadi ular yang sehat. Suatu pagi, Namar tiba-tiba menghilang, namun di tempat tidurnya tertinggal sebutir permata hijau yang sangat jernih. Permata itu ternyata memiliki keajaiban; setiap kali diletakkan di dalam tempayan beras, beras tersebut tidak pernah habis, sehingga pemuda itu bisa membagi-bagikan makanan kepada seluruh penduduk desa yang kelaparan. Pemuda itu pun hidup sejahtera bersama warga desa lainnya berkat kebaikan hatinya kepada seekor hewan kecil. Pesan Moral: Setiap perbuatan baik kepada makhluk hidup, sekecil apa pun itu, pasti akan mendatangkan kebaikan kembali kepada kita. Kasih sayang dan ketulusan adalah kunci kebahagiaan sejati. Pengarang:  Anonim (Sastra Lisan Dayak, Kalimantan Tengah).",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Kalteng%20-%20Ular%20Namar%20dan%20Pemuda%20yang%20Baik%20Hati.jpg"
     },
     native: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Dayak Ngaju", endonim: "Basa Ngaju", makna: "Ngaju' secara linguistik berarti 'hulu' atau 'ke arah hulu sungai'; merujuk pada masyarakat pedalaman.", dialek: "Kapuas, Kahayan, Ba'amang, Mantangai.", detail: "Palangka Raya, Kapuas, Pulang Pisau, Katingan.", description: "Menjadi Lingua Franca Dayak di Kalteng; bahasa ini digunakan sebagai bahasa pengantar dalam Alkitab (Surat Sinta) dan upacara Tiwah." },
+      { name: "Bahasa Dayak Ma'anyan", endonim: "Bahasa Ma'anyan", makna: "Ma'anyan' merujuk pada identitas klan; secara etimologis berkaitan dengan 'manya' (orang).", dialek: "Paju Epat, Paju Sapuluh, Banua Lima.", detail: "Kabupaten Barito Timur dan Barito Selatan.", description: "Memiliki kaitan genetik $90\%$ dengan bahasa Malagasi di Madagaskar, membuktikan migrasi pelaut kuno Kalimantan hingga ke Afrika." },
+      { name: "Bahasa Dayak Ot Danum", endonim: "Dohoi / Ot Danum", makna: "Ot' (hulu/orang) dan 'Danum' (air); secara harfiah berarti 'Orang Hulu Sungai'.", dialek: "Dohoi, Ulu Ai, Siang.", detail: "Kabupaten Gunung Mas, Murung Raya, Katingan Hulu.", description: "Merupakan salah satu suku Dayak tertua; bahasanya memiliki banyak kosa kata arkais yang digunakan dalam sastra lisan 'Sansana'." },
+      { name: "Bahasa Dayak Bakumpai", endonim: "Basa Bakumpai", makna: "Bakumpai' berasal dari kata 'Kumpai' (rumput/rawa); merujuk pada penduduk wilayah rawa/sungai.", dialek: "Bakumpai Tengah, Bakumpai Barito.", detail: "Kabupaten Barito Kuala (perbatasan) dan Barito Utara.", description: "Secara linguistik sangat dekat dengan Ngaju, namun penuturnya adalah masyarakat Dayak yang telah memeluk Islam sejak masa Kesultanan." },
+      { name: "Bahasa Dayak Katingan", endonim: "Basa Katingan", makna: "Merujuk pada identitas masyarakat yang mendiami sepanjang daerah aliran sungai (DAS) Katingan.", dialek: "Katingan Hilir, Katingan Hulu.", detail: "Kabupaten Katingan.", description: "Memiliki intonasi yang sangat khas dibandingkan Ngaju; bahasa ini masih sangat dominan digunakan dalam kehidupan domestik pedalaman." },
+      { name: "Bahasa Dayak Tamuan", endonim: "Basa Tamuan", makna: "Tamuan' berasal dari kata 'Temu'; merujuk pada komunitas yang terbentuk dari pertemuan berbagai kelompok.", dialek: "Dialek hulu dan hilir.", detail: "Kabupaten Kotawaringin Timur dan Lamandau.", description: "Sering diklasifikasikan sebagai bagian dari kelompok Malayic Dayak; bahasanya memiliki banyak kemiripan leksikal dengan bahasa Melayu." },
+      { name: "Bahasa Dayak Lawangan", endonim: "Basa Lawangan", makna: "Merujuk pada identitas etnis Lawangan di wilayah timur Kalimantan Tengah.", dialek: "Ajuh, Benua', Karau.", detail: "Kabupaten Barito Timur (wilayah perbatasan).", description: "Terkenal dengan ritual penyembuhan 'Belian'; bahasa ini memiliki kemiripan struktur dengan bahasa-bahasa di Kalimantan Timur." },
     ],
     community: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Banjar", endonim: "Bahasa Banjar", makna: "Banjar' merujuk pada tatanan pemukiman atau 'berbanjar'; identitas etnis pesisir Kalimantan Selatan.", dialek: "Banjar Hulu, Banjar Kuala.", detail: "Pulang Pisau, Kapuas, dan wilayah perkotaan.", description: "Berfungsi sebagai bahasa perdagangan utama di wilayah selatan Kalteng; banyak kosa kata Banjar yang diserap ke dalam bahasa Dayak Ngaju." },
+      { name: "Bahasa Jawa", endonim: "Boso Jowo", makna: "Jowo' merujuk pada tanaman 'Yava' (jelai) yang melambangkan kesuburan pulau asal.", dialek: "Jawa Ngoko (Transmigrasi).", detail: "Wilayah Transmigrasi di Katingan, Seruyan, dan Sukamara.", description: "Dibawa oleh program transmigrasi sejak tahun 1970-an; bahasa ini tetap lestari dalam paguyuban seni seperti kuda lumping di lokasi trans." },
+      { name: "Bahasa Madura", endonim: "Basa Madura", makna: "Kemungkinan berasal dari 'Madu-Dara'; identitas etnis asal Pulau Madura.", dialek: "Dialek pesisir.", detail: "Kotawaringin Timur (Sampit) dan Palangka Raya.", description: "Penuturnya merupakan komunitas agraris dan pedagang yang telah menetap selama beberapa generasi dan berakulturasi dengan warga lokal." },
+      { name: "Bahasa Bugis", endonim: "Basa Ugi", makna: "Merujuk pada identitas pengikut 'La Sattumpugi' dari Sulawesi Selatan.", dialek: "Bugis Pesisir.", detail: "Wilayah pesisir (Sampit, Kumai, Bahaur).", description: "Digunakan oleh komunitas nelayan dan pedagang maritim yang telah membangun pemukiman panggung di muara-muara sungai besar." },
     ],
     foreign: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Mandarin / Hakka", endonim: "Kyak-fa", makna: "Kyak' (tamu) dan 'Fa' (bahasa); secara harfiah bermakna 'bahasa orang pendatang'.", dialek: "Hakka (pengaruh Kalbar).", detail: "Palangka Raya, Pangkalan Bun, dan Sampit.", description: "Umumnya digunakan oleh komunitas peranakan Tionghoa yang bermigrasi dari Kalimantan Barat untuk berdagang di wilayah Kalteng." },
+      { name: "Bahasa Arab (Peranakan)", endonim: "Lughah al-Arabiyyah", makna: "Arab' merujuk pada entitas geografis dan etnis di Timur Tengah.", dialek: "Arab Hadrami.", detail: "Wilayah pemukiman Arab di perkotaan (Palangka Raya).", description: "Digunakan terbatas dalam lingkup keluarga 'Sayyid'; bahasa ini sangat berpengaruh pada serapan kosa kata religius dalam bahasa Bakumpai dan Ngaju." },
     ]
   },
   "Kalimantan Selatan": {
@@ -56,24 +102,46 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     headerDescription: "Mandai",
     headerLongDescription: "Mandai khas Provinsi Kalimantan Selatan memiliki rasa gurih dan sedikit asam yang khas dari fermentasi kulit cempedak. Teksturnya kenyal dan lezat, semakin nikmat saat digoreng hingga keemasan atau dimasak dengan bumbu. Kuliner tradisional Banjar ini menggugah selera sebagai sajian unik yang kaya cita rasa lokal.",
     regionalSong: {
-      title: "",
-      description: "",
-      audioUrl: ""
+      title: "Ampar-Ampar Pisang",
+      description: "Lagu 'Ampar-Ampar Pisang' yang diciptakan oleh Hamiedan AC secara linguistik menggambarkan metode penjemuran pisang secara berjejer sebagai fondasi kegiatan kuliner kolektif masyarakat Banjar. Liriknya yang penuh keceriaan dan humor mencerminkan semangat gotong royong yang mampu mengubah rutinitas kerja fisik menjadi sebuah interaksi sosial yang harmonis. Melalui komposisi ini, Hamiedan AC berhasil menyisipkan pesan filosofis tentang ketekunan dan rasa syukur sehingga lagu ini tetap menjadi sarana pendidikan karakter yang kuat bagi generasi muda.",
+      melodyNotes: [
+      { time: "0:0:0", note: "G4", duration: "8n" },
+      { time: "0:0:2", note: "G4", duration: "8n" },
+      { time: "0:1:0", note: "A4", duration: "8n" },
+      { time: "0:1:2", note: "B4", duration: "4n" },
+      { time: "0:2:0", note: "G4", duration: "8n" },
+      { time: "0:2:2", note: "G4", duration: "8n" },
+      { time: "0:3:0", note: "A4", duration: "8n" },
+      { time: "0:3:2", note: "B4", duration: "4n" },
+      { time: "1:0:0", note: "A4", duration: "8n" },
+      { time: "1:0:2", note: "B4", duration: "8n" },
+      { time: "1:1:0", note: "G4", duration: "8n" },
+      { time: "1:1:2", note: "E4", duration: "4n" },
+    ]
     },
     folklore: {
       title: "Legenda Ikan Patin",
       story: "Di sebuah desa di Kalimantan Selatan, hiduplah seorang pria tua bernama Datu Marmut. Ia hidup menyendiri dan sangat gemar memancing di sungai untuk memenuhi kebutuhan sehari-harinya. Suatu malam, ia bermimpi didatangi oleh seorang kakek yang memintanya pergi ke sungai pada keesokan harinya. Pagi harinya, Datu Marmut pergi memancing. Namun, anehnya, ia tidak mendapatkan satu ikan pun. Tiba-tiba, kailnya terasa sangat berat. Saat ditarik, ternyata bukan ikan yang ia dapatkan, melainkan sebuah telur besar yang sangat indah dan berkilau. Datu Marmut membawa telur itu pulang dan menyimpannya di dalam peti kayu yang lembut. Beberapa hari kemudian, telur itu menetas. Namun, alangkah terkejutnya Datu Marmut karena yang muncul dari telur itu bukanlah seekor hewan, melainkan seorang bayi perempuan yang sangat cantik. Datu Marmut merawat bayi itu dengan penuh kasih sayang dan memberinya nama Putri Junjung Buih. Putri Junjung Buih tumbuh menjadi gadis yang luar biasa. Konon, ia memiliki hubungan batin yang kuat dengan air sungai. Setiap kali ia mendekati air, ikan-ikan akan berkumpul menyambutnya. Dari keajaiban inilah masyarakat Banjar percaya bahwa asal-usul ikan patin yang memiliki kulit halus tanpa sisik berkaitan erat dengan kemurnian sang putri. Kehadiran putri tersebut membawa kedamaian dan kelimpahan pangan bagi desa Datu Marmut. Pesan Moral: Ketulusan dalam merawat dan menyayangi sesama makhluk akan membuahkan kebahagiaan. Selain itu, cerita ini mengajarkan kita untuk selalu bersyukur atas rezeki yang diberikan oleh Tuhan, meskipun datang dalam bentuk yang tidak terduga. Pengarang: Anonim (Cerita Rakyat Kalimantan Selatan / Suku Banjar).",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Kalsel%20-%20Legenda%20Ikan%20Patin.jpg"
     },
     native: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Banjar", endonim: "Bahasa Banjar", makna: "Banjar' berasal dari kata 'Banjar-ing' (berjejer); merujuk pada pemukiman yang berderet di sepanjang sungai.", dialek: "Banjar Hulu, Banjar Kuala.", detail: "Seluruh Kabupaten/Kota di Kalsel.", description: "Menjadi Lingua Franca di hampir seluruh Kalimantan; dialek Hulu dikenal lebih arkais dan memiliki kosa kata yang lebih murni." },
+      { name: "Bahasa Dayak Bakumpai", endonim: "Basa Bakumpai", makna: "Bakumpai' berasal dari 'Kumpai' (rumput/ilalang); merujuk pada penduduk yang tinggal di lahan basah/rawa.", dialek: "Bakumpai Hilir, Bakumpai Hulu.", detail: "Kabupaten Barito Kuala.", description: "Secara linguistik merupakan kerabat dekat Dayak Ngaju; mayoritas penuturnya beragama Islam dan memiliki tradisi sastra lisan 'Madihin Bakumpai'." },
+      { name: "Bahasa Dayak Meratus (Bukit)", endonim: "Bahasa Bukit", makna: "Bukit' merujuk pada topografi wilayah tempat tinggal mereka di dataran tinggi atau pegunungan.", dialek: "Loksado, Pitap, Alai.", detail: "Pegunungan Meratus (Hulu Sungai Tengah, Selatan, dan Balangan).", description: "Berkerabat dengan bahasa Melayu purba; statusnya Terjaga karena isolasi geografis, namun mulai terpengaruh leksikon Banjar." },
+      { name: "Bahasa Dayak Ma'anyan", endonim: "Bahasa Ma'anyan", makna: "Ma'anyan' merujuk pada klan atau identitas etnis; secara etimologis berkaitan dengan 'manya' (orang).", dialek: "Paju Epat, Warukin.", detail: "Kabupaten Tabalong dan Barito Timur (Perbatasan).", description: "Terkenal secara global karena memiliki kemiripan struktur 90 persen dengan bahasa Malagasi di Madagaskar, Afrika." },
+      { name: "Bahasa Dayak Deah", endonim: "Bahasa Deah", makna: "Deah' merujuk pada identitas klan Dayak di wilayah hulu; bermakna 'orang dari sini'.", dialek: "Dialek tunggal.", detail: "Kabupaten Tabalong (Distrik Upau dan Muara Uya).", description: "Memiliki tradisi ritual 'Mesiwah Alat' yang menggunakan bahasa Deah secara khusus untuk berkomunikasi dengan roh leluhur." },
+      { name: "Bahasa Dayak Samihim", endonim: "Bahasa Samihim", makna: "Merujuk pada identitas kelompok etnis Dayak yang mendiami wilayah pesisir timur.", dialek: "Dialek tunggal.", detail: "Kabupaten Kotabaru.", description: "Termasuk dalam rumpun Barito Timur; merupakan salah satu bahasa Dayak yang unik karena memiliki sejarah kontak lama dengan etnis pelaut." },
     ],
     community: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Bugis", endonim: "Basa Ugi", makna: "Merujuk pada leluhur 'La Sattumpugi'; 'Ugi' adalah identitas pengikut pemimpin tersebut.", dialek: "Bugis Pagatan (Sering dianggap dialek mandiri).", detail: "Kabupaten Tanah Bumbu (Pagatan) dan Kotabaru.", description: "Memiliki tradisi 'Mappadendang' dan 'Mappanretasi'; bahasa Bugis di Pagatan telah menyerap banyak kosa kata Banjar." },
+      { name: "Bahasa Jawa", endonim: "Boso Jowo", makna: "Jowo' merujuk pada tanaman 'Yava' (jelai/padi) yang melambangkan kesuburan.", dialek: "Jawa Ngoko (Transmigrasi).", detail: "Kabupaten Tanah Laut, Tanah Bumbu, dan Banjar.", description: "Dibawa oleh transmigran; bahasa ini tetap hidup dalam komunitas pertanian dan sering digunakan dalam kesenian Reog di Kalsel." },
+      { name: "Bahasa Madura", endonim: "Basa Madura", makna: "Kemungkinan berasal dari 'Madu-Dara'; identitas etnis asal Pulau Madura.", dialek: "Dialek pesisir.", detail: "Banjarmasin, Banjarbaru, dan wilayah perkebunan.", description: "Digunakan oleh komunitas pedagang dan buruh kebun; penuturnya sangat adaptif dan sering melakukan code-switching dengan bahasa Banjar." },
+      { name: "Bahasa Mandar", endonim: "Basa Mandar", makna: "Merujuk pada etnis Mandar; kemungkinan bermakna 'terang' atau 'panggilan'.", dialek: "Mandar Pesisir.", detail: "Pulau Laut (Kotabaru).", description: "Digunakan oleh komunitas nelayan keturunan pelaut Sulawesi Barat yang telah menetap berabad-abad di pesisir Kalsel." },
     ],
     foreign: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Mandarin (Peranakan)", endonim: "Huayu / Hokkien", makna: "Hua' (Tionghoa) dan 'Yu' (bahasa); identitas etnis Tionghoa.", dialek: "Hokkien (dominan) dan Mandarin standar.", detail: "Banjarmasin (Kawasan Veteran/Pecinan).", description: "Komunitas 'Cina Banjar' telah berasimilasi total; bahasa Mandarin/Hokkien mereka sering menggunakan intonasi dan akhiran kata khas Banjar." },
+      { name: "Bahasa Arab (Peranakan)", endonim: "Lughah al-Arabiyyah", makna: "Arab' merujuk pada identitas etnis dan geografis di Timur Tengah.", dialek: "Arab Hadrami.", detail: "Kampung Arab (Banjarmasin).", description: "Digunakan oleh keturunan Yaman (Habaib); bahasa ini sangat mempengaruhi dialek Banjar dalam hal kosa kata keagamaan dan intelektual." },
     ]
   },
   "Kalimantan Timur": {
@@ -81,24 +149,49 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     headerDescription: "Pepes Kepiting Soka",
     headerLongDescription: "Pepes kepiting soka khas Provinsi Kalimantan Timur memiliki rasa gurih manis alami dari daging kepiting yang lembut tanpa cangkang. Bumbu rempah yang kaya meresap sempurna, berpadu aroma harum daun pisang saat dikukus hingga menggugah selera. Hidangan khas ini menghadirkan kelezatan laut Kalimantan Timur yang unik, lembut, dan penuh cita rasa.",
     regionalSong: {
-      title: "",
-      description: "",
-      audioUrl: ""
+      title: "Indung-Indung",
+      description: "Lagu ini memanfaatkan metafora 'Indung' sebagai simbol otoritas orang tua yang menyampaikan kebijaksanaan hidup melalui rima pantun yang santun. Liriknya memadukan ajaran spiritual dengan etika sosial untuk mengingatkan bahwa setiap perilaku keseharian manusia memiliki konsekuensi yang akan dipertanggungjawabkan di akhirat. Dengan melodi yang sederhana namun bermakna, karya ini menjadi instrumen pendidikan moral yang efektif dalam membentuk karakter dan kesantunan generasi muda di Kalimantan Timur.",
+      melodyNotes: [
+      { time: "0:0:0", note: "G4", duration: "8n" },
+      { time: "0:0:2", note: "G4", duration: "8n" },
+      { time: "0:1:0", note: "A4", duration: "8n" },
+      { time: "0:1:2", note: "B4", duration: "4n" },
+      { time: "0:2:0", note: "G4", duration: "8n" },
+      { time: "0:2:2", note: "G4", duration: "8n" },
+      { time: "0:3:0", note: "A4", duration: "8n" },
+      { time: "0:3:2", note: "B4", duration: "4n" },
+      { time: "1:0:0", note: "A4", duration: "8n" },
+      { time: "1:0:2", note: "B4", duration: "8n" },
+      { time: "1:1:0", note: "G4", duration: "8n" },
+      { time: "1:1:2", note: "E4", duration: "4n" },
+    ]
     },
     folklore: {
       title: "Legenda Pesut Mahakam",
       story: "Dahulu kala, di sebuah desa di pinggiran Sungai Mahakam, hiduplah sepasang kakak beradik yatim piatu yang tinggal bersama ayah dan ibu tirinya. Ibu tirinya adalah orang yang sangat kikir dan sering memaksa kedua anak tersebut bekerja keras mencari kayu bakar di hutan tanpa henti. Suatu hari, kedua anak itu pulang membawa kayu bakar yang sangat banyak, namun sang ibu tiri justru marah karena merasa kayu tersebut masih kurang. Mereka dilarang makan sebelum membawa lebih banyak kayu lagi. Karena sangat lapar dan kelelahan, saat orang tuanya tidak ada di rumah, kedua anak itu menemukan kuali besar berisi bubur panas di dapur. Tanpa pikir panjang, mereka memakan bubur itu hingga habis. Namun, bubur tersebut ternyata sangat panas dan ajaib. Suhu tubuh mereka meningkat drastis hingga mereka merasa terbakar dari dalam. Dengan panik, mereka berlari ke arah Sungai Mahakam dan langsung melompat ke air untuk mendinginkan diri. Ajaibnya, saat menyentuh air, tubuh mereka tidak kembali normal melainkan berubah bentuk. Kulit mereka menjadi licin, anggota tubuh mereka menyusut, dan mereka berubah menjadi dua ekor ikan besar yang bernapas dengan paru-paru. Penduduk desa yang melihat kejadian itu terkejut dan menyebut mereka 'Pesut'. Konon, pesut-pesut di Mahakam adalah keturunan dari kedua anak tersebut yang selalu muncul ke permukaan untuk menyapa penduduk desa. Pesan Moral: Orang tua selalu menyayangi anak-anaknya dengan tulus dan tidak bertindak semena-mena. Selain itu, cerita ini mengajarkan kita untuk tidak mengambil sesuatu yang bukan hak kita secara berlebihan, serta pentingnya kesabaran dalam menghadapi ujian hidup. Pengarang: Anonim (Cerita Rakyat Kalimantan Timur / Suku Kutai).",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Kaltim%20-%20Legenda%20Pesut%20Mahakam.jpg"
     },
     native: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Melayu Kutai", endonim: "Bahase Kutai", makna: "Kutai' kemungkinan berasal dari 'Kuta' (Sanskerta: benteng) atau 'Ku-Tai' (catatan Tiongkok); merujuk pada kerajaan tertua.", dialek: "Tenggarong, Kota Bangun, Ancalong.", detail: "Kabupaten Kutai Kartanegara, Kutai Barat, Kutai Timur.", description: "Dialek Kota Bangun memiliki fonologi unik dengan penggunaan vokal 'e' pepet yang sangat dominan dibandingkan dialek Tenggarong." },
+      { name: "Bahasa Melayu Berau", endonim: "Bahase Berau", makna: "Merujuk pada identitas Kesultanan Berau; berasal dari kata 'Merau' yang berarti jauh.", dialek: "Sambaliung, Gunung Tabur.", detail: "Kabupaten Berau.", description: "Memiliki kedekatan leksikal dengan bahasa Melayu Brunei dan Banjar; digunakan sebagai identitas kebangsawanan di pesisir utara Kaltim." },
+      { name: "Bahasa Paser", endonim: "Nggahi Paser", makna: "Paser' secara linguistik merujuk pada pasir atau pesisir; identitas masyarakat asli di selatan Kaltim.", dialek: "Paser Pesisir, Paser Gunung.", detail: "Kabupaten Paser dan Penajam Paser Utara.", description: "Berstatus Rentan; kini sedang diupayakan pelestariannya di wilayah IKN (Ibu Kota Nusantara) agar tidak tergerus arus urbanisasi." },
+      { name: "Bahasa Kenyah", endonim: "Lema Kenyah", makna: "Kenyah' bermakna 'orang hulu' atau 'orang pedalaman'; identitas kolektif pengembara hutan.", dialek: "Lepoq Tau, Lepoq Jalan, Bakung.", detail: "Kabupaten Mahakam Ulu dan Malinau (perbatasan).", description: "Terkenal dengan tradisi seni ukir dan tari 'Enggang'; bahasa ini memiliki banyak dialek karena sejarah migrasi kelompok yang luas." },
+      { name: "Bahasa Tunjung (Tonyooi)", endonim: "Tonyooi", makna: "Tonyooi' adalah endonim asli; bermakna 'manusia' atau 'orang asli' dalam perspektif lokal.", dialek: "Tunjung Tengah, Tunjung Londong.", detail: "Kabupaten Kutai Barat.", description: "Memiliki kaitan genetik dengan rumpun Barito; penuturnya sangat aktif dalam upacara adat 'Kwangkay' (upacara kematian tingkat akhir)." },
+      { name: "Bahasa Benuaq", endonim: "Basa Benuaq", makna: "Benuaq' berasal dari kata 'Benua' yang berarti tanah atau kampung halaman.", dialek: "Benuaq Ohookng, Benuaq Dayatn.", detail: "Kabupaten Kutai Barat dan Kutai Kartanegara.", description: "Sangat dekat dengan bahasa Tunjung; dikenal karena penggunaan bahasa puitis dalam ritual penyembuhan 'Belian'." },
+      { name: "Bahasa Bahau", endonim: "Lema Bahau", makna: "Merujuk pada identitas etnis Bahau yang mendiami aliran sungai Mahakam bagian hulu.", dialek: "Bahau Sa'e, Bahau Hwang Sirau.", detail: "Kabupaten Mahakam Ulu.", description: "Merupakan bagian dari rumpun Kayanik; bahasa ini memiliki struktur yang sangat kompleks dan berkaitan dengan status sosial di masa lalu." },
+      { name: "Bahasa Basap", endonim: "Bahasa Basap", makna: "Basap' kemungkinan merujuk pada 'orang yang tinggal di gua atau hutan'.", dialek: "Dialek pesisir dan pedalaman.", detail: "Kutai Timur dan Berau.", description: "Penuturnya merupakan suku minoritas yang secara historis memiliki gaya hidup berburu-meramu; status bahasa ini Terancam Punah." },
     ],
     community: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Bugis", endonim: "Basa Ugi", makna: "Merujuk pada leluhur 'La Sattumpugi' dari Sulawesi Selatan.", dialek: "Bugis Pesisir (Samarinda Seberang).", detail: "Samarinda, Balikpapan, dan Bontang.", description: "Komunitas Bugis di Samarinda Seberang telah menetap sejak abad ke-17; mereka membawa tradisi tenun sarung yang sangat terkenal." },
+      { name: "Bahasa Jawa", endonim: "Boso Jowo", makna: "Jowo' merujuk pada tanaman 'Yava' (jelai) yang melambangkan kesuburan.", dialek: "Jawa Ngoko (Transmigrasi).", detail: "Wilayah Transmigrasi di Kutai Kartanegara dan Penajam.", description: "Menjadi salah satu bahasa dengan penutur terbanyak di Kaltim; bahasa ini sangat dominan di sektor pertanian dan pemukiman transmigran." },
+      { name: "Bahasa Banjar", endonim: "Bahasa Banjar", makna: "Merujuk pada identitas 'berbanjar' atau berderet; etnis pesisir Kalsel.", dialek: "Banjar Kuala.", detail: "Samarinda, Balikpapan, dan Kutai Timur.", description: "Berfungsi sebagai bahasa perdagangan kedua setelah Melayu Kutai; banyak menyumbangkan kosa kata dalam percakapan sehari-hari di Samarinda." },
+      { name: "Bahasa Toraja", endonim: "Basa Toraya", makna: "To' (orang) dan 'Riaja' (negeri di atas atau utara).", dialek: "Dialek Sa'dan.", detail: "Samarinda, Balikpapan, dan Kutai Barat.", description: "Digunakan secara aktif oleh komunitas perantau Sulawesi Selatan; bahasa ini terjaga dalam kegiatan sosial dan keagamaan komunitas Toraja." },
+      { name: "Bahasa Makassar", endonim: "Basa Mangkasara'", makna: "Mangkasara' berarti 'mereka yang berjiwa terbuka'.", dialek: "Makassar Pesisir.", detail: "Kota Balikpapan dan Samarinda.", description: "Digunakan oleh komunitas pedagang dan nelayan; penuturnya memiliki sejarah panjang dalam industri transportasi laut di Kaltim." },
     ],
     foreign: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Mandarin (Peranakan)", endonim: "Huayu / Hokkien", makna: "Hua' (Tionghoa) dan 'Yu' (bahasa); identitas etnis Tionghoa.", dialek: "Hokkien (dominan) dan Hakka.", detail: "Samarinda (Kawasan Citra Niaga) dan Balikpapan.", description: "Komunitas Tionghoa di Samarinda telah berasimilasi dalam bahasa Indonesia dan Melayu Kutai, namun dialek asal masih digunakan di kalangan keluarga." },
+      { name: "Bahasa Arab (Peranakan)", endonim: "Lughah al-Arabiyyah", makna: "Arab' merujuk pada entitas geografis semenanjung Arab.", dialek: "Arab Hadrami.", detail: "Kawasan pemukiman Arab di Samarinda dan Balikpapan.", description: "Digunakan oleh keturunan Yaman (Al-Habsyi, Al-Idrus); sangat berpengaruh pada kosa kata religius dan tradisi Islam di pesisir Mahakam." },
     ]
   },
   "Kalimantan Utara": {
@@ -106,24 +199,47 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     headerDescription: "Nasi Subut",
     headerLongDescription: "Nasi subut khas Kalimantan Utara tampil unik dengan warna ungu alami yang berasal dari beras atau ubi ungu, menjadikannya langsung menarik perhatian. Rasanya gurih dan lembut, berpadu dengan jagung, sayuran, dan kelapa parut yang menambah kekayaan cita rasa. Hidangan tradisional ini menggugah selera sebagai sajian khas yang tidak hanya lezat, tetapi juga indah dipandang.",
     regionalSong: {
-      title: "",
-      description: "",
-      audioUrl: ""
+      title: "Bebilin",
+      description: "Lagu 'Bebilin' yang diwariskan secara turun-temurun oleh masyarakat Tidung dan Bulungan yang secara linguistik bermakna memberi amanah atau pesan moral yang mendalam bagi generasi penerus. Liriknya menekankan pentingnya menjaga kehormatan keluarga serta akar budaya agar identitas daerah tetap terjaga dengan teguh di tengah arus modernisasi. Melalui komposisi tradisional ini, tercipta instrumen pemersatu yang mempererat harmoni sosial sekaligus memperkokoh jati diri masyarakat di provinsi Kalimantan Utara.",
+      melodyNotes: [
+      { time: "0:0:0", note: "G4", duration: "8n" },
+      { time: "0:0:2", note: "G4", duration: "8n" },
+      { time: "0:1:0", note: "A4", duration: "8n" },
+      { time: "0:1:2", note: "B4", duration: "4n" },
+      { time: "0:2:0", note: "G4", duration: "8n" },
+      { time: "0:2:2", note: "G4", duration: "8n" },
+      { time: "0:3:0", note: "A4", duration: "8n" },
+      { time: "0:3:2", note: "B4", duration: "4n" },
+      { time: "1:0:0", note: "A4", duration: "8n" },
+      { time: "1:0:2", note: "B4", duration: "8n" },
+      { time: "1:1:0", note: "G4", duration: "8n" },
+      { time: "1:1:2", note: "E4", duration: "4n" },
+    ]
     },
     folklore: {
       title: "Kisah Persahabatan Burung Enggang",
       story: "Di sebuah hutan belantara yang hijau di wilayah Kalimantan Utara, hiduplah seorang pemuda bernama Lian yang sangat pandai memainkan musik petikan (Sape). Lian dikenal sebagai pemuda yang tulus dan mencintai alam. Suatu hari, saat sedang memainkan musiknya di bawah pohon besar, Lian melihat seekor burung besar yang terluka sayapnya. Burung itu adalah burung enggang dengan paruh yang indah. Lian tidak memburu burung tersebut, melainkan merawatnya dengan penuh kesabaran. Ia memberi burung itu buah-buahan hutan dan setiap hari memainkannya lagu-lagu yang damai agar burung itu cepat sembuh. Lama-kelamaan, muncul keajaiban. Burung enggang tersebut ternyata bisa berbicara. 'Terima kasih atas kebaikanmu, Lian,' ucap sang burung. Sebagai tanda terima kasih, burung enggang itu memberikan salah satu bulu sayapnya yang terindah kepada Lian. Bulu itu memiliki kekuatan untuk memberikan petunjuk jalan bagi siapapun yang tersesat di hutan. Ketika burung itu akhirnya bisa terbang kembali, ia berjanji akan selalu menjaga hutan dan melindungi orang-orang yang memiliki hati bersih seperti Lian. Sejak saat itu, masyarakat Kalimantan Utara sangat menghormati burung enggang, dan suara kepakan sayapnya di angkasa dianggap sebagai tanda bahwa hutan sedang dalam keadaan aman dan damai. Pesan Moral: Kebaikan dan ketulusan hati terhadap sesama makhluk hidup akan membuahkan persahabatan yang abadi dan perlindungan dari alam. Jika kita menjaga alam dengan kasih sayang, maka alam pun akan menjaga kita kembali. Pengarang: Anonim (Sastra Lisan Masyarakat Dayak, Kalimantan Utara).",
       videoUrl: "",
-      videoPosterUrl: ""
+      videoPosterUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Folklore/Kalut%20-%20Kisah%20Persahabatan%20Burung%20Enggang.jpg"
     },
     native: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Bulungan", endonim: "Bahase Bulungan", makna: "Berasal dari kata 'Bulu' (bambu); merujuk pada mitos asal-usul nenek moyang yang ditemukan dalam bambu.", dialek: "Dialek tunggal.", detail: "Kabupaten Bulungan (Tanjung Selor).", description: "Merupakan bahasa resmi Kesultanan Bulungan; statusnya Terancam Punah karena dominasi bahasa Indonesia dan Melayu." },
+      { name: "Bahasa Tidung", endonim: "Buliga Tidung", makna: "Buliga' berarti lidah/bahasa, 'Tidung' berasal dari kata 'Tideng' yang berarti gunung atau bukit.", dialek: "Tarakan, Sesayap, Malinau, Sembakung.", detail: "Kota Tarakan, Kabupaten Nunukan, Tana Tidung.", description: "Memiliki kaitan erat dengan bahasa-bahasa di Sabah, Malaysia; merupakan salah satu bahasa daerah dengan penutur paling aktif di pesisir." },
+      { name: "Bahasa Lundayeh", endonim: "Lundayeh", makna: "Lun' berarti orang, 'Dayeh' berarti hulu atau interior; bermakna 'orang yang tinggal di pedalaman'.", dialek: "Lun Bawang, Kemaloh.", detail: "Kabupaten Malinau dan Krayan (Nunukan).", description: "Masyarakat penuturnya terkenal dengan pertanian padi organik di dataran tinggi Krayan; bahasa ini digunakan lintas batas negara." },
+      { name: "Bahasa Kenyah", endonim: "Lema Kenyah", makna: "Lema' berarti bahasa; 'Kenyah' merujuk pada kelompok etnis pengembara hulu sungai.", dialek: "Lepoq Tau, Lepoq Timai, Bakung.", detail: "Kabupaten Malinau dan hulu sungai di Bulungan.", description: "Terkenal dengan tradisi seni tari 'Kancet Lasan'; memiliki banyak dialek yang mencerminkan sejarah migrasi klan-klan Kenyah." },
+      { name: "Bahasa Tahol (Agabag)", endonim: "Bahasa Tahol", makna: "Tahol' merujuk pada identitas masyarakat Dayak Agabag/Murut di wilayah utara.", dialek: "Agabag, Tulang Shoor.", detail: "Kabupaten Nunukan (Sebuku, Sembakung).", description: "Merupakan bagian dari rumpun Murutic; penuturnya memiliki tradisi 'Ira'u' (pesta budaya) yang sangat megah." },
+      { name: "Bahasa Kayan", endonim: "Lema Kayan", makna: "Merujuk pada identitas masyarakat yang secara historis menguasai wilayah sungai-sungai besar.", dialek: "Kayan Uma' Lekat, Kayan Uma' Tukung.", detail: "Kabupaten Malinau dan Bulungan.", description: "Memiliki kaitan sejarah sebagai salah satu kelompok Dayak yang memiliki pengaruh politik kuat di pedalaman masa lampau." },
+      { name: "Bahasa Punan", endonim: "Bahasa Punan", makna: "Punan' secara linguistik merujuk pada 'masyarakat yang berburu atau berpindah-pindah'.", dialek: "Punan Sajau, Punan Merah.", detail: "Pedalaman Kabupaten Bulungan dan Malinau.", description: "Penuturnya adalah kelompok pemburu-meramu terakhir di Kalimantan; bahasanya memiliki banyak istilah yang berkaitan dengan flora dan fauna hutan." },
     ],
     community: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Bugis", endonim: "Basa Ugi", makna: "Merujuk pada leluhur 'La Sattumpugi' dari Sulawesi Selatan.", dialek: "Bugis Pesisir.", detail: "Kota Tarakan dan Kabupaten Nunukan.", description: "Menjadi etnis mayoritas di Kota Tarakan; bahasa Bugis berfungsi sebagai bahasa perdagangan utama di pelabuhan-pelabuhan Kaltara." },
+      { name: "Bahasa Jawa", endonim: "Boso Jowo", makna: "Jowo' merujuk pada tanaman 'Yava' (jelai) yang melambangkan kesuburan pulau asal.", dialek: "Jawa Ngoko (Transmigrasi).", detail: "Wilayah Transmigrasi di Bulungan dan Nunukan.", description: "Dibawa oleh program transmigrasi sejak masa Orde Baru; bahasa ini tetap hidup dalam komunitas pertanian dan kerajinan." },
+      { name: "Bahasa Banjar", endonim: "Bahasa Banjar", makna: "Merujuk pada tatanan pemukiman 'berbanjar'; identitas etnis Kalimantan Selatan.", dialek: "Banjar Kuala.", detail: "Tarakan, Nunukan, dan Bulungan.", description: "Memiliki pengaruh leksikal yang sangat kuat terhadap bahasa Bulungan dan Tidung karena kedekatan geografis dan sejarah perdagangan." },
+      { name: "Bahasa Toraja", endonim: "Basa Toraya", makna: "To' (orang) dan 'Riaja' (negeri di atas atau bagian utara).", dialek: "Dialek Sa'dan.", detail: "Kota Tarakan dan Kabupaten Malinau.", description: "Digunakan oleh komunitas perantau Sulawesi Selatan yang dominan bekerja di sektor pertambangan dan pemerintahan." },
     ],
     foreign: [
-      { name: "Bahasa ", endonim: "", makna: "", dialek: "", detail: "", description: "" },
+      { name: "Bahasa Mandarin (Peranakan)", endonim: "Huayu / Hakka", makna: "Hua' (Tionghoa) dan 'Yu' (bahasa); identitas etnis Tionghoa.", dialek: "Hakka dan Mandarin Standar.", detail: "Kota Tarakan (Kawasan Karang Rejo).", description: "Komunitas Tionghoa di Tarakan memiliki sejarah panjang sejak era pengeboran minyak pertama oleh Belanda (BPM)." },
+      { name: "Bahasa Arab (Peranakan)", endonim: "Lughah al-Arabiyyah", makna: "Arab' merujuk pada entitas geografis semenanjung Arab.", dialek: "Arab Hadrami.", detail: "Kawasan pesisir Bulungan dan Tarakan.", description: "Digunakan oleh keturunan Yaman yang memiliki hubungan sejarah dengan Kesultanan Bulungan dan penyebaran agama Islam." },
     ]
   }
 };
