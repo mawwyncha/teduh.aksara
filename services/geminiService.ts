@@ -1,4 +1,4 @@
-import { GoogleGenAI, Type, Modality } from "@google/genai";
+import { Type, Modality } from "@google/genai";
 import { 
   AnalysisResult, 
   WritingStyle, 
@@ -47,10 +47,20 @@ const LANGUAGE_MAP: Record<TargetLanguage, string> = {
   'zh_cantonese_id': 'Bahasa Kanton (Kantonis Indonesia)'
 };
 
-const getAI = () => {
-  const apiKey = process.env.API_KEY;
-  if (!apiKey) throw new Error("API_KEY_MISSING");
-  return new GoogleGenAI({ apiKey });
+// Helper function untuk call Netlify Function
+const callGeminiAPI = async (action: 'generateContent' | 'generateTTS', params: any) => {
+  const response = await fetch('/.netlify/functions/gemini-api', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action, params })
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.error || 'API call failed');
+  }
+
+  return await response.json();
 };
 
 const sanitizeInput = (text: string): string => {
@@ -138,8 +148,7 @@ export const fetchTTSAudio = async (text: string, languageName: string = "Bahasa
     if (cached) return cached;
   } catch (e) {}
 
-  const ai = getAI();
-  const response = await ai.models.generateContent({
+  const response = await callGeminiAPI('generateTTS', {
     model: "gemini-2.5-flash-preview-tts",
     contents: { parts: [{ text: `Bacakan dongeng ini dengan gaya anak-anak yang ekspresif dalam logat ${languageName}: "${cleanText}"` }] },
     config: {
@@ -150,7 +159,7 @@ export const fetchTTSAudio = async (text: string, languageName: string = "Bahasa
     },
   });
 
-  const b64 = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+  const b64 = response.audioBase64;
   if (b64) {
     saveData(STORES.TTS_CACHE, cacheKey, b64).catch(() => {});
     return b64;
@@ -171,12 +180,11 @@ export const generateSpeech = async (
     if (cached) { await playAudioBuffer(cached); return; }
   } catch (e) {}
 
-  const ai = getAI();
   const prompt = phoneticGuide 
     ? `Speak this cheerfully as a child in ${languageName} accent: "${cleanText}". Phonetic guide: ${phoneticGuide}`
     : `Speak this cheerfully as a child in ${languageName} accent: "${cleanText}"`;
 
-  const response = await ai.models.generateContent({
+  const response = await callGeminiAPI('generateTTS', {
     model: "gemini-2.5-flash-preview-tts",
     contents: { parts: [{ text: prompt }] },
     config: {
@@ -185,7 +193,7 @@ export const generateSpeech = async (
     },
   });
 
-  const b64 = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+  const b64 = response.audioBase64;
   if (b64) {
     saveData(STORES.TTS_CACHE, cacheKey, b64).catch(() => {});
     await playAudioBuffer(b64);
@@ -193,10 +201,9 @@ export const generateSpeech = async (
 };
 
 export const analyzeGrammar = async (text: string, style: WritingStyle, context: WritingContext, targetLang: TargetLanguage, withPlagiarism: boolean = false): Promise<AnalysisResult> => {
-  const ai = getAI();
   const targetLanguageName = LANGUAGE_MAP[targetLang] || targetLang;
   
-  const response = await ai.models.generateContent({
+  const response = await callGeminiAPI('generateContent', {
     model: "gemini-3-flash-preview",
     contents: `Analisis teks: "${sanitizeInput(text)}". 
     Gaya: ${style}, Konteks: ${context}.
@@ -254,7 +261,7 @@ export const analyzeGrammar = async (text: string, style: WritingStyle, context:
   }
 
   if (withPlagiarism) {
-    const pResponse = await ai.models.generateContent({
+    const pResponse = await callGeminiAPI('generateContent', {
       model: "gemini-3-flash-preview",
       contents: `Cek plagiarisme di web untuk: "${sanitizeInput(text)}".`,
       config: { tools: [{ googleSearch: {} }], thinkingConfig: { thinkingBudget: 0 } },
@@ -271,8 +278,7 @@ export const analyzeGrammar = async (text: string, style: WritingStyle, context:
 };
 
 export const transcribeAudio = async (base64Audio: string, mimeType: string): Promise<string> => {
-  const ai = getAI();
-  const response = await ai.models.generateContent({
+  const response = await callGeminiAPI('generateContent', {
     model: "gemini-3-flash-preview",
     contents: { 
       parts: [
@@ -282,7 +288,8 @@ export const transcribeAudio = async (base64Audio: string, mimeType: string): Pr
     },
     config: {
       systemInstruction: "Kamu adalah mesin transkripsi otomatis. Tugasmu hanya menuliskan kembali ucapan dari audio secara akurat. DILARANG memberikan pembukaan seperti 'Hasil transkripsi adalah', DILARANG memberikan penjelasan, dan DILARANG memberikan komentar apapun. Cukup keluarkan teks transkripsinya saja.", 
-      thinkingConfig: { thinkingBudget: 0 } }
+      thinkingConfig: { thinkingBudget: 0 } 
+    }
   });
   return (response.text || "").trim();
 };
@@ -293,8 +300,7 @@ export const analyzePronunciation = async (
   targetText: string, 
   languageName: string
 ): Promise<PronunciationResult> => {
-  const ai = getAI();
-  const response = await ai.models.generateContent({
+  const response = await callGeminiAPI('generateContent', {
     model: "gemini-3-flash-preview",
     contents: {
       parts: [
@@ -321,11 +327,9 @@ export const analyzePronunciation = async (
 };
 
 export const askTaraAboutPlatform = async (): Promise<string> => {
-  const ai = getAI();
-  const response = await ai.models.generateContent({
+  const response = await callGeminiAPI('generateContent', {
     model: "gemini-3-flash-preview",
     contents: "Jelaskan tentang Teduh Aksara secara singkat dan puitis sebagai Tara si Pohon Kersen.",
-    // Fix: thinkingBudget must be wrapped in thinkingConfig to avoid type error in GenerateContentConfig
     config: { thinkingConfig: { thinkingBudget: 0 } }
   });
   return response.text || "Aku adalah Tara, pohon kersen tempat naskahmu berteduh dan tumbuh.";
