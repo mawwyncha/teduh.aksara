@@ -58,25 +58,113 @@
             color: #1a0f0e; 
             font-weight: 600;
             transition: background-color 0.4s ease, color 0.4s ease;
+            overflow-x: hidden;
         }
         .dark body { background-color: #050a08; color: #e0f2f1; }
         .flower body { background-color: #fdf6f0; color: #3d2b1f; }
         
         /* Global Dyslexia Mode Rule - Applied to html for global inheritance */
-        html.dyslexia-mode, 
-        html.dyslexia-mode *, 
-        html.dyslexia-mode textarea, 
-        html.dyslexia-mode input, 
-        html.dyslexia-mode select, 
-        html.dyslexia-mode button { 
-            font-family: 'OpenDyslexic', sans-serif !important; 
+        html.dyslexia-mode,
+        html.dyslexia-mode *,
+        html.dyslexia-mode textarea,
+        html.dyslexia-mode input,
+        html.dyslexia-mode select,
+        html.dyslexia-mode button,
+        html.dyslexia-mode p,
+        html.dyslexia-mode span,
+        html.dyslexia-mode div,
+        html.dyslexia-mode h1,
+        html.dyslexia-mode h2,
+        html.dyslexia-mode h3,
+        html.dyslexia-mode h4,
+        html.dyslexia-mode label {
+            font-family: 'OpenDyslexic', sans-serif !important;
             letter-spacing: 0.05em !important;
             word-spacing: 0.15em !important;
-            line-height: 1.6 !important; /* Spasi vertikal lebih renggang untuk disleksia */
+            line-height: 1.8 !important;
+        }
+        
+        /* Ensure font is loaded before applying */
+        @font-face {
+            font-family: 'OpenDyslexic';
+            font-display: swap;
+        }
+
+        /* TARA ANIMATIONS - FIXED: Animasi untuk partikel yang jatuh */
+        @keyframes particle {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(80vh) translateX(var(--drift)) rotate(360deg); opacity: 0; }
+        }
+        .animate-particle {
+            position: absolute;
+            animation: particle var(--duration) cubic-bezier(0.4, 0, 0.2, 1) forwards;
+            pointer-events: none;
+            z-index: 100;
+        }
+
+        @keyframes tree-shake {
+            0%, 100% { transform: rotate(0deg); }
+            25% { transform: rotate(-5deg) scale(1.05); }
+            75% { transform: rotate(5deg) scale(1.05); }
+        }
+        .animate-tree-shake { animation: tree-shake 0.4s ease-in-out; }
+
+        @keyframes tree-breath {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+        }
+        .animate-tree-breath { animation: tree-breath 3s ease-in-out infinite; }
+
+        @keyframes tree-blink {
+            0%, 45%, 55%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(0.1); }
+        }
+        .animate-tree-blink { animation: tree-blink 4s infinite; 
+            transform-origin: center;
+            transform-box: fill-box;
+        }
+
+        @keyframes music-bar {
+            0%, 100% { height: 4px; }
+            50% { height: 16px; }
+        }
+        .animate-music-bar { animation: music-bar 0.6s ease-in-out infinite; }
+
+        @keyframes quota-low {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .animate-quota-low { animation: quota-low 1.5s infinite; }
+
+        /* Map Interaction */
+        path[onClick] {
+            transition: opacity 0.2s ease, transform 0.2s ease, filter 0.2s ease;
+            cursor: pointer;
+            pointer-events: auto;
+        }
+        path[onClick]:hover {
+            opacity: 1 !important;
+            filter: brightness(1.2) saturate(1.2);
+            transform: scale(1.002);
         }
 
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .quota-bar-container {
+            width: 100%;
+            height: 6px;
+            background: rgba(0,0,0,0.05);
+            border-radius: 10px;
+            overflow: hidden;
+            position: relative;
+        }
+        .quota-bar-fill {
+            height: 100%;
+            transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
     </style>
 
     <script type="importmap">

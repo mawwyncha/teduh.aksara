@@ -329,6 +329,23 @@ export const App: React.FC = () => {
   // Mendapatkan label bahasa target saat ini
   const currentLangLabel = LANG_OPTIONS.find(opt => opt.value === targetLang)?.label || targetLang;
 
+  // Effect untuk Dyslexia Mode - FIXED VERSION
+  useEffect(() => {
+    // Toggle class di document.documentElement
+    if (isDyslexiaMode) {
+      document.documentElement.classList.add('dyslexia-mode');
+      console.log('✅ Dyslexia mode ACTIVATED');
+    } else {
+      document.documentElement.classList.remove('dyslexia-mode');
+      console.log('❌ Dyslexia mode DEACTIVATED');
+    }
+    
+    // Simpan ke storage hanya setelah loaded
+    if (isLoaded) {
+      saveData(STORE_SETTINGS, KEY_DYSLEXIA, isDyslexiaMode);
+    }
+  }, [isDyslexiaMode, isLoaded]);
+
   // SCROLL LOCK EFFECT
   useEffect(() => {
     const isAnyModalOpen = !hasAcceptedConsent || isLimitModalOpen || isHistoryModalOpen || 
@@ -741,14 +758,25 @@ export const App: React.FC = () => {
         >
           <div className="flex flex-col gap-8 max-w-7xl w-full mx-auto pb-32">
             <div className="fixed left-4 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-40">
-              <button disabled={isBusy} onClick={() => setIsDyslexiaMode(!isDyslexiaMode)} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isDyslexiaMode ? 'bg-red-700 text-white' : (currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-red-700 dark:text-red-400 hover:scale-110 active:scale-90')}`} data-help="Mode Khusus Disleksia."><span className="font-bold text-xl">D</span></button>
+              <button 
+                disabled={isBusy} 
+                onClick={() => {
+                  const newMode = !isDyslexiaMode;
+                  setIsDyslexiaMode(newMode);
+                  console.log('🔄 Toggling dyslexia mode to:', newMode);
+                }} 
+                className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isDyslexiaMode ? 'bg-red-700 text-white scale-110 shadow-red-500/60 ring-4 ring-red-500/30' : (currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-red-700 dark:text-red-400 hover:scale-110 active:scale-90')}`} 
+                data-help="Mode Khusus Disleksia. Mengubah font agar lebih mudah dibaca bagi penyandang disleksia."
+              >
+                <span className="font-bold text-xl">D</span>
+              </button>
               <button onClick={() => !isBusy && setPermissionType('mic')} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${usageCount >= MAX_DAILY_REQUESTS ? 'grayscale opacity-50' : ''} ${currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-red-600 dark:text-red-400'}`} data-help="Rekam Suaramu."><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" cy="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
               <button onClick={handleSpeech} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${usageCount >= MAX_DAILY_REQUESTS ? 'grayscale opacity-50' : ''} ${currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400'}`} data-help="Dengarkan Naskah."><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
               <button onClick={() => !isBusy && setIsPronunciationModalOpen(true)} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${usageCount >= MAX_DAILY_REQUESTS ? 'grayscale opacity-50' : ''} ${currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-blue-600 dark:text-blue-400'}`} data-help={`Latihan Tutur. Berlatih melafalkan naskahmu dalam ${currentLangLabel}.`}>
                 <span className="text-xl">{currentTheme === 'flower' ? '🌸' : '🗣️'}</span>
               </button>
             </div>
-
+            
             <div className="space-y-8 w-full max-w-5xl mx-auto">
               <Mascot message={mascotMessage} isLoading={isBusy} forcedExpression={isViolationDetected ? 'shocked' : (isRecording ? 'happy' : undefined)} onAskInfo={async () => {
                 if (isBusy) return;

@@ -271,7 +271,13 @@ export const Layout: React.FC<LayoutProps> = ({
       </nav>
 
       <footer className={`mt-16 md:mt-28 text-center font-bold text-sm md:text-base pb-10 md:pb-14 pt-10 md:pt-14 w-full max-w-6xl border-t mb-24 lg:mb-0 ${theme === 'flower' ? 'border-pink-500/20 text-petal-800/40' : 'border-emerald-100 dark:border-emerald-900/20 text-[#2d4d3a]/60 dark:text-emerald-500/40'}`}>
-        <p className="mb-2">&copy;2025 Teduh Aksara • Google AI Studio x Netlify x Yotam Mann {theme === 'flower' ? '🌸🌿' : (theme === 'dark' ? '🌟🌿' : '🍃🌿')}</p>
+        <p className="mb-2">
+          &copy;2025 Teduh Aksara • Google AI Studio x Yotam Mann •{" "}
+          <a href="https://www.netlify.com" target="_blank" rel="noopener noreferrer">
+            This site is powered by Netlify
+          </a>{" "}
+          {theme === 'flower' ? '🌸🌿' : theme === 'dark' ? '🌟🌿' : '🍃🌿'}
+        </p>
         <div className="text-[10px] opacity-10 uppercase tracking-[0.4em] font-medium pointer-events-none select-none mt-4">Platform Penyelarasan Bahasa AI</div>
       </footer>
     </div>
