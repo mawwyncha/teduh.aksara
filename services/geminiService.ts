@@ -47,8 +47,35 @@ const LANGUAGE_MAP: Record<TargetLanguage, string> = {
   'zh_cantonese_id': 'Bahasa Kanton (Kantonis Indonesia)'
 };
 
-// Helper function untuk call Netlify Function
+// Helper function untuk call Gemini API
+const IS_DEV = import.meta.env.DEV;
+const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+
 const callGeminiAPI = async (action: 'generateContent' | 'generateTTS', params: any) => {
+  // Development mode: Call Gemini directly
+  if (IS_DEV && GEMINI_API_KEY) {
+    const { GoogleGenAI } = await import('@google/genai');
+    const ai = new GoogleGenAI({ apiKey: GEMINI_API_KEY });
+    
+    try {
+      const result = await ai.models.generateContent(params);
+      
+      if (action === 'generateTTS') {
+        const audioData = result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+        return { audioBase64: audioData || null };
+      }
+      
+      return {
+        text: result.text,
+        candidates: result.candidates
+      };
+    } catch (error) {
+      console.error('Gemini API error:', error);
+      throw error;
+    }
+  }
+  
+  // Production mode: Call via Netlify Function
   const response = await fetch('/.netlify/functions/gemini-api', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

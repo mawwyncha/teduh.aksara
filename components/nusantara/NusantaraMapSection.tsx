@@ -446,6 +446,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
                 stroke={isDark ? "#064e3b" : "#ffffff"} strokeLinecap="round" strokeLinejoin="round" strokeWidth=".6" 
                 viewBox="0 0 1000 368" width="100%" xmlns="http://www.w3.org/2000/svg"
                 preserveAspectRatio="xMidYMid meet" className="w-full h-auto drop-shadow-sm transition-all duration-1000"
+                style={{ touchAction: 'manipulation' }}
               >
                 <g transform="translate(5, 5) scale(0.98)">
                   <g className="transition-opacity duration-300" style={{ pointerEvents: 'auto' }}>

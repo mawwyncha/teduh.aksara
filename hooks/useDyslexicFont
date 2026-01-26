@@ -1,0 +1,13 @@
+import { useEffect } from 'react';
+
+export const useDyslexicFont = (enabled: boolean) => {
+  useEffect(() => {
+    if (enabled && !document.getElementById('opendyslexic-font')) {
+      const link = document.createElement('link');
+      link.id = 'opendyslexic-font';
+      link.rel = 'stylesheet';
+      link.href = 'https://cdn.jsdelivr.net/npm/opendyslexic@latest/dist/opendyslexic.min.css';
+      document.head.appendChild(link);
+    }
+  }, [enabled]);
+};
