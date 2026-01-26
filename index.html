@@ -59,7 +59,21 @@
         .dark body { background-color: #050a08; color: #e0f2f1; }
         .flower body { background-color: #fdf6f0; color: #3d2b1f; }
 
-        body.dyslexia-mode, body.dyslexia-mode * { font-family: 'OpenDyslexic', sans-serif !important; }
+         /* Global Dyslexia Mode Rule - Applied to html for global inheritance */
+        html.dyslexia-mode, 
+        html.dyslexia-mode *, 
+        html.dyslexia-mode textarea, 
+        html.dyslexia-mode input, 
+        html.dyslexia-mode select, 
+        html.dyslexia-mode button { 
+            font-family: 'OpenDyslexic', sans-serif !important; 
+            letter-spacing: 0.05em !important;
+            word-spacing: 0.15em !important;
+            line-height: 1.6 !important; /* Spasi vertikal lebih renggang untuk disleksia */
+        }
+
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
         
         @keyframes tree-breath { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
         @keyframes tree-blink { 0%, 90%, 100% { transform: scaleY(1); } 95% { transform: scaleY(0.1); } }
