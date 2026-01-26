@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 
 interface GuideModalProps {
@@ -7,10 +6,14 @@ interface GuideModalProps {
 }
 
 export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
-  const [isFlower, setIsFlower] = useState(false);
+  const [theme, setTheme] = useState<'light' | 'dark' | 'flower'>('light');
 
   useEffect(() => {
-    const checkTheme = () => setIsFlower(document.documentElement.classList.contains('flower'));
+    const checkTheme = () => {
+      if (document.documentElement.classList.contains('flower')) setTheme('flower');
+      else if (document.documentElement.classList.contains('dark')) setTheme('dark');
+      else setTheme('light');
+    };
     const observer = new MutationObserver(checkTheme);
     observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
     checkTheme();
@@ -18,6 +21,9 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
   }, []);
 
   if (!isOpen) return null;
+
+  const isFlower = theme === 'flower';
+  const isDark = theme === 'dark';
 
   const features = [
     { 
@@ -51,17 +57,30 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
   const stepTextColor = isFlower ? 'text-pink-100/80' : 'text-emerald-800/70 dark:text-emerald-200/60';
   const headerSubtextColor = isFlower ? 'text-pink-400' : 'text-emerald-700/40 dark:text-emerald-400/20';
 
+  // Dynamic styles for the Disclaimer Box
+  const disclaimerBoxStyles = isFlower 
+    ? "bg-pink-900/60 border-pink-500/30 text-pink-100" 
+    : isDark 
+      ? "bg-amber-900/20 border-amber-500/20 text-amber-200" 
+      : "bg-amber-50 border-amber-100 text-amber-900";
+
+  // Dynamic styles for the Garden Rules Box
+  const rulesBoxStyles = isFlower 
+    ? "bg-rose-900/40 border-rose-500/30 text-rose-100" 
+    : isDark 
+      ? "bg-rose-900/20 border-rose-500/20 text-rose-200" 
+      : "bg-rose-50 border-rose-100 text-rose-900";
+
   return (
     <div className="fixed inset-0 z-[150] flex items-center justify-center p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-300 cursor-pointer" onClick={onClose}>
-      <div className={`${modalBg} w-full max-w-xl max-h-[85vh] rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative overflow-hidden flex flex-col transition-all cursor-default border ${isFlower ? 'border-pink-500/20' : 'border-transparent'}`} onClick={(e) => e.stopPropagation()}>
+      <div className={`${modalBg} w-full max-w-xl max-h-[85vh] rounded-[2.5rem] p-8 md:p-10 shadow-2xl relative overflow-hidden flex flex-col transition-all cursor-default border ${isFlower ? 'border-pink-500/20' : 'border-white/5'}`} onClick={(e) => e.stopPropagation()}>
         
-        {/* Tombol Tutup (X) */}
         <button 
           onClick={onClose}
           className={`absolute top-8 right-8 p-2 transition-colors z-30 ${closeButtonColor}`}
           aria-label="Tutup"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" cy="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
         </button>
 
         <div className="flex justify-between items-start mb-8 pr-12">
@@ -73,42 +92,46 @@ export const GuideModal: React.FC<GuideModalProps> = ({ isOpen, onClose }) => {
 
         <div className="overflow-y-auto no-scrollbar space-y-8 flex-1 pr-2">
           {/* AI Disclaimer Section */}
-          <div className={`p-4 rounded-2xl text-xs border ${isFlower ? 'bg-pink-900/60 border-pink-500/30 text-pink-100' : 'bg-amber-50 border-amber-100 text-amber-900'}`}>
-            <strong className="uppercase tracking-widest">⚠️ Disclaimer:</strong>
-            <p className="mt-1 opacity-80 leading-relaxed font-medium">
+          <div className={`p-5 rounded-[2rem] text-xs border transition-colors duration-500 ${disclaimerBoxStyles}`}>
+            <strong className="uppercase tracking-widest flex items-center gap-2 mb-1.5">
+              <span>⚠️</span> Penafian (Disclaimer):
+            </strong>
+            <p className="opacity-80 leading-relaxed font-medium italic">
               Tara menggunakan AI yang tidak 100% akurat. Hasil analisis adalah saran, bukan kebenaran mutlak. 
-              Untuk dokumen penting, selalu verifikasi manual. Kami tidak bertanggung jawab atas kesalahan hasil.
+              Untuk dokumen penting, selalu verifikasi manual.
             </p>
           </div>
 
           {/* Aturan Taman Section */}
-          <div className={`p-4 rounded-2xl text-xs border ${isFlower ? 'bg-rose-900/40 border-rose-500/30 text-rose-100' : 'bg-rose-50 border-rose-100 text-rose-900'}`}>
-            <strong className="uppercase tracking-widest">🌸 Aturan Taman:</strong>
-            <p className="mt-1 italic font-medium leading-relaxed">
-              Gunakan bahasa yang santun. Kata kasar berulang akan mengakibatkan penangguhan akses otomatis.
+          <div className={`p-5 rounded-[2rem] text-xs border transition-colors duration-500 ${rulesBoxStyles}`}>
+            <strong className="uppercase tracking-widest flex items-center gap-2 mb-1.5">
+              <span>🌸</span> Aturan Taman:
+            </strong>
+            <p className="italic font-medium leading-relaxed">
+              Gunakan bahasa yang santun. Pelanggaran etika berulang akan mengakibatkan penutupan akses otomatis secara permanen demi kenyamanan bersama.
             </p>
           </div>
 
           {/* Steps Section */}
-          <section className={`${sectionBg} rounded-[2rem] p-7 space-y-5 border`}>
+          <section className={`${sectionBg} rounded-[2.5rem] p-8 space-y-6 border transition-colors duration-500`}>
             {[ 
               "Ketikan naskah di area menulis utama.", 
               "Pilih gaya naskah sesuai kebutuhanmu.", 
               "Klik tombol koreksi untuk penyelarasan instan."
             ].map((step, i) => (
               <div key={i} className="flex gap-5 items-center">
-                <span className={`w-10 h-10 rounded-full ${stepBadgeColor} flex items-center justify-center text-lg font-bold text-white shadow-md shrink-0`}>{i+1}</span>
-                <p className={`text-base font-bold ${stepTextColor}`}>{step}</p>
+                <span className={`w-10 h-10 rounded-full ${stepBadgeColor} flex items-center justify-center text-lg font-bold text-white shadow-md shrink-0 transition-colors duration-500`}>{i+1}</span>
+                <p className={`text-base font-bold ${stepTextColor} transition-colors duration-500`}>{step}</p>
               </div>
             ))}
           </section>
 
           {/* Features Section */}
-          <section>
-            <h3 className={`text-[10px] font-bold uppercase tracking-[0.2em] mb-4 ml-2 ${headerSubtextColor}`}>Apa yang Tara Periksa?</h3>
+          <section className="pb-4">
+            <h3 className={`text-[10px] font-bold uppercase tracking-[0.2em] mb-4 ml-2 ${headerSubtextColor} transition-colors duration-500`}>Apa yang Tara Periksa?</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {features.map((f, i) => (
-                <div key={i} className={`p-6 rounded-3xl border ${f.color} shadow-xl transition-transform hover:scale-[1.02]`}>
+                <div key={i} className={`p-6 rounded-3xl border ${f.color} shadow-xl transition-all hover:scale-[1.02] duration-500`}>
                   <h4 className="font-bold text-lg mb-2">{f.title}</h4>
                   <p className="text-xs opacity-80 italic font-medium leading-relaxed">{f.desc}</p>
                 </div>

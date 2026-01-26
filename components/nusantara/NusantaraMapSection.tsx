@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { PROVINCE_DIALECTS, DialectInfo, MelodyNote } from './Province';
 import { TargetLanguage } from '../../types';
@@ -23,6 +22,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
   const [showLongDesc, setShowLongDesc] = useState(false);
   const [songProgress, setSongProgress] = useState(0);
+  const [showCredits, setShowCredits] = useState(false);
   const [expandedSections, setExpandedSections] = useState<Record<string, boolean>>({
     native: true,
     community: false,
@@ -30,7 +30,6 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
   });
 
   const [hoveredDialect, setHoveredDialect] = useState<string | null>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
   
   // Folklore Audio States
   const [isFolkloreLoading, setIsFolkloreLoading] = useState(false);
@@ -81,23 +80,32 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
     lockCore: "#1a110c"
   };
   
-  // Cleanup effect
-useEffect(() => {
-  return () => {
-    stopMelody();
-    stopFolklore();
-    
-    Tone.getTransport().stop();
-    Tone.getTransport().cancel();
-    
-    // Revoke URL Blob untuk mencegah memory leak
-    if (folkloreAudioRef.current?.src && folkloreAudioRef.current.src.startsWith('blob:')) {
-      URL.revokeObjectURL(folkloreAudioRef.current.src);
+  // SCROLL LOCK EFFECT
+  useEffect(() => {
+    if (selectedRegion) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
     }
-  };
-}, []);
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedRegion]);
 
-  // Handle modal closing: Stop all audio and reset states
+  // Cleanup effect
+  useEffect(() => {
+    return () => {
+      stopMelody();
+      stopFolklore();
+      Tone.getTransport().stop();
+      Tone.getTransport().cancel();
+      if (folkloreAudioRef.current?.src && folkloreAudioRef.current.src.startsWith('blob:')) {
+        URL.revokeObjectURL(folkloreAudioRef.current.src);
+      }
+    };
+  }, []);
+
+  // Handle modal closing: Reset states
   useEffect(() => {
     if (!selectedRegion) {
       setShowLongDesc(false);
@@ -112,6 +120,7 @@ useEffect(() => {
   const toggleUnfold = () => {
     playSoftChime();
     setIsUnfolded(!isUnfolded);
+    setShowCredits(false);
   };
 
   const handleRegionClick = (name?: string) => {
@@ -154,74 +163,65 @@ useEffect(() => {
     } catch (e) {}
   }, []);
 
-    const stopMelody = useCallback(() => {
+  const stopMelody = useCallback(() => {
     Tone.getTransport().stop();
     Tone.getTransport().cancel();
     if (synthRef.current) {
       synthRef.current.releaseAll();
-      synthRef.current.dispose(); // Menghapus instance synth dari memori
+      synthRef.current.dispose();
       synthRef.current = null;
     }
     setIsMelodyPlaying(false);
     setActiveNote(null);
   }, []);
 
-    const playMelody = useCallback(async (melodyNotes: MelodyNote[]) => {
-  if (isMelodyPlaying) {
-    stopMelody();
-    return;
-  }
-
-  try {
-    await Tone.start();
-    setIsMelodyPlaying(true);
-    
-    Tone.getTransport().stop();
-    Tone.getTransport().cancel();
-    Tone.getTransport().bpm.value = 110; 
-
-    if (!synthRef.current) {
-      synthRef.current = new Tone.PolySynth(Tone.Synth, {
-        oscillator: { type: "sine" },
-        envelope: { attack: 0.1, decay: 0.2, sustain: 0.2, release: 1.2 }
-      }).toDestination();
+  const playMelody = useCallback(async (melodyNotes: MelodyNote[]) => {
+    if (isMelodyPlaying) {
+      stopMelody();
+      return;
     }
-    
-    const synth = synthRef.current;
 
-    melodyNotes.forEach((noteData) => {
-      Tone.getTransport().schedule((time) => {
+    try {
+      await Tone.start();
+      setIsMelodyPlaying(true);
+      Tone.getTransport().stop();
+      Tone.getTransport().cancel();
+      Tone.getTransport().bpm.value = 110; 
+
+      if (!synthRef.current) {
+        synthRef.current = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: "sine" },
+          envelope: { attack: 0.1, decay: 0.2, sustain: 0.2, release: 1.2 }
+        }).toDestination();
+      }
+      
+      const synth = synthRef.current;
+
+      melodyNotes.forEach((noteData) => {
+        Tone.getTransport().schedule((time) => {
+          Tone.Draw.schedule(() => {
+            if (synthRef.current) setActiveNote(noteData.note);
+          }, time);
+          if (synthRef.current) synth.triggerAttackRelease(noteData.note, noteData.duration, time);
+        }, noteData.time);
+      });
+
+      const lastNote = melodyNotes[melodyNotes.length - 1];
+      const totalDurationSeconds = Tone.Time(lastNote.time).toSeconds() + Tone.Time(lastNote.duration).toSeconds();
+
+      Tone.getTransport().schedule((t) => {
         Tone.Draw.schedule(() => {
-          if (synthRef.current) {
-            setActiveNote(noteData.note);
-          }
-        }, time);
-        
-        if (synthRef.current) {
-          synth.triggerAttackRelease(noteData.note, noteData.duration, time);
-        }
-      }, noteData.time);
-    });
+          if (synthRef.current) stopMelody();
+        }, t);
+      }, totalDurationSeconds + 0.5);
 
-    const lastNote = melodyNotes[melodyNotes.length - 1];
-    const totalDurationSeconds = Tone.Time(lastNote.time).toSeconds() + Tone.Time(lastNote.duration).toSeconds();
+      Tone.getTransport().start();
+    } catch (e) {
+      console.error("Melody playback failed", e);
+      stopMelody();
+    }
+  }, [isMelodyPlaying, stopMelody]);
 
-    Tone.getTransport().schedule((t) => {
-      Tone.Draw.schedule(() => {
-        if (synthRef.current) {
-          stopMelody();
-        }
-      }, t);
-    }, totalDurationSeconds + 0.5);
-
-    Tone.getTransport().start();
-  } catch (e) {
-    console.error("Melody playback failed", e);
-    stopMelody();
-  }
-}, [isMelodyPlaying, stopMelody]);
-
-  // Folklore Audio Handlers
   const handleFolkloreTimeUpdate = () => {
     if (folkloreAudioRef.current) {
       const progress = (folkloreAudioRef.current.currentTime / folkloreAudioRef.current.duration) * 100;
@@ -256,79 +256,57 @@ useEffect(() => {
   };
 
   const toggleFolklore = async (storyText: string) => {
-  // ✅ Early return dengan check null
-  if (!folkloreAudioRef.current) {
-    console.error("Folklore audio ref not available");
-    return;
-  }
-
-  if (folklorePlaying) {
-    folkloreAudioRef.current.pause();
-    setFolklorePlaying(false);
-    return;
-  }
-
-  if (folkloreAudioRef.current.src) {
-    folkloreAudioRef.current.play();
-    setFolklorePlaying(true);
-    return;
-  }
-    setIsFolkloreLoading(true);
-  let blobUrl: string | null = null; // ✅ Track blob URL
-
-  try {
-    const base64 = await fetchTTSAudio(storyText);
-    
-    if (base64 && folkloreAudioRef.current) {
-      const wavBlob = createWavBlob(base64, 24000);
-      blobUrl = URL.createObjectURL(wavBlob);
-      folkloreAudioRef.current.src = blobUrl;
-      await folkloreAudioRef.current.play();
+    if (!folkloreAudioRef.current) return;
+    if (folklorePlaying) {
+      folkloreAudioRef.current.pause();
+      setFolklorePlaying(false);
+      return;
+    }
+    if (folkloreAudioRef.current.src) {
+      folkloreAudioRef.current.play();
       setFolklorePlaying(true);
+      return;
     }
-  } catch (e) {
-    console.error("Folklore TTS failed", e);
-    
-    // ✅ Cleanup blob URL saat error
-    if (blobUrl) {
-      URL.revokeObjectURL(blobUrl);
+    setIsFolkloreLoading(true);
+    let blobUrl: string | null = null;
+    try {
+      const base64 = await fetchTTSAudio(storyText);
+      if (base64 && folkloreAudioRef.current) {
+        const wavBlob = createWavBlob(base64, 24000);
+        blobUrl = URL.createObjectURL(wavBlob);
+        folkloreAudioRef.current.src = blobUrl;
+        await folkloreAudioRef.current.play();
+        setFolklorePlaying(true);
+      }
+    } catch (e) {
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    } finally {
+      setIsFolkloreLoading(false);
     }
-  } finally {
-    setIsFolkloreLoading(false);
-  }
-};
+  };
 
   const stopFolklore = useCallback(() => {
-  if (folkloreAudioRef.current) {
-    if (folkloreAudioRef.current.src.startsWith('blob:')) {
-      URL.revokeObjectURL(folkloreAudioRef.current.src);
+    if (folkloreAudioRef.current) {
+      if (folkloreAudioRef.current.src.startsWith('blob:')) {
+        URL.revokeObjectURL(folkloreAudioRef.current.src);
+      }
+      folkloreAudioRef.current.pause();
+      folkloreAudioRef.current.src = "";
     }
-    folkloreAudioRef.current.pause();
-    folkloreAudioRef.current.src = "";
-  }
-  setFolklorePlaying(false);
-  setFolkloreProgress(0);
-}, []);
+    setFolklorePlaying(false);
+    setFolkloreProgress(0);
+  }, []);
 
   const handleSeekFolklore = (e: React.ChangeEvent<HTMLInputElement>) => {
-  if (!folkloreAudioRef.current) return;
-  
-  const audio = folkloreAudioRef.current;
-  
-  // ✅ Check duration valid
-  if (!audio.duration || !isFinite(audio.duration)) {
-    console.warn("Audio duration not available yet");
-    return;
-  }
-  
-  const newTime = (parseFloat(e.target.value) / 100) * audio.duration;
-  
-  // ✅ Validate newTime
-  if (isFinite(newTime) && newTime >= 0 && newTime <= audio.duration) {
-    audio.currentTime = newTime;
-    setFolkloreProgress(parseFloat(e.target.value));
-  }
-};  
+    if (!folkloreAudioRef.current) return;
+    const audio = folkloreAudioRef.current;
+    if (!audio.duration || !isFinite(audio.duration)) return;
+    const newTime = (parseFloat(e.target.value) / 100) * audio.duration;
+    if (isFinite(newTime) && newTime >= 0 && newTime <= audio.duration) {
+      audio.currentTime = newTime;
+      setFolkloreProgress(parseFloat(e.target.value));
+    }
+  };  
 
   const renderDialectList = (dialects: DialectInfo[], categoryLabel: string, sectionKey: string) => {
     if (!dialects || dialects.length === 0) return null;
@@ -439,9 +417,26 @@ useEffect(() => {
         <div className="w-full animate-in fade-in zoom-in-95 duration-700 flex flex-col items-center">
           <div className={`w-full max-w-3xl h-4 rounded-t-full shadow-lg z-20 border-b ${isFlower ? 'bg-petal-900 border-pink-500/20' : 'bg-emerald-50 dark:bg-[#1a110c] border-emerald-100 dark:border-emerald-800/30'}`}></div>
           <div className={`w-full relative py-12 px-4 sm:px-10 border-x transition-all duration-1000 ${isFlower ? 'bg-petal-100/5 border-pink-500/10' : 'bg-white/40 dark:bg-[#0a1a12]/40 border-emerald-50 dark:border-emerald-800/20'}`}>
+            
+            {/* CREDIT BUTTON & TOOLTIP */}
+            <div className="absolute top-4 left-4 z-40 flex items-center gap-2 group/credit">
+              <button 
+                onClick={() => setShowCredits(!showCredits)}
+                className={`p-1.5 rounded-full transition-all active:scale-90 flex items-center justify-center border ${isFlower ? 'bg-petal-800 text-pink-400 border-pink-500/20' : 'bg-white/80 dark:bg-emerald-950/80 text-emerald-600 dark:text-emerald-400 border-emerald-100 dark:border-emerald-800/30'}`}
+              >
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+              </button>
+              {showCredits && (
+                <div className={`px-3 py-1.5 rounded-xl border backdrop-blur-md shadow-lg animate-in fade-in slide-in-from-left-2 duration-300 ${isFlower ? 'bg-petal-900/90 border-pink-500/30 text-pink-200' : 'bg-white/90 dark:bg-emerald-950/90 border-emerald-100 dark:border-emerald-800/30 text-emerald-800 dark:text-emerald-200'}`}>
+                  <p className="text-[10px] font-bold whitespace-nowrap">Peta ini dibuat menggunakan data dari Simplemaps di bawah lisensi Creative Commons.</p>
+                </div>
+              )}
+            </div>
+
             <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
               <h2 className={`text-[11px] font-bold uppercase tracking-[0.6em] font-sans opacity-40 transition-colors duration-700 ${isFlower ? 'text-pink-400' : 'text-emerald-700 dark:text-emerald-400'}`}>Peta Nusantara</h2>
             </div>
+            
             <button onClick={toggleUnfold} className={`absolute top-4 right-4 p-2 rounded-full transition-all active:scale-90 z-30 ${isFlower ? 'text-pink-300 hover:text-pink-100' : 'text-emerald-400 hover:text-red-500'}`}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" cy="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
             </button>
@@ -455,40 +450,40 @@ useEffect(() => {
                 <g transform="translate(5, 5) scale(0.98)">
                   <g className="transition-opacity duration-300" style={{ pointerEvents: 'auto' }}>
                   <g className="pointer-events-none" id="label_points" stroke="none">
-                    <circle cx="467.7" cy="70" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"North Kalimantan"*/}
-                    <circle cx="560.4" cy="306" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Nusa Tenggara Timur"*/}
-                    <circle cx="357" cy="139.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Kalimantan Barat"*/}
-                    <circle cx="919.8" cy="213.1" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Papua"*/}
-                    <circle cx="384.3" cy="284.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Jawa Timur"*/} 
-                    <circle cx="728.9" cy="194.2" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Maluku"*/}
-                    <circle cx="487.1" cy="307.5" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Nusa Tenggara Barat"*/}
-                    <circle cx="538.9" cy="205.5" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*"Sulawesi Selatan"*/}
-                    <circle cx="338.4" cy="279.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Jawa Tengah“*/}
-                    <circle cx="294.6" cy="270.4" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Jawa Barat“*/}
-                    <circle cx="279.6" cy="257" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Jakarta Raya“*/}
-                    <circle cx="265" cy="262" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Banten“*/}
-                    <circle cx="350.1" cy="290.6" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Yogyakarta“*/}
-                    <circle cx="572.9" cy="203.6" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sulawesi Tenggara“*/}
-                    <circle cx="792.6" cy="160.1" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Papua Barat“*/}
-                    <circle cx="571.3" cy="161" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sulawesi Tengah“*/}
-                    <circle cx="693.2" cy="106" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Maluku Utara“*/}
-                    <circle cx="306.5" cy="55.3" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Kepulauan Riau“*/}
-                    <circle cx="176.1" cy="125.2" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Riau“*/}
-                    <circle cx="586.7" cy="118.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Gorontalo“*/}
-                    <circle cx="624.1" cy="120" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sulawesi Utara“*/}
-                    <circle cx="524.1" cy="190.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sulawesi Barat“*/}
-                    <circle cx="199.1" cy="167.3" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Jambi“*/}
-                    <circle cx="223" cy="204.1" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sumatera Selatan“*/}
-                    <circle cx="243.9" cy="229.4" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Lampung“*/}
-                    <circle cx="193.8" cy="204.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Bengkulu“*/}
-                    <circle cx="160.4" cy="151.3" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sumatera Barat“*/}
-                    <circle cx="126.7" cy="83.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Sumatera Utara“*/}
-                    <circle cx="82.9" cy="45.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Aceh“*/}
-                    <circle cx="410.5" cy="168.6" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Kalimantan Tengah“*/}
-                    <circle cx="448.7" cy="193.7" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Kalimantan Selatan“*/}
-                    <circle cx="445.2" cy="299.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Bali“*/}
-                    <circle cx="262.9" cy="178" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Bangka-Belitung“*/}
-                    <circle cx="469.2" cy="125.4" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> {/*”Kalimantan Timur“*/}
+                    <circle cx="467.7" cy="70" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="560.4" cy="306" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="357" cy="139.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="919.8" cy="213.1" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="384.3" cy="284.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" /> 
+                    <circle cx="728.9" cy="194.2" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="487.1" cy="307.5" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="538.9" cy="205.5" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="338.4" cy="279.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="294.6" cy="270.4" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="279.6" cy="257" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="265" cy="262" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="350.1" cy="290.6" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="572.9" cy="203.6" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="792.6" cy="160.1" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="571.3" cy="161" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="693.2" cy="106" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="306.5" cy="55.3" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="176.1" cy="125.2" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="586.7" cy="118.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="624.1" cy="120" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="524.1" cy="190.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="199.1" cy="167.3" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="223" cy="204.1" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="243.9" cy="229.4" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="193.8" cy="204.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="160.4" cy="151.3" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="126.7" cy="83.9" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="82.9" cy="45.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="410.5" cy="168.6" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="448.7" cy="193.7" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="445.2" cy="299.8" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="262.9" cy="178" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
+                    <circle cx="469.2" cy="125.4" r="3" fill={dotColor} className="opacity-20 animate-pulse" />
                   </g>
                   <SumateraMap {...mapProps} />
                   <JavaMap {...mapProps} />
@@ -575,7 +570,6 @@ useEffect(() => {
                       </div>
                     )}
 
-                    {/* Tombol Tone.js Melody */}
                     {PROVINCE_DIALECTS[selectedRegion].regionalSong?.melodyNotes && (
                       <button 
                         onClick={() => playMelody(PROVINCE_DIALECTS[selectedRegion].regionalSong?.melodyNotes || [])}
@@ -595,7 +589,6 @@ useEffect(() => {
                       </button>
                     )}
 
-                    {/* Folklore / Cerita Rakyat Section - Collapsible */}
                     {PROVINCE_DIALECTS[selectedRegion].folklore && (
                       <div className="mb-10">
                         <button 
@@ -629,7 +622,6 @@ useEffect(() => {
                                   </button>
                                 </div>
 
-                                {/* VIDEO SECTION - Interaktif dengan Poster */}
                                 {PROVINCE_DIALECTS[selectedRegion].folklore?.videoUrl && (
                                   <div 
                                     className="w-full aspect-video rounded-3xl overflow-hidden mb-6 border border-white/10 shadow-inner bg-black/20 group/vid relative cursor-pointer"
@@ -646,9 +638,6 @@ useEffect(() => {
                                           <div className={`w-20 h-20 rounded-full flex items-center justify-center backdrop-blur-md border transition-all duration-500 md:group-hover/vid:scale-110 ${isFlower ? 'bg-pink-500/20 border-pink-500/40 text-white' : 'bg-white/20 border-white/40 text-white'}`}>
                                             <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor" className="ml-1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                                           </div>
-                                        </div>
-                                        <div className="absolute bottom-4 left-0 right-0 text-center">
-                                           <span className="text-[10px] text-white/60 font-bold uppercase tracking-[0.2em] bg-black/40 px-4 py-1 rounded-full backdrop-blur-md">Klik untuk Menonton</span>
                                         </div>
                                       </>
                                     ) : (

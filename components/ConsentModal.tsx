@@ -1,14 +1,23 @@
-
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 interface ConsentModalProps {
   isOpen: boolean;
   onAccept: () => void;
   onReject: () => void;
+  recaptchaSiteKey: string;
 }
 
-export const ConsentModal: React.FC<ConsentModalProps> = ({ isOpen, onAccept, onReject }) => {
+export const ConsentModal: React.FC<ConsentModalProps> = ({ 
+  isOpen, 
+  onAccept, 
+  onReject,
+  recaptchaSiteKey 
+}) => {
   const [theme, setTheme] = useState<'light' | 'dark' | 'flower'>('light');
+  const [isVerified, setIsVerified] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const captchaRef = useRef<HTMLDivElement>(null);
+  const widgetIdRef = useRef<number | null>(null);
 
   useEffect(() => {
     const checkTheme = () => {
@@ -22,23 +31,156 @@ export const ConsentModal: React.FC<ConsentModalProps> = ({ isOpen, onAccept, on
     return () => observer.disconnect();
   }, []);
 
+  // Load reCAPTCHA Script
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const loadRecaptcha = () => {
+      if (document.getElementById('recaptcha-script')) return;
+
+      const script = document.createElement('script');
+      script.id = 'recaptcha-script';
+      script.src = 'https://www.google.com/recaptcha/api.js';
+      script.async = true;
+      script.defer = true;
+      document.head.appendChild(script);
+    };
+
+    loadRecaptcha();
+  }, [isOpen]);
+
+  // Render reCAPTCHA Widget
+  useEffect(() => {
+    if (!isOpen || !captchaRef.current) return;
+
+    const renderCaptcha = () => {
+      if (!window.grecaptcha || !window.grecaptcha.render) {
+        setTimeout(renderCaptcha, 100);
+        return;
+      }
+
+      if (widgetIdRef.current !== null) {
+        try {
+          window.grecaptcha.reset(widgetIdRef.current);
+        } catch (e) {
+          console.warn('Reset captcha failed:', e);
+        }
+        return;
+      }
+
+      try {
+        widgetIdRef.current = window.grecaptcha.render(captchaRef.current, {
+          sitekey: recaptchaSiteKey,
+          callback: handleCaptchaSuccess,
+          'expired-callback': handleCaptchaExpired,
+          'error-callback': handleCaptchaError,
+          theme: theme === 'dark' ? 'dark' : 'light'
+        });
+      } catch (error) {
+        console.error('Failed to render reCAPTCHA:', error);
+      }
+    };
+
+    const timer = setTimeout(renderCaptcha, 500);
+    return () => clearTimeout(timer);
+  }, [isOpen, recaptchaSiteKey, theme]);
+
+  const handleCaptchaSuccess = async (token: string) => {
+    setIsVerifying(true);
+    
+    // Bypass untuk localhost development
+    const isLocalhost = window.location.hostname === 'localhost' || 
+                        window.location.hostname === '127.0.0.1';
+    
+    if (isLocalhost) {
+      console.log('Localhost detected - bypassing reCAPTCHA verification');
+      setIsVerified(true);
+      setIsVerifying(false);
+      return;
+    }
+    
+    try {
+      // Verify token dengan backend (Netlify Function)
+      const response = await fetch('/.netlify/functions/verify-recaptcha', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setIsVerified(true);
+        setIsVerifying(false);
+      } else {
+        setIsVerified(false);
+        setIsVerifying(false);
+        if (widgetIdRef.current !== null) {
+          window.grecaptcha.reset(widgetIdRef.current);
+        }
+        alert('Verifikasi reCAPTCHA gagal. Silakan coba lagi.');
+      }
+    } catch (error) {
+      console.error('Verification error:', error);
+      setIsVerifying(false);
+      setIsVerified(false);
+      if (widgetIdRef.current !== null) {
+        window.grecaptcha.reset(widgetIdRef.current);
+      }
+      alert('Terjadi kesalahan saat verifikasi. Silakan coba lagi.');
+    }
+  };
+
+  const handleCaptchaExpired = () => {
+    setIsVerified(false);
+    console.log('reCAPTCHA expired');
+  };
+
+  const handleCaptchaError = () => {
+    setIsVerified(false);
+    console.error('reCAPTCHA error');
+  };
+
+  const handleAccept = () => {
+    if (isVerified) {
+      onAccept();
+    }
+  };
+
   if (!isOpen) return null;
 
   const isFlower = theme === 'flower';
   
   // Dynamic Styles
-  const modalBg = isFlower ? 'bg-petal-800 border-pink-500/20 shadow-pink-500/10' : 'bg-white dark:bg-[#0a1a12] border-emerald-100 dark:border-emerald-800/20';
+  const modalBg = isFlower 
+    ? 'bg-petal-800 border-pink-500/20 shadow-pink-500/10' 
+    : 'bg-white dark:bg-[#0a1a12] border-emerald-100 dark:border-emerald-800/20';
   const titleColor = isFlower ? 'text-pink-100' : 'text-emerald-900 dark:text-emerald-50';
   const subtitleColor = isFlower ? 'text-pink-400' : 'text-emerald-700 dark:text-emerald-300';
   const sectionText = isFlower ? 'text-pink-100/90' : 'text-emerald-900 dark:text-emerald-100';
   
-  const boxEtika = isFlower ? 'bg-rose-900/40 border-rose-500/30' : 'bg-rose-50 dark:bg-rose-900/20 border-rose-500';
-  const boxData = isFlower ? 'bg-pink-900/30 border-pink-500/10' : 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/10';
-  const boxPenting = isFlower ? 'bg-amber-900/20 border-amber-500/20' : 'bg-amber-50 dark:bg-amber-900/20 border-amber-500/20';
-  const boxHak = isFlower ? 'bg-blue-900/20 border-blue-500/20' : 'bg-blue-50 dark:bg-blue-900/20 border-blue-500/20';
+  const boxEtika = isFlower 
+    ? 'bg-rose-900/40 border-rose-500/30' 
+    : 'bg-rose-50 dark:bg-rose-900/20 border-rose-500';
+  const boxData = isFlower 
+    ? 'bg-pink-900/30 border-pink-500/10' 
+    : 'bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800/10';
+  const boxPenting = isFlower 
+    ? 'bg-amber-900/20 border-amber-500/20' 
+    : 'bg-amber-50 dark:bg-amber-900/20 border-amber-500/20';
+  const boxHak = isFlower 
+    ? 'bg-blue-900/20 border-blue-500/20' 
+    : 'bg-blue-50 dark:bg-blue-900/20 border-blue-500/20';
+  const boxCaptcha = isFlower 
+    ? 'bg-purple-900/20 border-purple-500/20' 
+    : 'bg-purple-50 dark:bg-purple-900/20 border-purple-500/20';
 
-  const btnAccept = isFlower ? 'bg-pink-500 hover:bg-pink-600 shadow-pink-500/20' : 'bg-emerald-700 hover:bg-emerald-800 shadow-emerald-700/20';
-  const btnReject = isFlower ? 'bg-petal-900 text-pink-300 border-pink-500/20 hover:bg-black' : 'bg-white dark:bg-forest-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50';
+  const btnAccept = isFlower 
+    ? 'bg-pink-500 hover:bg-pink-600 shadow-pink-500/20' 
+    : 'bg-emerald-700 hover:bg-emerald-800 shadow-emerald-700/20';
+  const btnReject = isFlower 
+    ? 'bg-petal-900 text-pink-300 border-pink-500/20 hover:bg-black' 
+    : 'bg-white dark:bg-forest-950 text-emerald-700 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50';
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-300">
@@ -52,7 +194,7 @@ export const ConsentModal: React.FC<ConsentModalProps> = ({ isOpen, onAccept, on
           </p>
         </div>
 
-        <div className={`space-y-5 text-sm ${sectionText} mb-10`}>
+        <div className={`space-y-5 text-sm ${sectionText} mb-8`}>
           <div className={`${boxEtika} p-5 rounded-3xl border-l-4 shadow-sm`}>
             <h3 className={`font-bold mb-2 flex items-center gap-2 ${isFlower ? 'text-rose-300' : 'text-rose-900 dark:text-rose-300'}`}>
               <span>🌸</span> Etika Beraksara (PENTING):
@@ -98,18 +240,38 @@ export const ConsentModal: React.FC<ConsentModalProps> = ({ isOpen, onAccept, on
           </div>
         </div>
 
+        {/* reCAPTCHA Checkbox Section */}
+        <div className={`${boxCaptcha} p-6 rounded-3xl border flex flex-col items-center gap-4 transition-all mb-6`}>
+          <h3 className={`font-bold text-center uppercase tracking-widest text-[10px] ${isFlower ? 'text-pink-300' : 'text-emerald-700 dark:text-emerald-300'}`}>
+            Konfirmasi Kemanusiaan
+          </h3>
+          <div ref={captchaRef} className="recaptcha-container min-h-[78px]"></div>
+          {isVerifying && (
+            <p className="text-[10px] animate-pulse">Memproses verifikasi...</p>
+          )}
+          {isVerified && (
+            <div className="flex items-center gap-2 text-emerald-500 font-bold text-xs animate-in zoom-in">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"></polyline>
+              </svg>
+              Terverifikasi Sebagai Manusia
+            </div>
+          )}
+        </div>
+
         <div className="flex flex-col gap-4">
           <button
-            onClick={onAccept}
-            className={`w-full py-5 ${btnAccept} text-white rounded-[1.5rem] font-bold transition-all active:scale-95 shadow-lg text-lg`}
+            onClick={handleAccept}
+            disabled={!isVerified}
+            className={`w-full py-5 ${btnAccept} text-white rounded-[1.5rem] font-bold transition-all active:scale-95 shadow-lg text-lg disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed`}
           >
-            Saya Mengerti dan Setuju
+            {!isVerified ? 'Centang Box di Atas Dahulu' : 'Saya Mengerti dan Setuju'}
           </button>
           <button
             onClick={onReject}
             className={`w-full py-4 ${btnReject} rounded-[1.5rem] font-bold border-2 transition-all active:scale-95 text-sm uppercase tracking-widest`}
           >
-            Tidak, Bawa Saya Keluar
+            Tidak, Keluar
           </button>
         </div>
       </div>

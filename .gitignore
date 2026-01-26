@@ -24,3 +24,10 @@ dist-ssr
 *.sw?
 *.env
 *.env.local
+*.netlify/
+*.env.production
+*.env.*.local
+.env
+.env.local
+.env.production
+.env.*.local

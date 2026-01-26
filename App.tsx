@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Layout } from './components/Layout';
 import { Mascot } from './components/Mascot';
@@ -42,8 +41,7 @@ const MAX_DAILY_REQUESTS = 25;
 const MAX_VIOLATIONS = 2;
 const MAX_CHARACTERS = 1000;
 
-// reCAPTCHA Test Key for Invisible
-const RECAPTCHA_SITE_KEY = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
+const RECAPTCHA_SITE_KEY = (import.meta as any)?.env?.RECAPTCHA_SITE_KEY || "6LdTFlUsAAAAALH-MlZGFD7tFEo_1x1FJBWIYNAK";
 
 const DONORS = [
   { name: "Sahabat Budi", amount: 250000, date: "15 Jan 2026" },
@@ -102,7 +100,7 @@ const LANG_OPTIONS = [
   { value: 'en_us', label: 'Inggris (AS) 🇺🇸' },
   { value: 'en_uk', label: 'Inggris (Britania) 🇬🇧' },
   { value: 'en_au', label: 'Inggris (Australia) 🇦🇺' },
-  { value: 'jv_central', label: 'Jawa Tengah (Solo) 🇮🇩' },
+  { value: "jv_central", label: 'Jawa Tengah (Solo) 🇮🇩' },
   { value: 'jv_yogyakarta', label: 'Jawa Yogyakarta 🇮🇩' },
   { value: 'jv_central_coastal', label: 'Jawa (Semarang/Demak) 🇮🇩' },
   { value: 'jv_east', label: 'Jawa Timur 🇮🇩' },
@@ -244,7 +242,7 @@ const GardenPromoBox: React.FC<{ isFlower: boolean; isDark: boolean }> = ({ isFl
       
       <div className="relative flex-1 rounded-3xl overflow-hidden mb-4 border border-white/5 min-h-[100px]">
         <img 
-          src="https://images.unsplash.com/photo-1516541196182-6bdb0516ed27?q=80&w=1887&auto=format&fit=crop" 
+          src="https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Story/page1.jpeg" 
           alt="Teduh Aksara Promo"
           className="w-full h-full object-cover grayscale opacity-60 group-hover/promo:grayscale-0 group-hover/promo:scale-105 group-hover/promo:opacity-100 transition-all duration-700"
         />
@@ -293,7 +291,6 @@ export const App: React.FC = () => {
   const [isHelpActive, setIsHelpActive] = useState(false);
   const [hasAcceptedConsent, setHasAcceptedConsent] = useState(false);
   const [currentTheme, setCurrentTheme] = useState<'light' | 'dark' | 'flower'>('light');
-  const [recaptchaWidgetId, setRecaptchaWidgetId] = useState<number | null>(null);
   
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
@@ -324,68 +321,56 @@ export const App: React.FC = () => {
   const isCanceledRef = useRef(false);
   const prevViolationRef = useRef(false);
   const pendingPlagiarismRef = useRef(false);
-  const captchaContainerRef = useRef<HTMLDivElement>(null);
+  const isInitializingRef = useRef(false);
 
   const isBusy = isAnalyzing || isSpeaking || isRecording || isTranscribing;
   const isBanned = violationCount >= MAX_VIOLATIONS;
 
-  // Initialize reCAPTCHA
+  // Mendapatkan label bahasa target saat ini
+  const currentLangLabel = LANG_OPTIONS.find(opt => opt.value === targetLang)?.label || targetLang;
+
+  // SCROLL LOCK EFFECT
   useEffect(() => {
-    const initRecaptcha = () => {
-      if (window.grecaptcha && window.grecaptcha.render && captchaContainerRef.current && recaptchaWidgetId === null) {
-        try {
-          const id = window.grecaptcha.render(captchaContainerRef.current, {
-            sitekey: RECAPTCHA_SITE_KEY,
-            callback: 'onSubmitCaptcha',
-            size: 'invisible',
-            theme: document.documentElement.classList.contains('dark') ? 'dark' : 'light'
-          });
-          setRecaptchaWidgetId(id);
-        } catch (e) {
-          console.warn("reCAPTCHA render failed or already rendered", e);
-        }
-      }
-    };
+    const isAnyModalOpen = !hasAcceptedConsent || isLimitModalOpen || isHistoryModalOpen || 
+                           isGuideModalOpen || isDevModalOpen || isFanGalleryModalOpen || 
+                           isCatalogModalOpen || isPronunciationModalOpen || permissionType || 
+                           isAnalyzing || isRecording || isTranscribing;
 
-    window.onSubmitCaptcha = (token: string) => {
-      if (token) {
-        startAnalysis(pendingPlagiarismRef.current);
-      }
-    };
-
-    if (window.grecaptcha && window.grecaptcha.render) {
-      initRecaptcha();
+    if (isAnyModalOpen) {
+      document.body.style.overflow = 'hidden';
     } else {
-      const checkTimer = setInterval(() => {
-        if (window.grecaptcha && window.grecaptcha.render) {
-          initRecaptcha();
-          clearInterval(checkTimer);
-        }
-      }, 500);
-      return () => clearInterval(checkTimer);
+      document.body.style.overflow = 'unset';
     }
-  }, [recaptchaWidgetId]);
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [hasAcceptedConsent, isLimitModalOpen, isHistoryModalOpen, isGuideModalOpen, 
+      isDevModalOpen, isFanGalleryModalOpen, isCatalogModalOpen, isPronunciationModalOpen, 
+      permissionType, isAnalyzing, isRecording, isTranscribing]);
 
   const playWarningChime = useCallback(() => {
-    try {
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const ctx = new AudioCtx();
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(880, ctx.currentTime);
-      gain.gain.setValueAtTime(0, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-      osc.start();
-      osc.stop(ctx.currentTime + 0.3);
-      setTimeout(() => ctx.close(), 500);
-    } catch (e) {
-      console.warn("Audio chime failed", e);
-    }
-  }, []);
+  try {
+    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+    const ctx = new AudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(880, ctx.currentTime);
+    gain.gain.setValueAtTime(0, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.3);
+    
+    setTimeout(() => {
+      ctx.close().catch(err => console.warn("Failed to close AudioContext:", err));
+    }, 500);
+  } catch (e) {
+    console.warn("Audio chime failed", e);
+  }
+}, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
@@ -468,42 +453,42 @@ export const App: React.FC = () => {
   }, []);
 
   const handleCancelProcess = useCallback((silent = false) => {
-    isCanceledRef.current = true;
-    processActiveRef.current = false;
-    setIsAnalyzing(false);
-    setIsSpeaking(false);
-    setIsTranscribing(false);
-    
-    if ('speechSynthesis' in window) {
-      window.speechSynthesis.cancel();
+  isCanceledRef.current = true;
+  processActiveRef.current = false;
+  setIsAnalyzing(false);
+  setIsSpeaking(false);
+  setIsTranscribing(false);
+  
+  if ('speechSynthesis' in window) {
+    window.speechSynthesis.cancel();
+  }
+  
+  if (loadingTimerRef.current) {
+    window.clearTimeout(loadingTimerRef.current);
+    loadingTimerRef.current = null;
+  }
+  
+  if (mediaRecorderRef.current) {
+    try {
+      if (mediaRecorderRef.current.state !== 'inactive') {
+        mediaRecorderRef.current.stop();
+      }
+    } catch (err) {
+      console.warn("Failed to stop media recorder:", err);
     }
-    
-    if (loadingTimerRef.current) window.clearTimeout(loadingTimerRef.current);
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') mediaRecorderRef.current.stop();
-    setIsRecording(false);
-    if (countdownIntervalRef.current) window.clearInterval(countdownIntervalRef.current);
-    if (!silent) setMascotMessage("Proses dibatalkan, Sahabat.");
-  }, []);
+  }
+  
+  setIsRecording(false);
+  
+  if (countdownIntervalRef.current) {
+    window.clearInterval(countdownIntervalRef.current);
+    countdownIntervalRef.current = null;
+  }
+  
+  if (!silent) setMascotMessage("Proses dibatalkan, Sahabat.");
+}, []);
 
-  const triggerAnalysis = (plagiarism: boolean) => {
-    if (isViolationDetected || isBusy) return;
-    
-    // Honeypot check
-    if (honeypot) {
-      console.warn("Spam detected - Honeypot filled.");
-      return;
-    }
-
-    pendingPlagiarismRef.current = plagiarism;
-    
-    if (window.grecaptcha && recaptchaWidgetId !== null) {
-      window.grecaptcha.execute(recaptchaWidgetId);
-    } else {
-      startAnalysis(plagiarism);
-    }
-  };
-
-  const startAnalysis = async (plagiarism: boolean) => {
+  const startAnalysis = useCallback(async (plagiarism: boolean) => {
     isCanceledRef.current = false;
     processActiveRef.current = true;
     setIsAnalyzing(true);
@@ -546,17 +531,26 @@ export const App: React.FC = () => {
       setHistory(updatedHistory);
       saveData(STORE_HISTORY, KEY_HISTORY_LIST, updatedHistory);
       
-      // Reset reCAPTCHA for next run
-      if (window.grecaptcha && recaptchaWidgetId !== null) {
-        window.grecaptcha.reset(recaptchaWidgetId);
-      }
-    } catch (error) { if (processActiveRef.current) setMascotMessage("Dahanku berguncang, coba lagi ya."); }
-    finally { 
+    } catch (error) { 
+      if (processActiveRef.current) setMascotMessage("Dahanku berguncang, coba lagi ya."); 
+    } finally { 
       setIsAnalyzing(false); 
       processActiveRef.current = false; 
     }
-  };
+  }, [inputText, selectedStyle, selectedContext, targetLang, violationCount, usageCount, history, playWarningChime]); 
 
+  const triggerAnalysis = useCallback(async (plagiarism: boolean) => {
+    if (isViolationDetected || isBusy) return;
+    if (honeypot) return;
+    if (usageCount >= MAX_DAILY_REQUESTS) { 
+      setIsLimitModalOpen(true); 
+      return; 
+    }
+    
+    pendingPlagiarismRef.current = plagiarism;
+    await startAnalysis(plagiarism);
+  }, [isViolationDetected, isBusy, honeypot, usageCount, startAnalysis]);
+  
   const startRecording = async () => {
     if (isBusy || usageCount >= MAX_DAILY_REQUESTS) return;
     setResult(null);
@@ -574,9 +568,7 @@ export const App: React.FC = () => {
       setIsRecording(true);
       setRecordingCountdown(5);
       mediaRecorder.start();
-      
       setMascotMessage("Aku mendengarkan... silakan bicara, Sahabat.");
-      
       countdownIntervalRef.current = window.setInterval(() => {
         setRecordingCountdown(prev => {
           if (prev <= 1) {
@@ -592,13 +584,27 @@ export const App: React.FC = () => {
   };
 
   const stopRecording = (cancel = false) => {
-    if (countdownIntervalRef.current) { clearInterval(countdownIntervalRef.current); countdownIntervalRef.current = null; }
-    if (mediaRecorderRef.current && mediaRecorderRef.current.state === 'recording') {
-      if (cancel) mediaRecorderRef.current.onstop = null;
+  if (countdownIntervalRef.current) { 
+    clearInterval(countdownIntervalRef.current); 
+    countdownIntervalRef.current = null; 
+  }
+  
+  if (mediaRecorderRef.current) {
+    if (cancel) mediaRecorderRef.current.onstop = null;
+    
+    if (mediaRecorderRef.current.state === 'recording') {
       mediaRecorderRef.current.stop();
     }
-    setIsRecording(false);
-  };
+    
+    // Cleanup stream
+    const stream = mediaRecorderRef.current.stream;
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+  }
+  
+  setIsRecording(false);
+};
 
   const processAudioTranscription = async (blob: Blob) => {
     isCanceledRef.current = false;
@@ -619,7 +625,6 @@ export const App: React.FC = () => {
         if (text && text.trim()) {
           setInputText(prev => prev ? prev + " " + text : text);
           setMascotMessage("Suaramu telah aku tanam di lembaran editor.");
-          
           const newCount = usageCount + 1;
           setUsageCount(newCount);
           saveData(STORE_SETTINGS, KEY_USAGE_COUNT, newCount);
@@ -649,7 +654,6 @@ export const App: React.FC = () => {
     try {
       if (result) {
         await generateSpeech(`Hasil perbaikannya ${result.correctedText}`, "Bahasa Indonesia", result.readingGuideIndo);
-        
         if (!isCanceledRef.current && result.translation) {
           await new Promise(r => setTimeout(r, 600));
           if (!isCanceledRef.current) {
@@ -663,9 +667,7 @@ export const App: React.FC = () => {
       } else {
         await generateSpeech(inputText, "Bahasa Indonesia");
       }
-
       if (!isCanceledRef.current) setMascotMessage("Begitulah alunan aksaramu, Sahabat.");
-      
       const newCount = usageCount + 1;
       setUsageCount(newCount);
       setIsLimitReached(newCount >= MAX_DAILY_REQUESTS);
@@ -703,8 +705,6 @@ export const App: React.FC = () => {
     }
   };
 
-  const isLimitReachedState = usageCount >= MAX_DAILY_REQUESTS;
-
   const inputBgClass = currentTheme === 'flower' 
     ? 'bg-petal-800 border-pink-500/20 shadow-2xl text-petal-50' 
     : (currentTheme === 'dark' ? 'bg-emerald-950/20 border-emerald-800/30 shadow-none' : 'bg-white border-emerald-50 shadow-sm');
@@ -740,12 +740,11 @@ export const App: React.FC = () => {
           onHelpToggle={() => !isBusy && setIsHelpActive(!isHelpActive)}
         >
           <div className="flex flex-col gap-8 max-w-7xl w-full mx-auto pb-32">
-            
             <div className="fixed left-4 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-40">
               <button disabled={isBusy} onClick={() => setIsDyslexiaMode(!isDyslexiaMode)} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isDyslexiaMode ? 'bg-red-700 text-white' : (currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-red-700 dark:text-red-400 hover:scale-110 active:scale-90')}`} data-help="Mode Khusus Disleksia."><span className="font-bold text-xl">D</span></button>
-              <button onClick={() => !isBusy && setPermissionType('mic')} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${isLimitReachedState ? 'grayscale opacity-50' : ''} ${currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-red-600 dark:text-red-400'}`} data-help="Rekam Suaramu."><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" cy="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
-              <button onClick={handleSpeech} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${isLimitReachedState ? 'grayscale opacity-50' : ''} ${currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400'}`} data-help="Dengarkan Naskah."><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
-              <button onClick={() => !isBusy && setIsPronunciationModalOpen(true)} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${isLimitReachedState ? 'grayscale opacity-50' : ''} ${currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-blue-600 dark:text-blue-400'}`} data-help="Latihan Tutur. Berlaith melafalkan naskahmu dan dapatkan ulasan dari Tara.">
+              <button onClick={() => !isBusy && setPermissionType('mic')} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${usageCount >= MAX_DAILY_REQUESTS ? 'grayscale opacity-50' : ''} ${currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-red-600 dark:text-red-400'}`} data-help="Rekam Suaramu."><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" cy="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg></button>
+              <button onClick={handleSpeech} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${usageCount >= MAX_DAILY_REQUESTS ? 'grayscale opacity-50' : ''} ${currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400'}`} data-help="Dengarkan Naskah."><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg></button>
+              <button onClick={() => !isBusy && setIsPronunciationModalOpen(true)} disabled={isBusy} className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isBusy ? 'opacity-50' : 'hover:scale-110 active:scale-90'} ${usageCount >= MAX_DAILY_REQUESTS ? 'grayscale opacity-50' : ''} ${currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-blue-600 dark:text-blue-400'}`} data-help={`Latihan Tutur. Berlatih melafalkan naskahmu dalam ${currentLangLabel}.`}>
                 <span className="text-xl">{currentTheme === 'flower' ? '🌸' : '🗣️'}</span>
               </button>
             </div>
@@ -771,7 +770,7 @@ export const App: React.FC = () => {
                        {MAX_DAILY_REQUESTS - usageCount} / {MAX_DAILY_REQUESTS} Tersisa
                     </span>
                  </div>
-                 <div className="quota-bar-container"><div className={`quota-bar-fill ${isLimitReachedState ? 'bg-red-600' : isQuotaLow ? 'bg-red-500' : (currentTheme === 'flower' ? 'bg-pink-500' : 'bg-emerald-600')}`} style={{ width: `${quotaPercent}%` }}></div></div>
+                 <div className="quota-bar-container"><div className={`quota-bar-fill ${usageCount >= MAX_DAILY_REQUESTS ? 'bg-red-600' : isQuotaLow ? 'bg-red-500' : (currentTheme === 'flower' ? 'bg-pink-500' : 'bg-emerald-600')}`} style={{ width: `${quotaPercent}%` }}></div></div>
               </div>
 
               <NusantaraMapSection currentTheme={currentTheme} targetLang={targetLang} inputBgClass={inputBgClass} />
@@ -827,26 +826,31 @@ export const App: React.FC = () => {
                 )}
 
                 <div className="relative">
-                  {/* Honeypot field - Totally hidden from humans */}
                   <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', opacity: 0, height: 0, width: 0, overflow: 'hidden' }} aria-hidden="true">
                     <label htmlFor="confirm_access_token">Don't fill this if you are human</label>
                     <input type="text" id="confirm_access_token" name="confirm_access_token" tabIndex={-1} autoComplete="off" value={honeypot} onChange={e => setHoneypot(e.target.value)} />
                   </div>
-                  
                   <textarea value={inputText} disabled={isBusy} onChange={handleInputChange} maxLength={MAX_CHARACTERS} placeholder="Tuliskan naskahmu di sini..." className={`w-full min-h-[350px] bg-transparent resize-none border-none outline-none text-xl leading-relaxed pr-12 transition-colors ${isViolationDetected ? 'text-red-700 dark:text-red-400' : (currentTheme === 'flower' ? 'text-pink-50 placeholder-pink-500/30' : 'text-emerald-950 dark:text-emerald-50 placeholder-red-700/30')}`} />
                   <div className={`absolute bottom-0 right-0 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.2em] transition-all duration-300 font-sans ${isViolationDetected ? 'text-red-600 animate-pulse' : isCharLimitNear ? 'text-red-600 scale-110' : charCount > MAX_CHARACTERS * 0.7 ? 'text-amber-500' : 'text-emerald-700/30 dark:text-emerald-400/20'}`}>{isViolationDetected ? '⚠️ POLA TERLARANG' : `${charCount} / ${MAX_CHARACTERS}`}</div>
-                </div>
+                </div>  
 
                 <div className="flex flex-col items-center gap-6 mt-8">
-                  {/* Invisible reCAPTCHA Badge Anchor */}
-                  <div 
-                    ref={captchaContainerRef}
-                    className="recaptcha-container"
-                  ></div>
-
                   <div className="flex flex-col sm:flex-row gap-4 w-full">
-                    <button onClick={() => triggerAnalysis(false)} disabled={!inputText.trim() || isBusy || isLimitReachedState || isViolationDetected} className={`flex-1 py-5 rounded-2xl font-bold transition-all active:scale-95 shadow-lg font-sans disabled:opacity-30 ${isLimitReachedState || isViolationDetected ? 'grayscale cursor-not-allowed' : ''} ${currentTheme === 'flower' ? 'bg-pink-500 text-white shadow-pink-500/20' : 'bg-emerald-700 text-white shadow-emerald-700/20'}`}>Koreksi & Terjemahkan</button>
-                    <button onClick={() => setPermissionType('plagiarism')} disabled={!inputText.trim() || isBusy || isLimitReachedState || isViolationDetected} className={`flex-1 py-5 premium-shimmer text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg font-sans disabled:opacity-30 ${isLimitReachedState || isViolationDetected ? 'grayscale cursor-not-allowed' : ''}`}>Cek Plagiarisme</button>
+                    <button 
+                      onClick={() => triggerAnalysis(false)} 
+                      disabled={!inputText.trim() || isBusy || usageCount >= MAX_DAILY_REQUESTS || isViolationDetected} 
+                      className={`flex-1 py-5 rounded-2xl font-bold transition-all active:scale-95 shadow-lg font-sans disabled:opacity-30 ${usageCount >= MAX_DAILY_REQUESTS || isViolationDetected ? 'grayscale cursor-not-allowed' : ''} ${currentTheme === 'flower' ? 'bg-pink-500 text-white shadow-pink-500/20' : 'bg-emerald-700 text-white shadow-emerald-700/20'}`}
+                    >
+                      Koreksi & Terjemahkan
+                    </button>
+                    
+                    <button 
+                      onClick={() => setPermissionType('plagiarism')} 
+                      disabled={!inputText.trim() || isBusy || usageCount >= MAX_DAILY_REQUESTS || isViolationDetected} 
+                      className={`flex-1 py-5 premium-shimmer text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg font-sans disabled:opacity-30 ${usageCount >= MAX_DAILY_REQUESTS || isViolationDetected ? 'grayscale cursor-not-allowed' : ''}`}
+                    >
+                      Cek Plagiarisme
+                    </button>
                   </div>
                 </div>
               </section>
@@ -902,15 +906,13 @@ export const App: React.FC = () => {
                     {history.length === 0 && <p className={`text-center py-10 italic font-sans ${currentTheme === 'flower' ? 'text-pink-100/20' : 'text-emerald-900/10 dark:text-emerald-400/10'}`}>Kotak jejak masih kosong.</p>}
                   </div>
                 </div>
-                
                 <TreeHugger />
-
                 <GardenPromoBox isFlower={currentTheme === 'flower'} isDark={currentTheme === 'dark'} />
               </div>
-            </div>
           </div>
+        </div>
 
-          <ConsentModal isOpen={!hasAcceptedConsent} onAccept={() => setHasAcceptedConsent(true)} onReject={() => window.location.href = 'https://google.com'} />
+          <ConsentModal isOpen={!hasAcceptedConsent} onAccept={() => setHasAcceptedConsent(true)} onReject={() => window.location.href = 'https://google.com'} recaptchaSiteKey={RECAPTCHA_SITE_KEY} />
           {permissionType && <PermissionModal type={permissionType} onAccept={() => { if (permissionType === 'mic') { startRecording(); } else if (permissionType === 'plagiarism') triggerAnalysis(true); setPermissionType(null); }} onDeny={() => setPermissionType(null)} />}
           <LimitModal isOpen={isLimitReached && isLimitModalOpen} onClose={() => setIsLimitModalOpen(false)} />
           <HistoryModal isOpen={isHistoryModalOpen} onClose={() => setIsHistoryModalOpen(false)} history={history} onSelectItem={(it) => { setInputText(it.originalText); setResult(it.result); }} onClearAll={() => { if(confirm("Hapus semua?")) setHistory([]); }} />
@@ -918,9 +920,10 @@ export const App: React.FC = () => {
           <DeveloperModal isOpen={isDevModalOpen} onClose={() => setIsDevModalOpen(false)} />
           <FanGalleryModal isOpen={isFanGalleryModalOpen} onClose={() => setIsFanGalleryModalOpen(false)} />
           <CatalogModal isOpen={isCatalogModalOpen} onClose={() => setIsCatalogModalOpen(false)} />
-          <PronunciationModal isOpen={isPronunciationModalOpen} onClose={() => setIsPronunciationModalOpen(false)} originalText={result?.correctedText || inputText} translation={result?.translation} onSuccess={() => {}} />
+          <PronunciationModal isOpen={isPronunciationModalOpen} onClose={() => setIsPronunciationModalOpen(false)} originalText={result?.correctedText || inputText} translation={result?.translation} currentTargetLangLabel={currentLangLabel} onSuccess={() => {}} />
         </Layout>
       </div>
     </>
   );
 };
+export default App;  // ✅ Default export
