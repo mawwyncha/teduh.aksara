@@ -8,6 +8,7 @@ import { NusaTenggaraMap } from './regions/maps/NusaTenggaraMap';
 import { SulawesiMap } from './regions/maps/SulawesiMap';
 import { PapuaMap } from './regions/maps/PapuaMap';
 import { fetchTTSAudio } from '../../services/geminiService';
+import { useFolkloreTTS } from '../../hooks/useFolkloreTTS';
 import * as Tone from 'tone';
 
 interface NusantaraMapSectionProps {
@@ -80,6 +81,15 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
     lockCore: "#1a110c"
   };
   
+  const folklore = PROVINCE_DIALECTS[selectedRegion]?.folklore;
+  const languageName = "Bahasa Indonesia";
+  
+  const { isReady, isPlaying, isLoading, playAudio, stopAudio } = useFolkloreTTS({
+    storyText: folklore?.story || '',
+    languageName: languageName,
+    isModalOpen: !!selectedRegion && showFolklore
+  });
+
   // SCROLL LOCK EFFECT
   useEffect(() => {
     if (selectedRegion) {
@@ -612,16 +622,37 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
                                     <span className={`text-[9px] font-bold uppercase tracking-[0.4em] block mb-1 opacity-60 ${isFlower ? 'text-pink-400' : 'text-emerald-600 dark:text-emerald-400'}`}>Dongeng Nusantara</span>
                                     <h4 className={`text-xl font-bold ${textColor}`}>{PROVINCE_DIALECTS[selectedRegion].folklore?.title}</h4>
                                   </div>
-                                  <button onClick={() => toggleFolklore(PROVINCE_DIALECTS[selectedRegion].folklore?.story || "")} disabled={isFolkloreLoading} className={`w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-lg active:scale-90 ${folklorePlaying ? 'bg-red-500 text-white animate-pulse' : (isFlower ? 'bg-pink-500 text-white' : 'bg-emerald-600 text-white')}`}>
-                                    {isFolkloreLoading ? (
+                                  <button 
+                                    onClick={isPlaying ? stopAudio : playAudio} 
+                                    disabled={isLoading} 
+                                    className={`w-14 h-14 rounded-full flex items-center justify-center transition-all shadow-lg active:scale-90 ${
+                                      isPlaying 
+                                        ? 'bg-red-500 text-white animate-pulse' 
+                                        : (isFlower ? 'bg-pink-500 text-white' : 'bg-emerald-600 text-white')
+                                    }`}
+                                  >
+                                    {isLoading ? (
                                       <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                                    ) : folklorePlaying ? (
+                                    ) : isPlaying ? (
                                       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
                                     ) : (
                                       <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor" className="ml-1"><polygon points="5 3 19 12 5 21 5 3"/></svg>
                                     )}
                                   </button>
                                 </div>
+
+                                {/* Status indicator - audio ready */}
+                                {isReady && !isPlaying && !isLoading && (
+                                  <div className={`mb-4 px-4 py-2 rounded-xl border flex items-center gap-2 ${
+                                    isFlower 
+                                      ? 'bg-pink-900/30 border-pink-500/20 text-pink-200' 
+                                      : 'bg-emerald-900/30 border-emerald-500/20 text-emerald-200'
+                                  }`}>
+                                    <span className="text-lg">✅</span>
+                                    <span className="text-xs font-semibold">Audio siap diputar (instant)</span>
+                                  </div>
+                                )}
+
 
                                 {PROVINCE_DIALECTS[selectedRegion].folklore?.videoUrl && (
                                   <div 

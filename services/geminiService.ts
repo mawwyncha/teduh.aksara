@@ -175,9 +175,14 @@ export const fetchTTSAudio = async (text: string, languageName: string = "Bahasa
     if (cached) return cached;
   } catch (e) {}
 
+  console.log('⏳ Generating audio...');
   const response = await callGeminiAPI('generateTTS', {
     model: "gemini-2.5-flash-preview-tts",
-    contents: { parts: [{ text: `Bacakan dongeng ini dengan gaya anak-anak yang ekspresif dalam logat ${languageName}: "${cleanText}"` }] },
+    contents: { 
+      parts: [{ 
+        text: `Bacakan dongeng ini dengan gaya anak-anak yang ekspresif dalam logat ${languageName}: "${cleanText}"` 
+      }] 
+    },
     config: {
       responseModalities: [Modality.AUDIO],
       speechConfig: { 
@@ -188,10 +193,70 @@ export const fetchTTSAudio = async (text: string, languageName: string = "Bahasa
 
   const b64 = response.audioBase64;
   if (b64) {
-    saveData(STORES.TTS_CACHE, cacheKey, b64).catch(() => {});
+    await saveData(STORES.TTS_CACHE, cacheKey, b64);
+    console.log('✅ Audio berhasil di-cache');
     return b64;
   }
   return null;
+};
+
+export const checkTTSCache = async (
+  storyText: string, 
+  languageName: string = "Bahasa Indonesia"
+): Promise<boolean> => {
+  const cleanText = sanitizeForTTS(storyText);
+  if (!cleanText) return false;
+
+  const cacheKey = `tts_raw_puck_${hashText(cleanText + languageName)}`;
+  
+  try {
+    const cached = await getData(STORES.TTS_CACHE, cacheKey);
+    return !!cached;
+  } catch (e) {
+    return false;
+  }
+};
+
+export const preloadFolkloreTTS = async (
+  storyText: string, 
+  languageName: string = "Bahasa Indonesia"
+): Promise<void> => {
+  const cleanText = sanitizeForTTS(storyText);
+  if (!cleanText) return;
+
+  const cacheKey = `tts_raw_puck_${hashText(cleanText + languageName)}`;
+  
+  // Cek cache dulu
+  try {
+    const cached = await getData(STORES.TTS_CACHE, cacheKey);
+    if (cached) {
+      console.log('✅ Audio sudah ada di cache');
+      return; // Sudah ada, skip generate
+    }
+  } catch (e) {}
+
+  // Belum ada, generate sekarang
+  console.log('⏳ Pre-generating audio...');
+  const response = await callGeminiAPI('generateTTS', {
+    model: "gemini-2.5-flash-preview-tts",
+    contents: { 
+      parts: [{ 
+        text: `Bacakan dongeng ini dengan gaya anak-anak yang ekspresif dalam logat ${languageName}: "${cleanText}"` 
+      }] 
+    },
+    config: {
+      responseModalities: [Modality.AUDIO],
+      speechConfig: { 
+        voiceConfig: { prebuiltVoiceConfig: { voiceName: 'Puck' } } 
+      },
+    },
+  });
+
+  const b64 = response.audioBase64;
+  if (b64) {
+    await saveData(STORES.TTS_CACHE, cacheKey, b64);
+    console.log('✅ Audio berhasil di-cache');
+  }
 };
 
 export const generateSpeech = async (
