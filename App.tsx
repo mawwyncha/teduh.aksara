@@ -367,6 +367,9 @@ export const App: React.FC = () => {
 
   const playWarningChime = useCallback(() => {
   try {
+    if (navigator.vibrate) {
+      navigator.vibrate([100, 30, 100, 30, 150]);
+    }
     const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
     const ctx = new AudioCtx();
     const osc = ctx.createOscillator();
@@ -526,6 +529,9 @@ export const App: React.FC = () => {
         const newViolations = violationCount + 1;
         setViolationCount(newViolations);
         await saveData(STORE_SETTINGS, KEY_VIOLATION_COUNT, newViolations);
+
+        if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
+
         playWarningChime();
         setMascotMessage(newViolations >= MAX_VIOLATIONS ? "Dahanku berguncang... Etika Beraksara dilanggar." : "Hati-hati, Sahabat. Naskahmu melanggar Etika Beraksara. Ini peringatan pertama.");
         setIsViolationDetected(true);
