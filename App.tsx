@@ -1,21 +1,21 @@
-
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { Layout } from './components/Layout';
 import { Mascot } from './components/Mascot';
 import { HistoryCard } from './components/HistoryCard';
-import { HistoryModal } from './components/HistoryModal';
-import { GuideModal } from './components/GuideModal';
-import { DeveloperModal } from './components/DeveloperModal';
-import { FanGalleryModal } from './components/FanGalleryModal';
-import { CatalogModal } from './components/CatalogModal';
-import { PermissionModal } from './components/PermissionModal';
-import { LimitModal } from './components/LimitModal';
-import { ConsentModal } from './components/ConsentModal';
-import { PronunciationModal } from './components/PronunciationModal';
 import { analyzeGrammar, generateSpeech, askTaraAboutPlatform, transcribeAudio, preloadWebSpeechVoices } from './services/geminiService';
 import { saveData, getData } from './services/dbService';
 import { AnalysisResult, HistoryItem, WritingStyle, WritingContext, TargetLanguage } from './types';
 import { NusantaraMapSection } from './components/nusantara/NusantaraMapSection';
+
+const HistoryModal = lazy(() => import('./components/HistoryModal').then(m => ({ default: m.HistoryModal })));
+const GuideModal = lazy(() => import('./components/GuideModal').then(m => ({ default: m.GuideModal })));
+const DeveloperModal = lazy(() => import('./components/DeveloperModal').then(m => ({ default: m.DeveloperModal })));
+const FanGalleryModal = lazy(() => import('./components/FanGalleryModal').then(m => ({ default: m.FanGalleryModal })));
+const CatalogModal = lazy(() => import('./components/CatalogModal').then(m => ({ default: m.CatalogModal })));
+const PermissionModal = lazy(() => import('./components/PermissionModal').then(m => ({ default: m.PermissionModal })));
+const LimitModal = lazy(() => import('./components/LimitModal').then(m => ({ default: m.LimitModal })));
+const ConsentModal = lazy(() => import('./components/ConsentModal').then(m => ({ default: m.ConsentModal })));
+const PronunciationModal = lazy(() => import('./components/PronunciationModal').then(m => ({ default: m.PronunciationModal })));
 
 declare global {
   interface Window {
@@ -295,6 +295,7 @@ export const App: React.FC = () => {
   
   const [result, setResult] = useState<AnalysisResult | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isResultReady, setIsResultReady] = useState(false); // Melacak apakah ada hasil baru yang belum dilihat
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [isRecording, setIsRecording] = useState(false);
   const [isTranscribing, setIsTranscribing] = useState(false);
@@ -344,7 +345,7 @@ export const App: React.FC = () => {
     const isAnyModalOpen = !hasAcceptedConsent || isLimitModalOpen || isHistoryModalOpen || 
                            isGuideModalOpen || isDevModalOpen || isFanGalleryModalOpen || 
                            isCatalogModalOpen || isPronunciationModalOpen || permissionType || 
-                           isAnalyzing || isRecording || isTranscribing;
+                           isRecording;
 
     if (isAnyModalOpen) {
       document.body.style.overflow = 'hidden';
@@ -389,6 +390,7 @@ export const App: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
     setInputText(val);
+    setIsResultReady(false); // Reset status jika naskah diubah
     const forbidden = FORBIDDEN_PATTERN.test(val);
     FORBIDDEN_PATTERN.lastIndex = 0;
 
@@ -475,6 +477,7 @@ export const App: React.FC = () => {
     setIsAnalyzing(false);
     setIsSpeaking(false);
     setIsTranscribing(false);
+    setIsResultReady(false);
     
     if ('speechSynthesis' in window) {
       window.speechSynthesis.cancel();
@@ -509,6 +512,7 @@ export const App: React.FC = () => {
     isCanceledRef.current = false;
     processActiveRef.current = true;
     setIsAnalyzing(true);
+    setIsResultReady(false);
     setLoadingMsg(CALMING_MESSAGES[Math.floor(Math.random() * CALMING_MESSAGES.length)]);
     setFunFactMsg(TARA_FUN_FACTS[Math.floor(Math.random() * TARA_FUN_FACTS.length)]);
     
@@ -539,6 +543,7 @@ export const App: React.FC = () => {
       }
 
       setResult(data);
+      setIsResultReady(true); // Menandai hasil sudah siap
       setMascotMessage(data.summary);
       
       const newCount = usageCount + 1;
@@ -574,6 +579,7 @@ export const App: React.FC = () => {
   const startRecording = async () => {
     if (isBusy || usageCount >= MAX_DAILY_REQUESTS) return;
     setResult(null);
+    setIsResultReady(false);
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mediaRecorder = new MediaRecorder(stream);
@@ -703,6 +709,12 @@ export const App: React.FC = () => {
     }
   };
 
+  const handleSeeResult = () => {
+    setIsResultReady(false); // Reset notifikasi
+    const el = document.getElementById('result-section');
+    if (el) el.scrollIntoView({ behavior: 'smooth' }); // Scroll smooth
+  };
+
   if (!isLoaded) return null;
   if (isBanned) return <BannedView />;
 
@@ -763,10 +775,10 @@ export const App: React.FC = () => {
 
   const selectClass = `p-3.5 rounded-2xl font-bold outline-none border transition-all backdrop-blur-md font-sans focus:ring-2 focus:ring-opacity-50 ${
     currentTheme === 'flower' 
-      ? 'bg-petal-900 text-pink-100 border-pink-500/20 focus:ring-pink-500 focus:border-pink-500/50' 
+      ? 'bg-petal-900 text-pink-100 border-pink-500/20 focus:ring-pink-500' 
       : currentTheme === 'dark'
-        ? 'bg-emerald-950/40 text-emerald-200 border-emerald-800/30 focus:ring-emerald-500 focus:border-emerald-600/50'
-        : 'bg-white/40 text-emerald-800 border-emerald-100/50 focus:ring-emerald-600 focus:border-emerald-700/50 shadow-sm'
+        ? 'bg-emerald-950/40 text-emerald-200 border-emerald-800/30 focus:ring-emerald-500'
+        : 'bg-white/40 text-emerald-800 border-emerald-100/50 focus:ring-emerald-600 shadow-sm'
   }`;
 
   return (
@@ -782,6 +794,7 @@ export const App: React.FC = () => {
           onEditorClick={() => { if(!isBusy) { setIsHistoryModalOpen(false); setIsGuideModalOpen(false); setIsDevModalOpen(false); setIsFanGalleryModalOpen(false); setIsCatalogModalOpen(false); window.scrollTo({top:0, behavior:'smooth'}); }}}
           isHelpActive={isHelpActive}
           onHelpToggle={() => !isBusy && setIsHelpActive(prev => !prev)}
+          isBusy={isBusy}
         >
           <div className="flex flex-col gap-8 max-w-7xl w-full mx-auto pb-32">
             <div className="fixed left-4 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-40">
@@ -824,31 +837,37 @@ export const App: React.FC = () => {
                  <div className="quota-bar-container"><div className={`quota-bar-fill ${usageCount >= MAX_DAILY_REQUESTS ? 'bg-red-600' : isQuotaLow ? 'bg-red-500' : (currentTheme === 'flower' ? 'bg-pink-500' : 'bg-emerald-600')}`} style={{ width: `${quotaPercent}%` }}></div></div>
               </div>
 
-              <NusantaraMapSection currentTheme={currentTheme} targetLang={targetLang} inputBgClass={inputBgClass} />
+              <NusantaraMapSection
+                currentTheme={currentTheme}
+                targetLang={targetLang}
+                inputBgClass={inputBgClass}
+                isResultReady={isResultReady}      // ← State (trigger notifikasi)
+                onSeeResult={handleSeeResult}      // ← Callback (scroll handler)
+              />
 
               <section className={`grid grid-cols-1 md:grid-cols-3 gap-6 p-6 rounded-[2.5rem] border ${inputBgClass}`}>
                 <div className="flex flex-col gap-1.5">
                   <label className={`text-[10px] font-bold uppercase tracking-[0.2em] ml-4 font-sans ${currentTheme === 'flower' ? 'text-pink-300' : 'text-emerald-800/40 dark:text-emerald-400/30'}`}>Gaya</label>
                   <select disabled={isBusy} value={selectedStyle} onChange={(e) => setSelectedStyle(e.target.value as any)} className={selectClass}>
-                    {STYLE_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 text-current">{o.label}</option>)}
+                    {STYLE_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 flower:bg-petal-800 text-current">{o.label}</option>)}
                   </select>
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className={`text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5 ml-4 font-sans ${currentTheme === 'flower' ? 'text-pink-300' : 'text-emerald-800/40 dark:text-emerald-400/30'}`}>Konteks</label>
                   <select disabled={isBusy} value={selectedContext} onChange={(e) => setSelectedContext(e.target.value as any)} className={selectClass}>
-                    {CONTEXT_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 text-current">{o.label}</option>)}
+                    {CONTEXT_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 flower:bg-petal-800 text-current">{o.label}</option>)}
                   </select>
                 </div>
                 <div className="flex flex-col gap-1.5">
                   <label className={`text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5 ml-4 font-sans ${currentTheme === 'flower' ? 'text-pink-300' : 'text-emerald-800/40 dark:text-emerald-400/30'}`}>Bahasa Target</label>
                   <select disabled={isBusy} value={targetLang} onChange={(e) => setTargetLang(e.target.value as any)} className={selectClass}>
-                    {LANG_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 text-current">{o.label}</option>)}
+                    {LANG_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 flower:bg-petal-800 text-current">{o.label}</option>)}
                   </select>
                 </div>
               </section>
 
               <section className={`rounded-[3.5rem] p-6 md:p-10 relative border transition-all duration-300 ${isViolationDetected ? 'border-red-600 shadow-red-600/10 animate-shake' : inputBgClass}`}>
-                {inputText && !isBusy && (<button onClick={() => { setInputText(''); setResult(null); }} className={`absolute top-8 right-8 p-3 transition-all active:scale-90 z-10 ${currentTheme === 'flower' ? 'text-pink-100/20 hover:text-pink-500' : 'text-emerald-800/20 dark:text-emerald-400/20 hover:text-red-700'}`}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" /></svg></button>)}
+                {inputText && !isBusy && (<button onClick={() => { setInputText(''); setResult(null); setIsResultReady(false); }} className={`absolute top-8 right-8 p-3 transition-all active:scale-90 z-10 ${currentTheme === 'flower' ? 'text-pink-100/20 hover:text-pink-500' : 'text-emerald-800/20 dark:text-emerald-400/20 hover:text-red-700'}`}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" /></svg></button>)}
 
                 {isBusy && !isRecording && (
                   <div className={`absolute inset-0 z-50 flex flex-col items-center justify-center backdrop-blur-md rounded-[3.5rem] p-8 sm:p-12 text-center animate-in fade-in ${currentTheme === 'flower' ? 'bg-petal-900/90' : 'bg-white/95 dark:bg-[#050a08]/95'}`}>
@@ -995,8 +1014,9 @@ export const App: React.FC = () => {
           </div>
         </Layout>
 
+        <Suspense fallback={null}>
           <ConsentModal isOpen={!hasAcceptedConsent} onAccept={() => setHasAcceptedConsent(true)} onReject={() => window.location.href = 'https://google.com'} recaptchaSiteKey={RECAPTCHA_SITE_KEY} />
-          {permissionType && <PermissionModal type={permissionType} onAccept={() => { if (permissionType === 'mic') { startRecording(); } else if (permissionType === 'plagiarism') triggerAnalysis(true); setPermissionType(null); }} onDeny={() => setPermissionType(null)} />}
+            {permissionType && <PermissionModal type={permissionType} onAccept={() => { if (permissionType === 'mic') { startRecording(); } else if (permissionType === 'plagiarism') triggerAnalysis(true); setPermissionType(null); }} onDeny={() => setPermissionType(null)} />}
           <LimitModal isOpen={isLimitReached && isLimitModalOpen} onClose={() => setIsLimitModalOpen(false)} />
           <HistoryModal isOpen={isHistoryModalOpen} onClose={() => setIsHistoryModalOpen(false)} history={history} onSelectItem={(it) => { setInputText(it.originalText); setResult(it.result); }} onClearAll={() => { if(confirm("Hapus semua?")) setHistory([]); }} />
           <GuideModal isOpen={isGuideModalOpen} onClose={() => setIsGuideModalOpen(false)} />
@@ -1004,6 +1024,8 @@ export const App: React.FC = () => {
           <FanGalleryModal isOpen={isFanGalleryModalOpen} onClose={() => setIsFanGalleryModalOpen(false)} />
           <CatalogModal isOpen={isCatalogModalOpen} onClose={() => setIsCatalogModalOpen(false)} />
           <PronunciationModal isOpen={isPronunciationModalOpen} onClose={() => setIsPronunciationModalOpen(false)} originalText={result?.correctedText || inputText} translation={result?.translation} currentTargetLangLabel={currentLangLabel} onSuccess={() => {}} />
+        </Suspense>
+      
       </div>
     </>
   );

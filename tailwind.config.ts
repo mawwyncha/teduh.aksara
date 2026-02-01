@@ -21,9 +21,10 @@ export default {
           400: '#f472b6',
           500: '#ec4899',
           800: '#3d2b1f',
-          900: '#2a1a12',
+          900: '#2a1a12'
         }
       }
-    },
-    plugins: [],
-  }} satisfies Config
+    }
+  },
+  plugins: [],
+} satisfies Config

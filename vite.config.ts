@@ -67,6 +67,9 @@ export default defineConfig(({ mode }) => {
                 // Everything else
                 return 'vendor';
               }
+               if (id.includes('/components/') && id.includes('Modal')) {
+                return 'modals';
+              }
             },
             
             // OPTIMIZED: Better file naming for caching

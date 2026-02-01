@@ -13,6 +13,7 @@ interface LayoutProps {
   onEditorClick: () => void;
   isHelpActive: boolean;
   onHelpToggle: () => void;
+  isBusy?: boolean; // Prop baru untuk mendeteksi proses AI
 }
 
 const STORE_SETTINGS = 'settings';
@@ -22,13 +23,14 @@ export const Layout: React.FC<LayoutProps> = ({
   children, 
   activeModal,
   onHistoryClick, 
-  onGuideClick,
+  onGuideClick, 
   onDevClick,
   onGalleryClick,
   onCatalogClick,
   onEditorClick,
   isHelpActive,
-  onHelpToggle
+  onHelpToggle,
+  isBusy = false
 }) => {
   const [theme, setTheme] = useState<'light' | 'dark' | 'flower'>('light');
   const [isReady, setIsReady] = useState(false);
@@ -96,12 +98,13 @@ export const Layout: React.FC<LayoutProps> = ({
   }, [isHelpActive, hoveredHelp]);
 
   const cycleTheme = () => {
+    if (isBusy) return;
     if (theme === 'light') setTheme('dark');
     else if (theme === 'dark') setTheme('flower');
     else setTheme('light');
   };
 
-  const navLinkClass = `px-4 py-2 font-bold transition-all text-base md:text-xl ${
+  const navLinkClass = `px-4 py-2 font-bold transition-all text-base md:text-xl ${isBusy ? 'opacity-30 cursor-not-allowed' : ''} ${
     theme === 'flower' 
       ? 'text-pink-300 hover:text-pink-100' 
       : 'text-[#2d4d3a] dark:text-emerald-200/60 hover:text-emerald-700 dark:hover:text-emerald-400'
@@ -154,19 +157,20 @@ export const Layout: React.FC<LayoutProps> = ({
         </div>
         
         <nav className={`hidden lg:flex gap-2 items-center px-4 py-1.5 rounded-full backdrop-blur-sm shadow-sm ${theme === 'flower' ? 'bg-petal-800 border border-pink-500/20' : 'bg-white/50 dark:bg-[#1a110c]/30'}`}>
-          <button onClick={onEditorClick} className={navLinkClass} data-help="Kembali ke lembaran editor untuk mulai merawat aksara baru.">Editor</button>
+          <button disabled={isBusy} onClick={onEditorClick} className={navLinkClass} data-help="Kembali ke lembaran editor untuk mulai merawat aksara baru.">Editor</button>
           <div className={`w-[1px] h-4 ${theme === 'flower' ? 'bg-pink-500/20' : 'bg-emerald-100 dark:bg-emerald-900'}`}></div>
-          <button onClick={onHistoryClick} className={navLinkClass} data-help="Melihat jejak naskah yang pernah kamu semai di perangkat ini.">Riwayat</button>
+          <button disabled={isBusy} onClick={onHistoryClick} className={navLinkClass} data-help="Melihat jejak naskah yang pernah kamu semai di perangkat ini.">Riwayat</button>
           <div className={`w-[1px] h-4 ${theme === 'flower' ? 'bg-pink-500/20' : 'bg-emerald-100 dark:bg-emerald-900'}`}></div>
-          <button onClick={onGuideClick} className={navLinkClass} data-help="Pelajari cara terbaik untuk menggunakan fitur-fitur Tara.">Panduan</button>
+          <button disabled={isBusy} onClick={onGuideClick} className={navLinkClass} data-help="Pelajari cara terbaik untuk menggunakan fitur-fitur Tara.">Panduan</button>
           <div className={`w-[1px] h-4 ${theme === 'flower' ? 'bg-pink-500/20' : 'bg-emerald-100 dark:bg-emerald-900'}`}></div>
-          <button onClick={onDevClick} className={navLinkClass} data-help="Kenali sosok di balik tumbuhnya dahan-dahan Teduh Aksara.">Tentang Kami</button>
+          <button disabled={isBusy} onClick={onDevClick} className={navLinkClass} data-help="Kenali sosok di balik tumbuhnya dahan-dahan Teduh Aksara.">Tentang Kami</button>
         </nav>
 
         <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto justify-end">
           <button 
+            disabled={isBusy}
             onClick={onCatalogClick}
-            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center ${activeModal === 'catalog' ? 'bg-amber-600 text-white' : (theme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-[#2d1e17] text-red-600 dark:text-amber-400')}`}
+            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center ${isBusy ? 'opacity-30 cursor-not-allowed' : ''} ${activeModal === 'catalog' ? 'bg-amber-600 text-white' : (theme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-[#2d1e17] text-red-600 dark:text-amber-400')}`}
             data-help="Katalog Dukungan. Lihat merchandise dan cara mendukung pengembangan Teduh Aksara."
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="md:w-6 md:h-6">
@@ -177,8 +181,9 @@ export const Layout: React.FC<LayoutProps> = ({
           </button>
 
           <button 
+            disabled={isBusy}
             onClick={onGalleryClick}
-            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center ${activeModal === 'gallery' ? 'bg-emerald-700 text-white' : (theme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-[#2d1e17] text-emerald-700 dark:text-emerald-400')}`}
+            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center ${isBusy ? 'opacity-30 cursor-not-allowed' : ''} ${activeModal === 'gallery' ? 'bg-emerald-700 text-white' : (theme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-[#2d1e17] text-emerald-700 dark:text-emerald-400')}`}
             data-help="Galeri Sahabat. Lihat karya dan kiriman kenangan dari sesama Sahabat Aksara."
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="md:w-6 md:h-6">
@@ -189,20 +194,22 @@ export const Layout: React.FC<LayoutProps> = ({
           </button>
 
           <button 
+            disabled={isBusy}
             onClick={onHelpToggle}
-            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center ${isHelpActive ? 'premium-shimmer text-white rotate-12' : (theme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-[#2d1e17] text-emerald-700 dark:text-emerald-400')}`}
+            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm transition-all transform hover:scale-110 active:scale-95 flex items-center justify-center ${isBusy ? 'opacity-30 cursor-not-allowed' : ''} ${isHelpActive ? 'premium-shimmer text-white rotate-12' : (theme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-[#2d1e17] text-emerald-700 dark:text-emerald-400')}`}
             data-help="Mode Bantuan. Aktifkan lalu arahkan parahmu ke tombol lain untuk penjelasan."
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="md:w-6 md:h-6">
               <circle cx="12" cy="12" r="10"/>
               <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
-              <line x1="12" y1="17" x2="12.01" y2="17"/>
+              <line x1="12" cy="17" x2="12.01" y2="17"/>
             </svg>
           </button>
 
           <button 
+            disabled={isBusy}
             onClick={cycleTheme}
-            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm hover:scale-110 hover:rotate-12 transition-all flex items-center justify-center ${theme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : (theme === 'dark' ? 'bg-[#2d1e17] text-amber-600 dark:text-emerald-300' : 'bg-white text-red-600')}`}
+            className={`p-3 md:p-4 rounded-xl md:rounded-2xl shadow-sm hover:scale-110 hover:rotate-12 transition-all flex items-center justify-center ${isBusy ? 'opacity-30 cursor-not-allowed' : ''} ${theme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : (theme === 'dark' ? 'bg-[#2d1e17] text-amber-600 dark:text-emerald-300' : 'bg-white text-red-600')}`}
             title="Ubah Suasana Taman"
             data-help="Ubah suasana taman: Embun Pagi (Cerah), Rimbun Malam (Tenang), atau Kembang Lestari (Floral)."
           >
@@ -240,28 +247,28 @@ export const Layout: React.FC<LayoutProps> = ({
       </main>
 
       <nav className={`fixed bottom-4 left-4 right-4 h-24 backdrop-blur-xl rounded-[2.5rem] shadow-xl border border-white/20 flex items-center justify-around px-2 z-[80] lg:hidden ${theme === 'flower' ? 'bg-petal-800 border-pink-500/20' : 'bg-white/90 dark:bg-[#1a110c]/80'}`}>
-        <button onClick={onEditorClick} className={`${mobileNavClass} ${activeModal === null ? mobileNavActiveClass : (theme === 'flower' ? 'text-pink-300' : 'text-emerald-800/60 dark:text-emerald-400/50')}`} data-help="Laman Utama Editor.">
+        <button disabled={isBusy} onClick={onEditorClick} className={`${mobileNavClass} ${isBusy ? 'opacity-30' : ''} ${activeModal === null ? mobileNavActiveClass : (theme === 'flower' ? 'text-pink-300' : 'text-emerald-800/60 dark:text-emerald-400/50')}`} data-help="Laman Utama Editor.">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
             <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
           </svg>
           <span className="text-[10px] uppercase tracking-widest font-bold">Aksara</span>
         </button>
-        <button onClick={onHistoryClick} className={`${mobileNavClass} ${activeModal === 'history' ? mobileNavActiveClass : (theme === 'flower' ? 'text-pink-300' : 'text-emerald-800/60 dark:text-emerald-400/50')}`} data-help="Jejak Riwayat.">
+        <button disabled={isBusy} onClick={onHistoryClick} className={`${mobileNavClass} ${isBusy ? 'opacity-30' : ''} ${activeModal === 'history' ? mobileNavActiveClass : (theme === 'flower' ? 'text-pink-300' : 'text-emerald-800/60 dark:text-emerald-400/50')}`} data-help="Jejak Riwayat.">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 8v4l3 3"/>
             <circle cx="12" cy="12" r="9"/>
           </svg>
           <span className="text-[10px] uppercase tracking-widest font-bold">Jejak</span>
         </button>
-        <button onClick={onGuideClick} className={`${mobileNavClass} ${activeModal === 'guide' ? mobileNavActiveClass : (theme === 'flower' ? 'text-pink-300' : 'text-emerald-800/60 dark:text-emerald-400/50')}`} data-help="Panduan Tara.">
+        <button disabled={isBusy} onClick={onGuideClick} className={`${mobileNavClass} ${isBusy ? 'opacity-30' : ''} ${activeModal === 'guide' ? mobileNavActiveClass : (theme === 'flower' ? 'text-pink-300' : 'text-emerald-800/60 dark:text-emerald-400/50')}`} data-help="Panduan Tara.">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M2 3h6a4 4 0 0 1 4 4v14a4 4 0 0 0-4-4H2z"/>
             <path d="M22 3h-6a4 4 0 0 0-4 4v14a4 4 0 0 1 4-4h6z"/>
           </svg>
           <span className="text-[10px] uppercase tracking-widest font-bold">Panduan</span>
         </button>
-        <button onClick={onDevClick} className={`${mobileNavClass} ${activeModal === 'dev' ? mobileNavActiveClass : (theme === 'flower' ? 'text-pink-300' : 'text-emerald-800/60 dark:text-emerald-400/50')}`} data-help="Tentang Kami.">
+        <button disabled={isBusy} onClick={onDevClick} className={`${mobileNavClass} ${isBusy ? 'opacity-30' : ''} ${activeModal === 'dev' ? mobileNavActiveClass : (theme === 'flower' ? 'text-pink-300' : 'text-emerald-800/60 dark:text-emerald-400/50')}`} data-help="Tentang Kami.">
           <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
             <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
             <circle cx="12" cy="7" r="4"/>

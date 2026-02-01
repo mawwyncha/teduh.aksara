@@ -15,9 +15,16 @@ interface NusantaraMapSectionProps {
   currentTheme: 'light' | 'dark' | 'flower';
   targetLang: TargetLanguage;
   inputBgClass: string;
+  isResultReady: boolean; // ✅ Prop baru untuk notifikasi
+  onSeeResult: () => void; // ✅ Callback untuk menutup modal dan scroll ke hasil
 }
 
-export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ currentTheme, inputBgClass }) => {
+export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ 
+  currentTheme, 
+  inputBgClass, 
+  isResultReady, // ✅ Destructure prop
+  onSeeResult // ✅ Destructure callback
+}) => {
   const [isUnfolded, setIsUnfolded] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
@@ -721,6 +728,29 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ curren
               </div>
             </div>
           </div>
+          {/* ✨ FLOATING TOAST NOTIFICATION - Fitur Baru ✨ */}
+            {isResultReady && (
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[300] w-full max-w-sm px-4 animate-in slide-in-from-bottom-10 duration-500 animate-bounce">
+                <div className={`p-4 rounded-[2rem] border shadow-2xl flex items-center justify-between gap-4 backdrop-blur-2xl ${isFlower ? 'bg-pink-600/95 border-pink-400 text-white' : 'bg-emerald-800/95 border-emerald-500 text-white'}`}>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl animate-bounce">✨</span>
+                    <div>
+                      <p className="text-[11px] font-bold uppercase tracking-widest leading-none mb-1">Kabar dari Tara</p>
+                      <p className="text-[10px] opacity-90 italic">Naskahmu selesai dirapikan!</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => { 
+                      setSelectedRegion(null);  // Tutup modal eksplorasi
+                      onSeeResult();            // Panggil handler (scroll ke hasil)
+                    }}
+                    className={`px-4 py-2 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 shadow-lg ${isFlower ? 'bg-white text-pink-600 hover:bg-pink-50' : 'bg-white text-emerald-800 hover:bg-emerald-50'}`}
+                  >
+                    Lihat Hasil
+                  </button>
+                </div>
+              </div>
+            )}
         </div>
       )}
     </div>

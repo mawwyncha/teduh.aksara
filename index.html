@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -47,7 +48,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/opendyslexic@1.0.3/dist/opendyslexic.min.css">
     
-
+    <!-- reCAPTCHA API with explicit render -->
+    <script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
 
     <style>
         * { -webkit-tap-highlight-color: transparent; }
@@ -62,7 +64,7 @@
         .dark body { background-color: #050a08; color: #e0f2f1; }
         .flower body { background-color: #fdf6f0; color: #3d2b1f; }
         
-        /* Global Dyslexia Mode Rule - Applied to html for global inheritance */
+        /* Global Dyslexia Mode Rule */
         html.dyslexia-mode,
         html.dyslexia-mode *,
         html.dyslexia-mode textarea,
@@ -83,7 +85,6 @@
             line-height: 1.8 !important;
         }
         
-        /* Ensure font is loaded before applying */
         @font-face {
             font-family: 'OpenDyslexic';
             font-display: swap;
@@ -144,7 +145,6 @@
             0%, 45%, 55%, 100% { transform: scaleY(1); }
             50% { transform: scaleY(0.1); }
         }
-        /* FIXED: Added transform-origin and transform-box to keep eyes centered during blink */
         .animate-tree-blink { 
             animation: tree-blink 4s infinite; 
             transform-origin: center;
@@ -209,7 +209,6 @@
       }
     }
     </script>
-<script src="https://www.google.com/recaptcha/api.js?render=explicit" async defer></script>
 </head>
 <body>
     <div id="root"></div>
