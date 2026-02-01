@@ -64,8 +64,9 @@ export const ConsentModal: React.FC<ConsentModalProps> = ({
           window.grecaptcha.reset(widgetIdRef.current);
         } catch (e) {
           console.warn('Reset captcha failed:', e);
+            widgetIdRef.current = null; // ← TAMBAHKAN INI
         }
-        return;
+        if (widgetIdRef.current !== null) return; // ← TAMBAHKAN INI
       }
 
       try {
@@ -78,6 +79,7 @@ export const ConsentModal: React.FC<ConsentModalProps> = ({
         });
       } catch (error) {
         console.error('Failed to render reCAPTCHA:', error);
+        widgetIdRef.current = null;
       }
     };
 

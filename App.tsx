@@ -42,7 +42,7 @@ const MAX_DAILY_REQUESTS = 25;
 const MAX_VIOLATIONS = 2;
 const MAX_CHARACTERS = 1000;
 
-const RECAPTCHA_SITE_KEY = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
+const RECAPTCHA_SITE_KEY = "6LdTFlUsAAAAALH-MlZGFD7tFEo_1x1FJBWIYNAK";
 
 const DONORS = [
   { name: "Sahabat Budi", amount: 250000, date: "15 Jan 2026" },
