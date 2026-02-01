@@ -1,6 +1,13 @@
 
 import { ProvinceData } from '../../ProvinceInterfaces';
 
+import { dayungSampan } from './lagu/java/banten-dayung_sampan.ts';
+import { manukDadali } from './lagu/java/jabar-manuk_dadali.ts';
+import { gundulGundulPacul } from './lagu/java/jateng-gundul_gundul_pacul.ts';
+import { rekAyoRek } from './lagu/java/jatim-rek_ayo_rek.ts';
+import { kicirKicir } from './lagu/java/jakarta-kicir_kicir.ts';
+import { yenIngTawangAnaLintang } from './lagu/java/yogyakarta-yen_ing_tawang_ana_lintang.ts';
+
 export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
   "Banten": {
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/banten%20-%20sate%20bandeng.png",
@@ -9,20 +16,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Dayung Sampan",
       description: "Dayung Sampan merupakan lagu daerah Banten yang termasuk lagu rakyat sehingga penciptanya tidak diketahui. Secara linguistik, judul dayung sampan berarti aktivitas mengayuh perahu kecil yang mencerminkan kehidupan masyarakat pesisir. Makna lirik lagu ini menggambarkan semangat kerja, kebersamaan, dan kehidupan sederhana masyarakat Banten, khususnya di wilayah perairan.",
-      melodyNotes: [
-      { time: "0:0:0", note: "G4", duration: "8n" },
-      { time: "0:0:2", note: "G4", duration: "8n" },
-      { time: "0:1:0", note: "A4", duration: "8n" },
-      { time: "0:1:2", note: "B4", duration: "4n" },
-      { time: "0:2:0", note: "G4", duration: "8n" },
-      { time: "0:2:2", note: "G4", duration: "8n" },
-      { time: "0:3:0", note: "A4", duration: "8n" },
-      { time: "0:3:2", note: "B4", duration: "4n" },
-      { time: "1:0:0", note: "A4", duration: "8n" },
-      { time: "1:0:2", note: "B4", duration: "8n" },
-      { time: "1:1:0", note: "G4", duration: "8n" },
-      { time: "1:1:2", note: "E4", duration: "4n" },
-    ]
+      melodyNotes: dayungSampan.melody
     },
     folklore: {
       title: "Legenda Danau Tasikardi",
@@ -52,20 +46,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Manuk Dadali",
       description: "Manuk Dadali adalah lagu daerah Jawa Barat ciptaan Sambas Mangundikarta. Secara linguistik, manuk berarti burung dan dadali berarti garuda. Makna lirik lagu ini melambangkan keberanian, kekuatan, dan semangat nasionalisme masyarakat Jawa Barat melalui simbol burung garuda.",
-      melodyNotes: [
-      { time: "0:0:0", note: "G4", duration: "8n" },
-      { time: "0:0:2", note: "G4", duration: "8n" },
-      { time: "0:1:0", note: "A4", duration: "8n" },
-      { time: "0:1:2", note: "B4", duration: "4n" },
-      { time: "0:2:0", note: "G4", duration: "8n" },
-      { time: "0:2:2", note: "G4", duration: "8n" },
-      { time: "0:3:0", note: "A4", duration: "8n" },
-      { time: "0:3:2", note: "B4", duration: "4n" },
-      { time: "1:0:0", note: "A4", duration: "8n" },
-      { time: "1:0:2", note: "B4", duration: "8n" },
-      { time: "1:1:0", note: "G4", duration: "8n" },
-      { time: "1:1:2", note: "E4", duration: "4n" },
-    ]
+      melodyNotes: manukDadali.melody
     },
     folklore: {
       title: "Legenda Sangkuriang dan Gunung Tangkuban Parahu",
@@ -98,20 +79,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Gundul-Gundul Pacul",
       description: "Gundul-Gundul Pacul adalah lagu daerah Jawa Tengah ciptaan R.C. Hardjosubroto. Secara linguistik, gundul berarti kepala botak dan pacul berarti cangkul, yang melambangkan pemimpin dan alat rakyat. Makna liriknya berisi nasihat moral bahwa pemimpin yang sombong dan melupakan tanggung jawab akan kehilangan amanahnya.",
-      melodyNotes: [
-      { time: "0:0:0", note: "G4", duration: "8n" },
-      { time: "0:0:2", note: "G4", duration: "8n" },
-      { time: "0:1:0", note: "A4", duration: "8n" },
-      { time: "0:1:2", note: "B4", duration: "4n" },
-      { time: "0:2:0", note: "G4", duration: "8n" },
-      { time: "0:2:2", note: "G4", duration: "8n" },
-      { time: "0:3:0", note: "A4", duration: "8n" },
-      { time: "0:3:2", note: "B4", duration: "4n" },
-      { time: "1:0:0", note: "A4", duration: "8n" },
-      { time: "1:0:2", note: "B4", duration: "8n" },
-      { time: "1:1:0", note: "G4", duration: "8n" },
-      { time: "1:1:2", note: "E4", duration: "4n" },
-    ]
+      melodyNotes: gundulGundulPacul.melody
     },
     folklore: {
       title: "Legenda Roro Jonggrang",
@@ -146,20 +114,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Rek Ayo Rek",
       description: "Rek Ayo Rek adalah lagu daerah Jawa Timur ciptaan Is Haryanto. Secara linguistik, rek merupakan sapaan khas Surabaya yang berarti “kawan”, sedangkan ayo bermakna ajakan. Makna lirik lagu ini menggambarkan keramahan, semangat pergaulan, dan kehidupan sosial masyarakat Surabaya yang akrab serta egaliter.",
-      melodyNotes: [
-      { time: "0:0:0", note: "G4", duration: "8n" },
-      { time: "0:0:2", note: "G4", duration: "8n" },
-      { time: "0:1:0", note: "A4", duration: "8n" },
-      { time: "0:1:2", note: "B4", duration: "4n" },
-      { time: "0:2:0", note: "G4", duration: "8n" },
-      { time: "0:2:2", note: "G4", duration: "8n" },
-      { time: "0:3:0", note: "A4", duration: "8n" },
-      { time: "0:3:2", note: "B4", duration: "4n" },
-      { time: "1:0:0", note: "A4", duration: "8n" },
-      { time: "1:0:2", note: "B4", duration: "8n" },
-      { time: "1:1:0", note: "G4", duration: "8n" },
-      { time: "1:1:2", note: "E4", duration: "4n" },
-    ]
+      melodyNotes: rekAyoRek.melody
     },
     folklore: {
       title: "Legenda Roro Anteng dan Joko Seger",
@@ -198,20 +153,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Kicir-Kicir",
       description: "Kicir-Kicir merupakan lagu daerah Betawi dari DKI Jakarta yang termasuk lagu rakyat sehingga penciptanya tidak diketahui. Secara linguistik, kicir-kicir menirukan bunyi kincir yang berputar. Makna liriknya menggambarkan dinamika kehidupan masyarakat Betawi serta nasihat agar tetap bersemangat dalam menjalani hidup.",
-      melodyNotes: [
-      { time: "0:0:0", note: "G4", duration: "8n" },
-      { time: "0:0:2", note: "G4", duration: "8n" },
-      { time: "0:1:0", note: "A4", duration: "8n" },
-      { time: "0:1:2", note: "B4", duration: "4n" },
-      { time: "0:2:0", note: "G4", duration: "8n" },
-      { time: "0:2:2", note: "G4", duration: "8n" },
-      { time: "0:3:0", note: "A4", duration: "8n" },
-      { time: "0:3:2", note: "B4", duration: "4n" },
-      { time: "1:0:0", note: "A4", duration: "8n" },
-      { time: "1:0:2", note: "B4", duration: "8n" },
-      { time: "1:1:0", note: "G4", duration: "8n" },
-      { time: "1:1:2", note: "E4", duration: "4n" },
-    ]
+      melodyNotes: kicirKicir.melody
     },
     folklore: {
       title: "Kisah Si Pitung",
@@ -243,20 +185,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Yen Ing Tawang Ana Lintang",
       description: "Yen Ing Tawang Ana Lintang adalah lagu daerah Yogyakarta ciptaan R. M. Sutardjo. Secara linguistik, judulnya berarti “jika di langit ada bintang”. Makna lirik lagu ini mengungkapkan perasaan rindu, harapan, dan kesetiaan dengan ungkapan yang lembut dan puitis.",
-      melodyNotes: [
-      { time: "0:0:0", note: "G4", duration: "8n" },
-      { time: "0:0:2", note: "G4", duration: "8n" },
-      { time: "0:1:0", note: "A4", duration: "8n" },
-      { time: "0:1:2", note: "B4", duration: "4n" },
-      { time: "0:2:0", note: "G4", duration: "8n" },
-      { time: "0:2:2", note: "G4", duration: "8n" },
-      { time: "0:3:0", note: "A4", duration: "8n" },
-      { time: "0:3:2", note: "B4", duration: "4n" },
-      { time: "1:0:0", note: "A4", duration: "8n" },
-      { time: "1:0:2", note: "B4", duration: "8n" },
-      { time: "1:1:0", note: "G4", duration: "8n" },
-      { time: "1:1:2", note: "E4", duration: "4n" },
-    ]
+      melodyNotes: yenIngTawangAnaLintang.melody
     },
     folklore: {
       title: "Legenda Alas Mentaok",

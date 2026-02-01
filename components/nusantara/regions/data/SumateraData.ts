@@ -1,5 +1,15 @@
 
 import { ProvinceData } from '../../ProvinceInterfaces';
+import { bungongJeumpa } from './lagu/sumatera/aceh-bungong_jeumpa.ts';
+import { alusiAu } from './lagu/sumatera/sumut-alusi_au.ts';
+import { ayamDenLapeh } from './lagu/sumatera/sumbar-ayam_den_lapeh.ts';
+import { soleram } from './lagu/sumatera/riau-soleram.ts';
+import { segantangLada } from './lagu/sumatera/kepri-segantang_lada.ts';
+import { yokMiak } from './lagu/sumatera/kepbabel-yok_miak.ts';
+import { injitInjitSemut } from './lagu/sumatera/jambi-injit_injit_semut.ts';
+import { gendingSriwijaya } from './lagu/sumatera/sumsel-gending_sriwijaya.ts';
+import { ikanPais } from './lagu/sumatera/bengkulu-ikan_pais.ts';
+import { pangLipangDang } from './lagu/sumatera/lampung-pang_lipang_dang.ts';
 
 export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
   "Daerah Istimewa Aceh": {
@@ -9,67 +19,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Bungong Jeumpa",
       description: "Pencipta lagu Bungong Jeumpa adalah Ibrahim Abduh. Arti Nama 'Bungong Jeumpa' berarti bunga cempaka, yang merupakan bunga kebanggaan sekaligus simbol keindahan bagi masyarakat Aceh.",
-      melodyNotes: [
-      // --- Bait 1: Bungong jeumpa, meugah di Aceh ---
-      { time: "0:0:0", note: "A4", duration: "8n" },
-      { time: "0:0:2", note: "A4", duration: "16n" },
-      { time: "0:0:3", note: "B4", duration: "16n" },
-      { time: "0:1:0", note: "A4", duration: "8n" },
-      { time: "0:1:2", note: "G#4", duration: "4n" },
-      { time: "0:2:2", note: "A4", duration: "8n" },
-      { time: "0:3:0", note: "A4", duration: "16n" },
-      { time: "0:3:1", note: "B4", duration: "16n" },
-      { time: "0:3:2", note: "A4", duration: "8n" },
-      { time: "1:0:0", note: "G#4", duration: "4n" },
-      { time: "1:1:0", note: "A4", duration: "16n" },
-      { time: "1:1:1", note: "B4", duration: "16n" },
-      { time: "1:1:2", note: "C5", duration: "8n" },
-      { time: "1:2:0", note: "B4", duration: "8n" },
-      { time: "1:2:2", note: "C5", duration: "4n" },
-
-      // --- Bait 2: Bungong teuleubeh, indah lagoina ---
-      { time: "1:3:2", note: "C5", duration: "8n" },
-      { time: "2:0:0", note: "C5", duration: "16n" },
-      { time: "2:0:1", note: "D5", duration: "16n" },
-      { time: "2:0:2", note: "C5", duration: "8n" },
-      { time: "2:1:0", note: "B4", duration: "4n" },
-      { time: "2:2:0", note: "C5", duration: "8n" },
-      { time: "2:2:2", note: "C5", duration: "8n" },
-      { time: "2:3:0", note: "D5", duration: "8n" },
-      { time: "2:3:2", note: "C5", duration: "8n" },
-      { time: "3:0:0", note: "B4", duration: "8n" },
-      { time: "3:0:2", note: "C5", duration: "8n" },
-      { time: "3:1:0", note: "B4", duration: "16n" },
-      { time: "3:1:1", note: "A4", duration: "16n" },
-      { time: "3:1:2", note: "G#4", duration: "8n" },
-      { time: "3:2:0", note: "A4", duration: "4n" },
-
-      // --- Refrain: Puteh kuning, meujampu mirah ---
-      { time: "3:3:0", note: "E5", duration: "4n" },
-      { time: "4:0:0", note: "E5", duration: "16n" },
-      { time: "4:0:1", note: "D5", duration: "16n" },
-      { time: "4:0:2", note: "C5", duration: "8n" },
-      { time: "4:1:0", note: "B4", duration: "4n" },
-      { time: "4:2:0", note: "D5", duration: "16n" },
-      { time: "4:2:1", note: "E5", duration: "16n" },
-      { time: "4:2:2", note: "C5", duration: "8n" },
-      { time: "4:3:0", note: "B4", duration: "8n" },
-      { time: "4:3:2", note: "A4", duration: "4n" },
-
-      // --- Refrain: Bungong si ulah, indah lagoina ---
-      { time: "5:0:2", note: "C5", duration: "8n" },
-      { time: "5:1:0", note: "C5", duration: "8n" },
-      { time: "5:1:2", note: "B4", duration: "16n" },
-      { time: "5:1:3", note: "A4", duration: "16n" },
-      { time: "5:2:0", note: "G#4", duration: "8n" },
-      { time: "5:2:2", note: "A4", duration: "16n" },
-      { time: "5:2:3", note: "B4", duration: "16n" },
-      { time: "5:3:0", note: "C5", duration: "4n" },
-      { time: "6:0:0", note: "B4", duration: "8n" },
-      { time: "6:0:2", note: "A4", duration: "8n" },
-      { time: "6:1:0", note: "G#4", duration: "8n" },
-      { time: "6:1:2", note: "A4", duration: "2n" }
-    ]
+      melodyNotes: bungongJeumpa.melody 
     },
     folklore: {
       title: "Kisah Si Parkit Raja Parakeet",
@@ -107,64 +57,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Alusi Au",
       description: "Lagu Alusi Au adalah lagu daerah dari Sumatera Utara yang diciptakan oleh komponis ternama Batak, Nahum Situmorang. Secara harfiah, judul lagu ini berarti 'Jawablah Aku' (alusi berarti jawab, au berarti aku). ",
-      melodyNotes: [
-      // --- INTRO (Bagian 1) ---
-      { time: "0:1:0", note: "G4", duration: "8n" },   // 5
-      { time: "0:1:2", note: "A4", duration: "16n" },  // 6
-      { time: "0:1:3", note: "G4", duration: "16n" },  // 5
-      { time: "0:2:0", note: "F4", duration: "16n" },  // 4
-      { time: "0:2:1", note: "G4", duration: "16n" },  // 5
-      { time: "1:0:0", note: "D5", duration: "1n" },   // 2' (Sustain sampai bar 2)
-      { time: "3:0:0", note: "C5", duration: "2n" },   // 1'
-      { time: "3:2:0", note: "E5", duration: "2n" },   // 3' (Intro 1 selesai di bar 4)
-
-      // --- INTRO (Bagian 2 - Pengulangan sesuai permintaan "Alusiau dua kali") ---
-      { time: "4:0:0", note: "G4", duration: "8n" },   // Digeser ke bar 4 agar tidak menimpa
-      { time: "4:0:2", note: "A4", duration: "16n" },
-      { time: "4:0:3", note: "G4", duration: "16n" },
-      { time: "4:1:0", note: "F4", duration: "16n" },
-      { time: "4:1:1", note: "G4", duration: "16n" },
-      { time: "5:0:0", note: "D5", duration: "1n" },   // Sustain sampai bar 6
-      { time: "7:0:0", note: "C5", duration: "2n" },
-      { time: "7:2:0", note: "E2", duration: "2n" },   // Intro 2 selesai di bar 8
-
-      // --- BAIT 1: "Maragam ragam do..." (Dimulai setelah Intro 2) ---
-      { time: "8:0:0", note: "G4", duration: "16n" },  // 5 5 5 (Anakrusis digeser ke bar 8)
-      { time: "8:0:1", note: "G4", duration: "16n" },
-      { time: "8:0:2", note: "G4", duration: "16n" },
-      { time: "8:1:0", note: "E4", duration: "8n" },   // 3
-      { time: "8:1:2", note: "G4", duration: "8n" },   // 5
-      { time: "8:2:0", note: "G4", duration: "8n" },   // 5
-      { time: "8:2:2", note: "G4", duration: "8n" },   // 5
-      { time: "8:3:0", note: "G4", duration: "8n" },   // 5
-      { time: "8:3:2", note: "G4", duration: "8n" },   // 5
-      { time: "9:0:0", note: "G4", duration: "8n" },   // 5
-      { time: "9:1:0", note: "G4", duration: "8n" },   // 5
-      { time: "9:2:0", note: "G4", duration: "8n" },   // 5
-      { time: "9:3:0", note: "F4", duration: "8n" },   // 4
-      { time: "10:0:0", note: "A4", duration: "4n" },  // 6
-      { time: "10:1:0", note: "G4", duration: "2n" },  // 5
-
-      // --- LANJUTAN / BRIDGE ("Tung ho long ni ro ham") ---
-      { time: "12:2:0", note: "E5", duration: "16n" }, // Nada 3' 3' 3' 3'
-      { time: "12:2:1", note: "E5", duration: "16n" },
-      { time: "12:2:2", note: "E5", duration: "16n" },
-      { time: "12:2:3", note: "E5", duration: "16n" },
-      { time: "13:0:0", note: "E5", duration: "2n" },  // 3'
-      { time: "13:2:0", note: "D5", duration: "16n" }, // 2' 3' 2'
-      { time: "13:2:1", note: "E5", duration: "16n" },
-      { time: "13:2:2", note: "D5", duration: "16n" },
-      { time: "13:3:0", note: "C5", duration: "4n" },  // 1'
-      { time: "14:0:0", note: "C5", duration: "8n" },  // 1'
-      { time: "14:0:2", note: "B4", duration: "8n" },  // 7
-      { time: "14:1:0", note: "B4", duration: "8n" },  // 7
-      { time: "14:1:2", note: "A4", duration: "8n" },  // 6
-      { time: "14:2:0", note: "G4", duration: "8n" },  // 5
-      { time: "14:2:2", note: "F4", duration: "8n" },  // 4
-      { time: "14:3:0", note: "E4", duration: "8n" },  // 3
-      { time: "14:3:2", note: "F4", duration: "8n" },  // 4
-      { time: "15:0:0", note: "G4", duration: "1n" },  // 5 (Sustain penutup bridge)
-    ]
+      melodyNotes: alusiAu.melody 
     },
     folklore: {
       title: "Legenda Danau Toba",
@@ -197,67 +90,8 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     headerLongDescription: "Rendang sapi memiliki rasa gurih yang dalam dan kompleks, berpadu antara santan kental, rempah-rempah hangat, serta sentuhan pedas yang meresap hingga ke serat daging. Dagingnya empuk, kaya aroma serai, lengkuas, dan daun jeruk, dengan lapisan rasa yang semakin kuat di setiap kunyahan. Hidangan khas Minangkabau ini bukan sekadar makanan, melainkan pengalaman rasa yang memanjakan lidah dan meninggalkan kesan tak terlupakan.",
     regionalSong: {
       title: "Ayam Den Lapeh",
-      description: "Ayam Den Lapeh adalah lagu ciptaan Nuskan Syarif. Judulnya berarti “ayam saya lepas” yang melambangkan kehilangan sesuatu yang sangat berharga. Lagu ini menceritakan kesedihan dan penyesalan akibat kehilangan orang yang dicintai atau kegagalan dalam cinta.",
-      melodyNotes: [
-      // --- Bait 1: Luruilah jalan (1 2 3 3 1) ---
-      { time: "0:0:0", note: "D4", duration: "8n" },
-      { time: "0:0:2", note: "E4", duration: "8n" },
-      { time: "0:1:0", note: "F#4", duration: "8n" },
-      { time: "0:1:2", note: "F#4", duration: "8n" },
-      { time: "0:2:0", note: "D4", duration: "4n" },
-
-      // --- Payakumbua babelok jalan (2 3 2 1 2 7 1) ---
-      { time: "1:0:0", note: "E4", duration: "8n" },
-      { time: "1:0:2", note: "F#4", duration: "8n" },
-      { time: "1:1:0", note: "E4", duration: "8n" },
-      { time: "1:1:2", note: "D4", duration: "8n" },
-      { time: "1:2:0", note: "E4", duration: "8n" },
-      { time: "1:2:2", note: "C#4", duration: "8n" },
-      { time: "1:3:0", note: "D4", duration: "4n" },
-
-      // --- Kayu jati (1 2 1 7 1) ---
-      { time: "2:0:0", note: "D4", duration: "8n" },
-      { time: "2:0:2", note: "E4", duration: "8n" },
-      { time: "2:1:0", note: "D4", duration: "8n" },
-      { time: "2:1:2", note: "C#4", duration: "8n" },
-      { time: "2:2:0", note: "D4", duration: "4n" },
-
-      // --- Di maati indak karusuah (6 7 1 2 1 7 1 6) ---
-      { time: "3:0:0", note: "B3", duration: "8n" },
-      { time: "3:0:2", note: "C#4", duration: "8n" },
-      { time: "3:1:0", note: "D4", duration: "8n" },
-      { time: "3:1:2", note: "E4", duration: "8n" },
-      { time: "3:2:0", note: "D4", duration: "8n" },
-      { time: "3:2:2", note: "C#4", duration: "8n" },
-      { time: "3:3:0", note: "D4", duration: "8n" },
-      { time: "3:3:2", note: "B3", duration: "8n" },
-
-      // --- Ayam den lapeh (Bagian 1: 6 2 1 7 6) ---
-      { time: "4:0:0", note: "B3", duration: "8n" },
-      { time: "4:0:2", note: "E4", duration: "8n" },
-      { time: "4:1:0", note: "D4", duration: "8n" },
-      { time: "4:1:2", note: "C#4", duration: "8n" },
-      { time: "4:2:0", note: "B3", duration: "4n" },
-
-      // --- Ai ai (Bagian 1: 7 2 7 1) ---
-      { time: "5:0:0", note: "C#4", duration: "8n" },
-      { time: "5:0:2", note: "E4", duration: "8n" },
-      { time: "5:1:0", note: "C#4", duration: "8n" },
-      { time: "5:1:2", note: "D4", duration: "4n" },
-
-      // --- Ayam den lapeh (Bagian 2: Pengulangan diatur ke Bar 6) ---
-      { time: "6:0:0", note: "B3", duration: "8n" },
-      { time: "6:0:2", note: "E4", duration: "8n" },
-      { time: "6:1:0", note: "D4", duration: "8n" },
-      { time: "6:1:2", note: "C#4", duration: "8n" },
-      { time: "6:2:0", note: "B3", duration: "4n" },
-
-      // --- Ai ai (Bagian 2: Pengulangan diatur ke Bar 7) ---
-      { time: "7:0:0", note: "C#4", duration: "8n" },
-      { time: "7:0:2", note: "E4", duration: "8n" },
-      { time: "7:1:0", note: "C#4", duration: "8n" },
-      { time: "7:1:2", note: "D4", duration: "4n" },
-    ]
+      description: "Ayam Den Lapeh adalah lagu ciptaan Nuskan Syarif. Judulnya berarti 'ayam saya lepas' yang melambangkan kehilangan sesuatu yang sangat berharga. Lagu ini menceritakan kesedihan dan penyesalan akibat kehilangan orang yang dicintai atau kegagalan dalam cinta.",
+      melodyNotes: ayamDenLapeh.melody
     },
     folklore: {
       title: "Legenda Malin Kundang",
@@ -286,87 +120,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Soleram",
       description: "Soleram adalah lagu daerah dari Provinsi Riau yang berasal dari tradisi Melayu, dengan pencipta yang tidak diketahui karena diwariskan secara turun-temurun. Judul Soleram merupakan ungkapan lembut khas Melayu yang digunakan sebagai pengantar nasihat. Lagu ini menceritakan pesan moral tentang kasih sayang, sopan santun, dan budi pekerti yang diajarkan orang tua kepada anak.",
-      melodyNotes: [
-      // --- Bait 1: Soleram so le ram (Bar 0-2) ---
-      { time: "0:0:0", note: "C4", duration: "4n" },   // 1
-      { time: "0:1:0", note: "D4", duration: "4n" },   // 2
-      { time: "0:2:0", note: "E4", duration: "4n" },   // 3
-      { time: "0:3:0", note: "E4", duration: "4n" },   // 3
-      { time: "1:0:0", note: "F4", duration: "4n" },   // 4
-      { time: "1:1:0", note: "G4", duration: "4n" },   // 5
-      { time: "1:2:0", note: "F4", duration: "4n" },   // 4
-      { time: "1:3:0", note: "E4", duration: "4n" },   // 3
-      { time: "2:0:0", note: "D4", duration: "2n" },   // 2 (Sustain sampai Bar 3)
-
-      // --- Bait 2: Soleram anak yang manis (Bar 3-4) ---
-      { time: "3:0:0", note: "E4", duration: "4n" },   // 3
-      { time: "3:1:0", note: "F4", duration: "4n" },   // 4
-      { time: "3:2:0", note: "G4", duration: "4n" },   // 5
-      { time: "3:3:0", note: "G4", duration: "4n" },   // 5
-      { time: "4:0:0", note: "A4", duration: "8n" },   // 6
-      { time: "4:0:2", note: "G4", duration: "8n" },   // 5
-      { time: "4:1:0", note: "F4", duration: "4n" },   // 4
-      { time: "4:2:0", note: "A4", duration: "4n" },   // 6
-      { time: "4:3:0", note: "G4", duration: "4n" },   // 5
-
-      // --- Refrain 1: Anak manis janganlah dicium (Bar 5-7) ---
-      { time: "5:0:0", note: "G4", duration: "8n" },   // 5
-      { time: "5:0:2", note: "A4", duration: "8n" },   // 6
-      { time: "5:1:0", note: "B4", duration: "4n" },   // 7
-      { time: "5:2:0", note: "C5", duration: "4n" },   // 1'
-      { time: "5:3:0", note: "G4", duration: "4n" },   // 5
-      { time: "6:0:0", note: "A4", duration: "4n" },   // 6
-      { time: "6:1:0", note: "G4", duration: "4n" },   // 5
-      { time: "6:2:0", note: "F4", duration: "8n" },   // 4
-      { time: "6:2:2", note: "A4", duration: "8n" },   // 6
-      { time: "6:3:0", note: "G4", duration: "8n" },   // 5
-      { time: "6:3:2", note: "F4", duration: "8n" },   // 4
-      { time: "7:0:0", note: "E4", duration: "4n" },   // 3
-      { time: "7:1:0", note: "D4", duration: "4n" },   // 2
-      { time: "7:2:0", note: "C4", duration: "2n" },   // 1 (Sustain sampai Bar 8)
-
-      // --- Refrain 1: Kalau dicium merahlah pipinya (Bar 8-10) ---
-      { time: "8:0:0", note: "G4", duration: "4n" },   // 5
-      { time: "8:1:0", note: "G4", duration: "4n" },   // 5
-      { time: "8:2:0", note: "G4", duration: "4n" },   // 5
-      { time: "8:3:0", note: "A4", duration: "4n" },   // 6
-      { time: "9:0:0", note: "F4", duration: "4n" },   // 4
-      { time: "9:1:0", note: "D4", duration: "4n" },   // 2
-      { time: "9:2:0", note: "B3", duration: "4n" },   // 7 rendah
-      { time: "9:3:0", note: "C4", duration: "4n" },   // 1
-      { time: "10:0:0", note: "E4", duration: "4n" },  // 3
-      { time: "10:1:0", note: "D4", duration: "4n" },  // 2
-      { time: "10:2:0", note: "C4", duration: "2n" },  // 1 (Sustain sampai Bar 11)
-
-      // --- PENGULANGAN (Refrain 2 - Dimulai dari Bar 11) ---
-      { time: "11:0:0", note: "G4", duration: "8n" },
-      { time: "11:0:2", note: "A4", duration: "8n" },
-      { time: "11:1:0", note: "B4", duration: "4n" },
-      { time: "11:2:0", note: "C5", duration: "4n" },
-      { time: "11:3:0", note: "G4", duration: "4n" },
-      { time: "12:0:0", note: "A4", duration: "4n" },
-      { time: "12:1:0", note: "G4", duration: "4n" },
-      { time: "12:2:0", note: "F4", duration: "8n" },
-      { time: "12:2:2", note: "A4", duration: "8n" },
-      { time: "12:3:0", note: "G4", duration: "8n" },
-      { time: "12:3:2", note: "F4", duration: "8n" },
-      { time: "13:0:0", note: "E4", duration: "4n" },
-      { time: "13:1:0", note: "D4", duration: "4n" },
-      { time: "13:2:0", note: "C4", duration: "2n" },
-
-      // --- Pengulangan Penutup: Kalau dicium (Bar 14-16) ---
-      { time: "14:0:0", note: "G4", duration: "4n" },
-      { time: "14:1:0", note: "G4", duration: "4n" },
-      { time: "14:2:0", note: "G4", duration: "4n" },
-      { time: "14:3:0", note: "A4", duration: "4n" },
-      { time: "15:0:0", note: "F4", duration: "4n" },
-      { time: "15:1:0", note: "D4", duration: "4n" },
-      { time: "15:2:0", note: "B3", duration: "4n" },
-      { time: "15:3:0", note: "C4", duration: "4n" },
-      { time: "16:0:0", note: "E4", duration: "4n" },
-      { time: "16:1:0", note: "D4", duration: "4n" },
-      { time: "16:2:0", note: "C4", duration: "2n" },
-    ]
+      melodyNotes: soleram.melody
     },
     folklore: {
       title: "Legenda Putri Tujuh",
@@ -396,56 +150,9 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     headerDescription: "Gonggong",
     headerLongDescription: "Gonggong khas Kepulauan Riau memiliki rasa gurih alami laut yang segar, dengan daging siput yang kenyal namun lembut saat dikunyah. Disajikan sederhana dengan cara direbus, cita rasa aslinya semakin menonjol ketika dicocol sambal pedas atau saus khas. Hidangan laut ikonik ini menggugah selera sebagai sajian autentik yang sederhana, segar, dan penuh kelezatan pesisir.",
     regionalSong: {
-      title: "Pulau Bintan",
-      description: "Lagu Pulau Bintan merupakan karya musik Melayu klasik dari Kepulauan Riau yang sering dikaitkan dengan gubahan seniman lokal legendaris seperti H. Raja Hamzah. Judul lagu ini merujuk pada identitas geografis Pulau Bintan yang dikenal sebagai jantung sejarah kesultanan Melayu dan simbol kebanggaan wilayah tersebut. Secara mendalam, liriknya bermakna sebagai ungkapan kekaguman terhadap bentang alam laut biru dan gunung yang tinggi, sekaligus menyampaikan rasa rindu yang pilu serta penghormatan bagi para pahlawan Melayu yang bersemayam di sana.",
-      melodyNotes: [
-      { time: "0:0:0", note: "A4", duration: "4n" },   // Pu-
-      { time: "0:1:0", note: "C5", duration: "4n" },   // lau
-      { time: "0:2:0", note: "E5", duration: "4n" },   // Bin-tan
-      { time: "0:3:0", note: "G4", duration: "8n" },   // a-
-      { time: "0:3:2", note: "E4", duration: "8n" },   // la
-      { time: "1:0:0", note: "G4", duration: "4n" },   // sa-
-      { time: "1:1:0", note: "B4", duration: "4n" },   // yang
-      { time: "1:2:0", note: "A4", duration: "4n" },   // laut-
-      { time: "1:3:0", note: "B4", duration: "8n" },   // nya
-      { time: "1:3:2", note: "C5", duration: "8n" },   // bi-
-      { time: "2:0:0", note: "A4", duration: "2n" },   // ru... (alahai adik)
-
-      // --- Bait 1: Pulau Penyengat ala sayang luas membentang (Dm - Am - Em) ---
-      { time: "3:0:0", note: "D5", duration: "4n" },   // Pu-
-      { time: "3:1:0", note: "F5", duration: "4n" },   // lau
-      { time: "3:2:0", note: "A5", duration: "4n" },   // Pe-nye-ngat
-      { time: "3:3:0", note: "C5", duration: "8n" },   // a-
-      { time: "3:3:2", note: "A4", duration: "8n" },   // la
-      { time: "4:0:0", note: "C5", duration: "4n" },   // sa-
-      { time: "4:1:0", note: "E5", duration: "4n" },   // yang
-      { time: "4:2:0", note: "B4", duration: "4n" },   // lu-
-      { time: "4:3:0", note: "G4", duration: "8n" },   // as
-      { time: "4:3:2", note: "E4", duration: "8n" },   // mem-
-      { time: "5:0:0", note: "E4", duration: "2n" },   // ben-tang
-
-      // --- Refrain: Hiu-hiu dilautan biru (C - Am) ---
-      { time: "6:0:0", note: "C5", duration: "8n" },   // Hi-
-      { time: "6:0:2", note: "C5", duration: "8n" },   // u-
-      { time: "6:1:0", note: "C5", duration: "8n" },   // hi-
-      { time: "6:1:2", note: "C5", duration: "8n" },   // u
-      { time: "6:2:0", note: "B4", duration: "8n" },   // di-
-      { time: "6:2:2", note: "A4", duration: "8n" },   // lau-
-      { time: "6:3:0", note: "G4", duration: "4n" },   // tan
-      { time: "7:0:0", note: "C5", duration: "8n" },   // bi-
-      { time: "7:0:2", note: "C5", duration: "8n" },   // ru
-      { time: "7:1:0", note: "B4", duration: "4n" },   // a-
-      { time: "7:2:0", note: "A4", duration: "2n" },   // la sayang
-
-      // --- Refrain: Hatiku rindu apakah obatnya (Dm - Em - Am) ---
-      { time: "8:0:0", note: "D5", duration: "8n" },   // Ha-
-      { time: "8:0:2", note: "D5", duration: "8n" },   // ti-
-      { time: "8:1:0", note: "D5", duration: "4n" },   // ku
-      { time: "8:2:0", note: "C5", duration: "8n" },   // rin-
-      { time: "8:2:2", note: "B4", duration: "8n" },   // du
-      { time: "8:3:0", note: "G4", duration: "4n" },   // a-
-      { time: "9:0:0", note: "A4", duration: "2n" },   // pa obatnya
-    ]
+      title: "Segantang Lada",
+      description: "Segantang Lada merupakan lagu daerah kebanggaan Provinsi Kepulauan Riau yang judulnya diambil dari julukan resmi provinsi tersebut karena kondisi geografisnya yang unik. Secara linguistik, nama ini bermakna 'satu gantang lada', gantang adalah alat ukur takaran tradisional, sebuah metafora visual puitis yang menggambarkan ribuan pulau kecil di Kepri yang tersebar di lautan luas layaknya butiran lada. Lirik lagu ini mengandung makna kekaguman terhadap keindahan alam bahari serta melambangkan persatuan dan kerukunan masyarakat Melayu yang tetap harmonis meskipun hidup terpisah di antara ribuan pulau.",
+      melodyNotes: segantangLada.melody
     },
     folklore: {
       title: "Kisah Jenang Perkasa",
@@ -478,51 +185,9 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     headerDescription: "Kericu",
     headerLongDescription: "Kericu khas Kepulauan Bangka Belitung memiliki rasa gurih laut yang khas dari telur cumi, berpadu dengan aroma bumbu sederhana yang menggoda selera. Teksturnya renyah dan ringan saat digigit, menghadirkan sensasi kriuk yang memuaskan di setiap suapan. Camilan tradisional ini menggugah selera sebagai oleh-oleh favorit yang lezat, bergizi, dan sarat cita rasa pesisir.",
     regionalSong: {
-      title: "Nyok Miak",
-      description: "Lagu daerah yang paling terkenal dari Provinsi Kepulauan Bangka Belitung adalah “Nyok Miak” atau “Yok Miak”. Lagu ini menjadi simbol budaya dan tradisi masyarakat saat bekerja bersama di ladang. Sebagai lagu rakyat, penciptanya tidak diketahui dan diwariskan secara turun-temurun.",
-      melodyNotes: [
-      // --- Bait 1: Yok miak kite tegi (Bar 0-1) ---
-      { time: "0:0:0", note: "A3", duration: "4n" },   // Yok (6 rendah)
-      { time: "0:1:0", note: "B3", duration: "8n" },   // mi-
-      { time: "0:1:2", note: "C4", duration: "8n" },   // ak
-      { time: "0:2:0", note: "D4", duration: "8n" },   // ki-
-      { time: "0:2:2", note: "B3", duration: "8n" },   // te
-      { time: "0:3:0", note: "C4", duration: "4n" },   // te-
-      { time: "1:0:0", note: "A3", duration: "4n" },   // gi
-
-      // --- Bait 1: ke kebun ke hume (Bar 1-2) ---
-      { time: "1:1:0", note: "B3", duration: "8n" },   // ke
-      { time: "1:1:2", note: "C4", duration: "16n" },  // ke-
-      { time: "1:1:3", note: "B3", duration: "16n" },  // bun
-      { time: "1:2:0", note: "C4", duration: "8n" },   // ke
-      { time: "1:2:2", note: "D4", duration: "8n" },   // hu-
-      { time: "1:3:0", note: "E4", duration: "2n" },   // me (3)
-
-      // --- Bait 1: Mawak suyak mikol pacul (Bar 3-5) ---
-      { time: "3:0:0", note: "A4", duration: "4n" },   // Ma- (6)
-      { time: "3:1:0", note: "G4", duration: "8n" },   // wak
-      { time: "3:1:2", note: "F4", duration: "16n" },  // su-
-      { time: "3:1:3", note: "E4", duration: "16n" },  // yak
-      { time: "3:2:0", note: "D4", duration: "2n" },   // mi...
-      { time: "4:2:0", note: "G#4", duration: "8n" },  // kol (triplet 5#)
-      { time: "4:2:2", note: "A4", duration: "8n" },   // (6)
-      { time: "4:3:0", note: "G#4", duration: "8n" },  // (5#)
-      { time: "5:0:0", note: "F4", duration: "8n" },   // pa-
-      { time: "5:0:2", note: "E4", duration: "8n" },   // cul
-      { time: "5:1:0", note: "D4", duration: "4n" },   // (hold)
-
-      // --- Refrain: Kite begawe bersama-sama (Bar 6-7) ---
-      { time: "6:0:0", note: "F4", duration: "8n" },   // Ki-
-      { time: "6:0:2", note: "E4", duration: "8n" },   // te
-      { time: "6:1:0", note: "D4", duration: "8n" },   // be-
-      { time: "6:1:2", note: "C4", duration: "8n" },   // ga-
-      { time: "6:2:0", note: "B3", duration: "8n" },   // we
-      { time: "6:2:2", note: "B3", duration: "8n" },   // sa-
-      { time: "6:3:0", note: "B3", duration: "8n" },   // me
-      { time: "6:3:2", note: "C4", duration: "8n" },   // sa-
-      { time: "7:0:0", note: "D4", duration: "8n" },   // me
-      { time: "7:0:2", note: "A3", duration: "2n" },   // (hold)
-    ]
+      title: "Yok Miak",
+      description: "Lagu daerah yang paling terkenal dari Provinsi Kepulauan Bangka Belitung adalah 'Yok Miak'. Lagu ini menjadi simbol budaya dan tradisi masyarakat saat bekerja bersama di ladang. Sebagai lagu rakyat, penciptanya tidak diketahui dan diwariskan secara turun-temurun.",
+      melodyNotes: yokMiak.melody
     },
     folklore: {
       title: "Kisah Legenda Pohon Pelawan",
@@ -554,69 +219,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Injit-Injit Semut",
       description: "Injit-Injit Semut adalah lagu daerah khas Provinsi Jambi; judulnya berarti “menginjak semut” yang menjadi simbol peringatan akan akibat dari perbuatan menyakiti orang lain. Makna lagu ini menyampaikan pesan moral tentang keadilan, sebab setiap perbuatan buruk akan mendapat balasan. Lagu ini merupakan lagu rakyat Melayu, sehingga penciptanya tidak diketahui dan diwariskan secara turun-temurun.",
-      melodyNotes: [
-      // --- Bait 1: Jalan-jalan ke tanah Deli ---
-      { time: "0:1:0", note: "D4", duration: "8n" },
-      { time: "0:1:2", note: "D4", duration: "8n" },
-      { time: "1:0:0", note: "D4", duration: "4n" },
-      { time: "1:1:0", note: "C#5", duration: "4n" },
-      { time: "1:3:0", note: "D4", duration: "4n" },
-      { time: "2:0:0", note: "C#5", duration: "4n" },
-      { time: "2:2:0", note: "C#5", duration: "4n" },
-      { time: "2:3:0", note: "B4", duration: "8n" },
-      { time: "2:3:2", note: "A4", duration: "8n" },
-
-      // --- Bait 1: Sungguh indah si puta-masu ---
-      { time: "3:1:0", note: "B4", duration: "8n" },
-      { time: "3:1:2", note: "B4", duration: "8n" },
-      { time: "4:0:0", note: "B4", duration: "8n" },
-      { time: "4:0:2", note: "B4", duration: "8n" },
-      { time: "4:1:0", note: "B4", duration: "8n" },
-      { time: "4:1:2", note: "B4", duration: "8n" },
-      { time: "4:2:0", note: "A4", duration: "8n" },
-      { time: "4:2:2", note: "G4", duration: "8n" },
-      { time: "4:3:0", note: "A4", duration: "4n" },
-
-      // --- Bait 1: Naik perahu ke pulau Sribu ---
-      { time: "5:0:0", note: "A4", duration: "4n" },
-      { time: "5:3:0", note: "A4", duration: "4n" },
-      { time: "6:0:0", note: "E4", duration: "8n" },
-      { time: "6:0:2", note: "E4", duration: "8n" },
-      { time: "6:1:0", note: "E4", duration: "8n" },
-      { time: "6:1:2", note: "E4", duration: "8n" },
-      { time: "6:2:2", note: "E4", duration: "8n" },
-      { time: "6:3:0", note: "F#4", duration: "8n" },
-      { time: "6:3:2", note: "G4", duration: "8n" },
-
-      // --- Bait 1: Sungguh malang nasibuku ---
-      { time: "7:1:0", note: "C#5", duration: "8n" },
-      { time: "7:1:2", note: "C#5", duration: "8n" },
-      { time: "8:0:0", note: "C#5", duration: "8n" },
-      { time: "8:0:2", note: "C#5", duration: "8n" },
-      { time: "8:1:0", note: "C#5", duration: "8n" },
-      { time: "8:1:2", note: "D4", duration: "8n" },
-      { time: "8:2:0", note: "C#5", duration: "8n" },
-      { time: "8:3:0", note: "B4", duration: "8n" },
-      { time: "8:3:2", note: "A4", duration: "8n" },
-
-      // --- Reff: Injit-injit semut siapa sakit (Contoh Pengulangan) ---
-      { time: "28:0:0", note: "D4", duration: "8n" },
-      { time: "28:0:2", note: "D4", duration: "8n" },
-      { time: "28:1:0", note: "D4", duration: "8n" },
-      { time: "28:1:2", note: "D4", duration: "8n" },
-      { time: "28:2:2", note: "C#5", duration: "8n" },
-      { time: "28:3:0", note: "D4", duration: "8n" },
-      { time: "28:3:2", note: "C#5", duration: "8n" },
-
-      // --- Penutup: Jangan dilepas ---
-      { time: "30:0:0", note: "B4", duration: "8n" },
-      { time: "30:0:2", note: "B4", duration: "8n" },
-      { time: "30:1:0", note: "B4", duration: "8n" },
-      { time: "30:1:2", note: "B4", duration: "8n" },
-      { time: "30:2:0", note: "A4", duration: "8n" },
-      { time: "30:2:2", note: "G4", duration: "8n" },
-      { time: "30:3:0", note: "A4", duration: "4n" }
-    ]
+      melodyNotes: injitInjitSemut.melody
     },
     folklore: {
       title: "Legenda Angso Duo",
@@ -647,48 +250,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Gending Sriwijaya",
       description: "Gending Sriwijaya merupakan lagu daerah Sumatera Selatan dengan lirik karya Mahdi Yazid dan musik ciptaan Arraniry. Secara linguistik, gending berarti nyanyian atau iringan, sedangkan Sriwijaya merujuk pada kerajaan besar yang pernah berjaya di wilayah tersebut. Makna lagu ini menggambarkan kejayaan, kemegahan, dan kebesaran Kerajaan Sriwijaya sebagai simbol kebanggaan budaya Palembang.",
-      melodyNotes: [
-      // --- Intro (G) ---
-      { time: "0:0:0", note: "G4", duration: "2n" },
-      { time: "0:2:0", note: "B4", duration: "4n" },
-      { time: "0:3:0", note: "D5", duration: "4n" },
-
-      // --- Bait 1: Di kala ku merindukan (C - D - Em) ---
-      { time: "1:0:0", note: "E5", duration: "8n" },   // Di
-      { time: "1:0:2", note: "E5", duration: "8n" },   // ka-
-      { time: "1:1:0", note: "D5", duration: "4n" },   // la
-      { time: "1:2:0", note: "B4", duration: "8n" },   // ku
-      { time: "1:2:2", note: "C5", duration: "8n" },   // me-
-      { time: "1:3:0", note: "D5", duration: "4n" },   // rin-
-      { time: "2:0:0", note: "G4", duration: "4n" },   // du-
-      { time: "2:1:0", note: "A4", duration: "4n" },   // kan (D)
-      { time: "2:2:0", note: "B4", duration: "2n" },   // (Em)
-
-      // --- Bait 1: Keluhuran dahulu kala (D - Am) ---
-      { time: "3:0:0", note: "A4", duration: "8n" },   // ke-
-      { time: "3:0:2", note: "B4", duration: "8n" },   // lu-
-      { time: "3:1:0", note: "C5", duration: "4n" },   // hu-
-      { time: "3:2:0", note: "E4", duration: "4n" },   // ran
-      { time: "3:3:0", note: "A4", duration: "4n" },   // da-
-      { time: "4:0:0", note: "G4", duration: "4n" },   // hu-
-      { time: "4:1:0", note: "F#4", duration: "4n" },  // lu
-      { time: "4:2:0", note: "E4", duration: "2n" },   // ka-la
-
-      // --- Bait 1: Kutembangkan nyanyian lagu (C - G) ---
-      { time: "5:0:0", note: "C5", duration: "4n" },   // Ku-
-      { time: "5:1:0", note: "B4", duration: "4n" },   // tem-
-      { time: "5:2:0", note: "A4", duration: "8n" },   // bang-
-      { time: "5:2:2", note: "G4", duration: "8n" },   // kan
-      { time: "5:3:0", note: "B4", duration: "4n" },   // nya-
-      { time: "6:0:0", note: "D4", duration: "2n" },   // nyi-an
-
-      // --- Bait 1: Gending Sriwijaya (Em - C - G) ---
-      { time: "7:0:0", note: "G4", duration: "4n" },   // Gen-
-      { time: "7:1:0", note: "E4", duration: "4n" },   // ding
-      { time: "7:2:0", note: "C4", duration: "4n" },   // Sri-
-      { time: "7:3:0", note: "D4", duration: "4n" },   // wi-
-      { time: "8:0:0", note: "G3", duration: "1n" },   // ja-ya
-    ]
+      melodyNotes: gendingSriwijaya.melody
     },
     folklore: {
       title: "Legenda Pulau Kemaro",
@@ -726,47 +288,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Ikan Pais",
       description: "Lagu Ikan Pais merupakan lagu daerah legendaris dari Bengkulu yang diciptakan oleh seniman lokal bernama H. Syamlan. Judul lagu ini secara harfiah merujuk pada hidangan tradisional 'Pepes Ikan', yakni kuliner berbumbu rempah dan kelapa yang dibungkus rapi dengan daun talas sebelum dikukus. Secara mendalam, liriknya bermakna sebagai ungkapan kegembiraan serta kenikmatan menyantap kuliner khas tersebut bersama keluarga, sekaligus menjadi simbol kebanggaan terhadap identitas budaya kuliner masyarakat setempat.",
-      melodyNotes: [
-      { time: "0:0:0", note: "G4", duration: "4n" },   // I-
-      { time: "0:1:0", note: "B4", duration: "4n" },   // kan
-      { time: "0:2:0", note: "B4", duration: "8n" },   // pa-
-      { time: "0:2:2", note: "G4", duration: "8n" },   // is
-      { time: "1:0:0", note: "B4", duration: "8n" },   // ke-
-      { time: "1:0:2", note: "D5", duration: "8n" },   // la-
-      { time: "1:1:0", note: "C5", duration: "8n" },   // po-
-      { time: "1:1:2", note: "B4", duration: "8n" },   // nyo
-      { time: "1:2:0", note: "A4", duration: "4n" },   // mu-
-      { time: "1:3:0", note: "G4", duration: "4n" },   // do
-
-      // --- Bait 1: dibungkus daun talas rapih-rapih (D) ---
-      { time: "2:0:0", note: "F#4", duration: "8n" },  // di-
-      { time: "2:0:2", note: "A4", duration: "8n" },   // bung-
-      { time: "2:1:0", note: "A4", duration: "4n" },   // kus
-      { time: "2:2:0", note: "A4", duration: "8n" },   // da-
-      { time: "2:2:2", note: "B4", duration: "8n" },   // un
-      { time: "2:3:0", note: "C5", duration: "4n" },   // ta-
-      { time: "3:0:0", note: "B4", duration: "8n" },   // las
-      { time: "3:1:0", note: "A4", duration: "8n" },   // ra-
-      { time: "3:1:2", note: "F#4", duration: "8n" },  // pih
-      { time: "3:2:0", note: "A4", duration: "2n" },   // rapih
-
-      // --- Reff: Rasonyo oii lemak nian (C - D - G) ---
-      { time: "5:0:0", note: "C5", duration: "4n" },   // Ra-
-      { time: "5:1:0", note: "E5", duration: "4n" },   // so-
-      { time: "5:2:0", note: "D5", duration: "4n" },   // nyo
-      { time: "5:3:0", note: "C5", duration: "4n" },   // oii
-      { time: "6:0:0", note: "B4", duration: "4n" },   // le-
-      { time: "6:1:0", note: "A4", duration: "4n" },   // mak
-      { time: "6:2:0", note: "G4", duration: "2n" },   // ni-an
-
-      // --- Reff: makan sebungkus samo samo (G - Em) ---
-      { time: "7:0:0", note: "G4", duration: "8n" },   // ma-
-      { time: "7:0:2", note: "B4", duration: "8n" },   // kan
-      { time: "7:1:0", note: "D5", duration: "4n" },   // se-
-      { time: "7:2:0", note: "B4", duration: "8n" },   // bung-
-      { time: "7:2:2", note: "G4", duration: "8n" },   // kus
-      { time: "7:3:0", note: "E4", duration: "2n" },   // sa-mo sa-mo
-    ]
+      melodyNotes: ikanPais.melody
     },
     folklore: {
       title: "Legenda Putri Gading Cempaka",
@@ -804,52 +326,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     regionalSong: {
       title: "Lipang Lipang Dang",
       description: "Lagu ini merupakan lagu hiburan yang menggunakan judul berupa onomatope keceriaan untuk menggambarkan suasana hati yang riang. Liriknya berisi nasihat jenaka yang dikemas dalam bentuk pantun untuk mengingatkan para pemuda agar lebih berhati-hati dalam urusan asmara. Secara keseluruhan, lagu ini berpesan agar seseorang tidak mudah terbuai oleh janji manis atau penampilan luar semata agar tidak mengalami kekecewaan di kemudian hari.",
-      melodyNotes: [
-      // --- Intro (C - G - C - G) ---
-      { time: "0:0:0", note: "C4", duration: "8n" },
-      { time: "0:0:2", note: "E4", duration: "8n" },
-      { time: "0:1:0", note: "G4", duration: "8n" },
-      { time: "0:1:2", note: "E4", duration: "8n" },
-      { time: "0:2:0", note: "D4", duration: "4n" },
-      { time: "0:3:0", note: "G3", duration: "4n" },
-
-      // --- Bait: Pang lipang dang pang lipang dang (Bar 1-2) ---
-      { time: "1:0:0", note: "C4", duration: "8n" },   // Pang
-      { time: "1:0:2", note: "C4", duration: "8n" },   // li-
-      { time: "1:1:0", note: "C4", duration: "4n" },   // pang dang
-      { time: "1:2:0", note: "C4", duration: "8n" },   // pang
-      { time: "1:2:2", note: "C4", duration: "8n" },   // li-
-      { time: "1:3:0", note: "C4", duration: "8n" },   // pang dang
-      { time: "1:3:2", note: "D4", duration: "8n" },   // ki
-
-      // --- Bait: ki lidang sakik lipang jak kundang (Bar 2-4) ---
-      { time: "2:0:0", note: "E4", duration: "4n" },   // li-
-      { time: "2:1:0", note: "D4", duration: "4n" },   // dang
-      { time: "2:2:0", note: "B3", duration: "8n" },   // sa-
-      { time: "2:2:2", note: "D4", duration: "8n" },   // kik
-      { time: "2:3:0", note: "D4", duration: "4n" },   // li-pang
-      { time: "3:0:0", note: "D4", duration: "8n" },   // jak
-      { time: "3:1:0", note: "B3", duration: "8n" },   // kun-
-      { time: "3:2:0", note: "C4", duration: "2n" },   // dang
-
-      // --- Chorus: Api penggali lawas (Bar 5-6) ---
-      { time: "5:0:0", note: "E4", duration: "4n" },   // A-
-      { time: "5:1:0", note: "G4", duration: "4n" },   // pi
-      { time: "5:2:0", note: "F4", duration: "8n" },   // peng-
-      { time: "5:2:2", note: "E4", duration: "8n" },   // ga-
-      { time: "5:3:0", note: "D4", duration: "4n" },   // li
-      { time: "6:0:0", note: "F4", duration: "4n" },   // la-
-      { time: "6:1:0", note: "E4", duration: "4n" },   // was
-
-      // --- Chorus: Mekhanai awas awas (Bar 7-8) ---
-      { time: "7:0:0", note: "D4", duration: "8n" },   // Me-
-      { time: "7:0:2", note: "D4", duration: "8n" },   // kha-
-      { time: "7:1:0", note: "D4", duration: "4n" },   // nai
-      { time: "7:2:0", note: "B3", duration: "8n" },   // a-
-      { time: "7:2:2", note: "B3", duration: "8n" },   // was
-      { time: "7:3:0", note: "B3", duration: "4n" },   // a-was
-      { time: "8:0:0", note: "C4", duration: "1n" },   // (Sustain penutup)
-    ]
+      melodyNotes: pangLipangDang.melody
     },
     folklore: {
       title: "Legenda Buay Tumi dan Kisah Sekala Brak",
