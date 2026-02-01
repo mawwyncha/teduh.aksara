@@ -121,3 +121,37 @@ select option {
   background-color: #3d2b1f;
   color: #fce7f3;
 }
+
+/* Memaksa background select di mode Flower agar tidak putih di Chrome */
+.flower select {
+  background-color: #2a1a12 !important; /* Paksa warna petal-900 */
+  color: #fce7f3 !important;           /* Paksa warna pink terang */
+}
+
+/* Mengatur warna daftar pilihan (saat diklik) */
+.flower select option {
+  background-color: #3d2b1f !important; /* Paksa warna petal-800 */
+  color: #fce7f3 !important;
+}
+
+/* CRITICAL FIX: Paksa background select di mode Flower */
+html.flower select,
+.flower select {
+  background-color: #2a1a12 !important;
+  color: #fce7f3 !important;
+}
+
+/* CRITICAL FIX: Paksa background dropdown list saat diklik */
+html.flower select option,
+.flower select option {
+  background-color: #3d2b1f !important;
+  color: #fce7f3 !important;
+}
+
+/* EXTRA FIX: Untuk browser Webkit (Chrome/Safari) */
+@supports (-webkit-appearance: none) {
+  html.flower select {
+    background-color: #2a1a12 !important;
+    background-blend-mode: normal !important;
+  }
+}

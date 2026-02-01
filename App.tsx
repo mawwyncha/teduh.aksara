@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Layout } from './components/Layout';
 import { Mascot } from './components/Mascot';
@@ -41,7 +42,7 @@ const MAX_DAILY_REQUESTS = 25;
 const MAX_VIOLATIONS = 2;
 const MAX_CHARACTERS = 1000;
 
-const RECAPTCHA_SITE_KEY = (import.meta as any)?.env?.RECAPTCHA_SITE_KEY || "6LdTFlUsAAAAALH-MlZGFD7tFEo_1x1FJBWIYNAK";
+const RECAPTCHA_SITE_KEY = "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI";
 
 const DONORS = [
   { name: "Sahabat Budi", amount: 250000, date: "15 Jan 2026" },
@@ -321,32 +322,24 @@ export const App: React.FC = () => {
   const isCanceledRef = useRef(false);
   const prevViolationRef = useRef(false);
   const pendingPlagiarismRef = useRef(false);
-  const isInitializingRef = useRef(false);
 
   const isBusy = isAnalyzing || isSpeaking || isRecording || isTranscribing;
   const isBanned = violationCount >= MAX_VIOLATIONS;
 
-  // Mendapatkan label bahasa target saat ini
   const currentLangLabel = LANG_OPTIONS.find(opt => opt.value === targetLang)?.label || targetLang;
 
-  // Effect untuk Dyslexia Mode - FIXED VERSION
   useEffect(() => {
-    // Toggle class di document.documentElement
     if (isDyslexiaMode) {
       document.documentElement.classList.add('dyslexia-mode');
-      console.log('✅ Dyslexia mode ACTIVATED');
     } else {
       document.documentElement.classList.remove('dyslexia-mode');
-      console.log('❌ Dyslexia mode DEACTIVATED');
     }
     
-    // Simpan ke storage hanya setelah loaded
     if (isLoaded) {
       saveData(STORE_SETTINGS, KEY_DYSLEXIA, isDyslexiaMode);
     }
   }, [isDyslexiaMode, isLoaded]);
 
-  // SCROLL LOCK EFFECT
   useEffect(() => {
     const isAnyModalOpen = !hasAcceptedConsent || isLimitModalOpen || isHistoryModalOpen || 
                            isGuideModalOpen || isDevModalOpen || isFanGalleryModalOpen || 
@@ -366,31 +359,32 @@ export const App: React.FC = () => {
       permissionType, isAnalyzing, isRecording, isTranscribing]);
 
   const playWarningChime = useCallback(() => {
-  try {
-    if (navigator.vibrate) {
-      navigator.vibrate([100, 30, 100, 30, 150]);
+    try {
+      if (navigator.vibrate) {
+        navigator.vibrate([100, 30, 100, 30, 150]); 
+      }
+
+      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(880, ctx.currentTime);
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+      
+      setTimeout(() => {
+        ctx.close().catch(err => console.warn("Failed to close AudioContext:", err));
+      }, 500);
+    } catch (e) {
+      console.warn("Audio chime failed", e);
     }
-    const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-    const ctx = new AudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(880, ctx.currentTime);
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.1, ctx.currentTime + 0.01);
-    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.start();
-    osc.stop(ctx.currentTime + 0.3);
-    
-    setTimeout(() => {
-      ctx.close().catch(err => console.warn("Failed to close AudioContext:", err));
-    }, 500);
-  } catch (e) {
-    console.warn("Audio chime failed", e);
-  }
-}, []);
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value;
@@ -400,7 +394,7 @@ export const App: React.FC = () => {
 
     if (forbidden && !prevViolationRef.current) {
       playWarningChime();
-      setMascotMessage("Dahanku gemetar... mohon gunakan bahasa yang santun, Sahabat.");
+      setMascotMessage("Dahanku berguncang... mohon gunakan bahasa yang santun, Sahabat.");
     } else if (!forbidden && prevViolationRef.current) {
       setMascotMessage("Terima kasih telah merapikan naskahmu kembali.");
     }
@@ -446,7 +440,10 @@ export const App: React.FC = () => {
         if (s) setSelectedStyle(s);
         if (c) setSelectedContext(c);
         if (l) setTargetLang(l);
-        if (dy !== undefined) setIsDyslexiaMode(dy);
+        if (dy !== undefined) {
+           setIsDyslexiaMode(dy);
+           document.documentElement.classList.toggle('dyslexia-mode', dy);
+        }
         if (savedViolations !== undefined) setViolationCount(savedViolations);
 
         if (savedUsageDate !== today) {
@@ -473,40 +470,40 @@ export const App: React.FC = () => {
   }, []);
 
   const handleCancelProcess = useCallback((silent = false) => {
-  isCanceledRef.current = true;
-  processActiveRef.current = false;
-  setIsAnalyzing(false);
-  setIsSpeaking(false);
-  setIsTranscribing(false);
-  
-  if ('speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
-  }
-  
-  if (loadingTimerRef.current) {
-    window.clearTimeout(loadingTimerRef.current);
-    loadingTimerRef.current = null;
-  }
-  
-  if (mediaRecorderRef.current) {
-    try {
-      if (mediaRecorderRef.current.state !== 'inactive') {
-        mediaRecorderRef.current.stop();
-      }
-    } catch (err) {
-      console.warn("Failed to stop media recorder:", err);
+    isCanceledRef.current = true;
+    processActiveRef.current = false;
+    setIsAnalyzing(false);
+    setIsSpeaking(false);
+    setIsTranscribing(false);
+    
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
     }
-  }
-  
-  setIsRecording(false);
-  
-  if (countdownIntervalRef.current) {
-    window.clearInterval(countdownIntervalRef.current);
-    countdownIntervalRef.current = null;
-  }
-  
-  if (!silent) setMascotMessage("Proses dibatalkan, Sahabat.");
-}, []);
+    
+    if (loadingTimerRef.current) {
+      window.clearTimeout(loadingTimerRef.current);
+      loadingTimerRef.current = null;
+    }
+    
+    if (mediaRecorderRef.current) {
+      try {
+        if (mediaRecorderRef.current.state !== 'inactive') {
+          mediaRecorderRef.current.stop();
+        }
+      } catch (err) {
+        console.warn("Failed to stop media recorder:", err);
+      }
+    }
+    
+    setIsRecording(false);
+    
+    if (countdownIntervalRef.current) {
+      window.clearInterval(countdownIntervalRef.current);
+      countdownIntervalRef.current = null;
+    }
+    
+    if (!silent) setMascotMessage("Proses dibatalkan, Sahabat.");
+  }, []);
 
   const startAnalysis = useCallback(async (plagiarism: boolean) => {
     isCanceledRef.current = false;
@@ -529,9 +526,9 @@ export const App: React.FC = () => {
         const newViolations = violationCount + 1;
         setViolationCount(newViolations);
         await saveData(STORE_SETTINGS, KEY_VIOLATION_COUNT, newViolations);
-
+        
         if (navigator.vibrate) navigator.vibrate([200, 100, 200, 100, 200]);
-
+        
         playWarningChime();
         setMascotMessage(newViolations >= MAX_VIOLATIONS ? "Dahanku berguncang... Etika Beraksara dilanggar." : "Hati-hati, Sahabat. Naskahmu melanggar Etika Beraksara. Ini peringatan pertama.");
         setIsViolationDetected(true);
@@ -607,27 +604,23 @@ export const App: React.FC = () => {
   };
 
   const stopRecording = (cancel = false) => {
-  if (countdownIntervalRef.current) { 
-    clearInterval(countdownIntervalRef.current); 
-    countdownIntervalRef.current = null; 
-  }
-  
-  if (mediaRecorderRef.current) {
-    if (cancel) mediaRecorderRef.current.onstop = null;
-    
-    if (mediaRecorderRef.current.state === 'recording') {
-      mediaRecorderRef.current.stop();
+    if (countdownIntervalRef.current) { 
+      clearInterval(countdownIntervalRef.current); 
+      countdownIntervalRef.current = null; 
     }
     
-    // Cleanup stream
-    const stream = mediaRecorderRef.current.stream;
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
+    if (mediaRecorderRef.current) {
+      if (cancel) mediaRecorderRef.current.onstop = null;
+      if (mediaRecorderRef.current.state === 'recording') {
+        mediaRecorderRef.current.stop();
+      }
+      const stream = mediaRecorderRef.current.stream;
+      if (stream) {
+        stream.getTracks().forEach(track => track.stop());
+      }
     }
-  }
-  
-  setIsRecording(false);
-};
+    setIsRecording(false);
+  };
 
   const processAudioTranscription = async (blob: Blob) => {
     isCanceledRef.current = false;
@@ -710,7 +703,7 @@ export const App: React.FC = () => {
     }
   };
 
-  if (!isBanned && !isLoaded) return null;
+  if (!isLoaded) return null;
   if (isBanned) return <BannedView />;
 
   const quotaPercent = (usageCount / MAX_DAILY_REQUESTS) * 100;
@@ -719,14 +712,42 @@ export const App: React.FC = () => {
   const isCharLimitNear = charCount >= MAX_CHARACTERS * 0.9;
 
   const getSuggestionTypeColor = (type: string) => {
-    switch(type) {
-      case 'Ejaan': return currentTheme === 'flower' ? 'bg-pink-500/20 text-pink-300' : (currentTheme === 'dark' ? 'bg-amber-900/40 text-amber-300' : 'bg-red-100 text-red-800');
-      case 'Tata Bahasa': return currentTheme === 'flower' ? 'bg-emerald-500/20 text-emerald-300' : (currentTheme === 'dark' ? 'bg-emerald-900/40 text-amber-300' : 'bg-emerald-100 text-emerald-700');
-      case 'Tanda Baca': return currentTheme === 'flower' ? 'bg-blue-500/20 text-blue-300' : (currentTheme === 'dark' ? 'bg-blue-900/40 text-blue-300' : 'bg-blue-100 text-blue-700');
-      case 'Gaya Bahasa': return currentTheme === 'flower' ? 'bg-purple-500/20 text-purple-300' : (currentTheme === 'dark' ? 'bg-red-900/40 text-red-300' : 'bg-purple-100 text-purple-700');
-      default: return currentTheme === 'dark' ? 'bg-gray-800 text-gray-400' : 'bg-gray-100 text-gray-700';
-    }
-  };
+  switch (type) {
+    case 'Ejaan':
+      return currentTheme === 'flower'
+        ? 'bg-pink-500/25 text-pink-100'
+        : currentTheme === 'dark'
+        ? 'bg-amber-900/50 text-amber-200'
+        : 'bg-amber-50 text-amber-800 border border-amber-200';
+
+    case 'Tata Bahasa':
+      return currentTheme === 'flower'
+        ? 'bg-emerald-500/25 text-emerald-100'
+        : currentTheme === 'dark'
+        ? 'bg-emerald-900/50 text-emerald-200'
+        : 'bg-emerald-50 text-emerald-800 border border-emerald-200';
+
+    case 'Tanda Baca':
+      return currentTheme === 'flower'
+        ? 'bg-blue-500/25 text-blue-100'
+        : currentTheme === 'dark'
+        ? 'bg-blue-900/50 text-blue-200'
+        : 'bg-blue-50 text-blue-800 border border-blue-200';
+
+    case 'Gaya Bahasa':
+      return currentTheme === 'flower'
+        ? 'bg-rose-500/25 text-rose-100'
+        : currentTheme === 'dark'
+        ? 'bg-rose-900/50 text-rose-200'
+        : 'bg-rose-50 text-rose-800 border border-rose-200';
+
+    default:
+      return currentTheme === 'dark'
+        ? 'bg-gray-800 text-gray-300'
+        : 'bg-gray-100 text-gray-700';
+  }
+};
+
 
   const inputBgClass = currentTheme === 'flower' 
     ? 'bg-petal-800 border-pink-500/20 shadow-2xl text-petal-50' 
@@ -742,7 +763,7 @@ export const App: React.FC = () => {
 
   const selectClass = `p-3.5 rounded-2xl font-bold outline-none border transition-all backdrop-blur-md font-sans focus:ring-2 focus:ring-opacity-50 ${
     currentTheme === 'flower' 
-      ? 'bg-pink-900/30 text-pink-100 border-pink-500/20 focus:ring-pink-500 focus:border-pink-500/50' 
+      ? 'bg-petal-900 text-pink-100 border-pink-500/20 focus:ring-pink-500 focus:border-pink-500/50' 
       : currentTheme === 'dark'
         ? 'bg-emerald-950/40 text-emerald-200 border-emerald-800/30 focus:ring-emerald-500 focus:border-emerald-600/50'
         : 'bg-white/40 text-emerald-800 border-emerald-100/50 focus:ring-emerald-600 focus:border-emerald-700/50 shadow-sm'
@@ -751,7 +772,7 @@ export const App: React.FC = () => {
   return (
     <>
       <div className="pt-10 md:pt-12 font-sans">
-        <Layout 
+        <Layout
           activeModal={isHistoryModalOpen ? 'history' : isGuideModalOpen ? 'guide' : isDevModalOpen ? 'dev' : isFanGalleryModalOpen ? 'gallery' : isCatalogModalOpen ? 'catalog' : null}
           onHistoryClick={() => !isBusy && setIsHistoryModalOpen(true)}
           onGuideClick={() => !isBusy && setIsGuideModalOpen(true)}
@@ -760,17 +781,13 @@ export const App: React.FC = () => {
           onCatalogClick={() => !isBusy && setIsCatalogModalOpen(true)}
           onEditorClick={() => { if(!isBusy) { setIsHistoryModalOpen(false); setIsGuideModalOpen(false); setIsDevModalOpen(false); setIsFanGalleryModalOpen(false); setIsCatalogModalOpen(false); window.scrollTo({top:0, behavior:'smooth'}); }}}
           isHelpActive={isHelpActive}
-          onHelpToggle={() => !isBusy && setIsHelpActive(!isHelpActive)}
+          onHelpToggle={() => !isBusy && setIsHelpActive(prev => !prev)}
         >
           <div className="flex flex-col gap-8 max-w-7xl w-full mx-auto pb-32">
             <div className="fixed left-4 md:left-6 top-1/2 -translate-y-1/2 flex flex-col gap-4 z-40">
               <button 
                 disabled={isBusy} 
-                onClick={() => {
-                  const newMode = !isDyslexiaMode;
-                  setIsDyslexiaMode(newMode);
-                  console.log('🔄 Toggling dyslexia mode to:', newMode);
-                }} 
+                onClick={() => setIsDyslexiaMode(prev => !prev)} 
                 className={`w-12 h-12 md:w-14 md:h-14 rounded-full shadow-2xl flex items-center justify-center transition-all ${isDyslexiaMode ? 'bg-red-700 text-white scale-110 shadow-red-500/60 ring-4 ring-red-500/30' : (currentTheme === 'flower' ? 'bg-petal-800 text-pink-400 border border-pink-500/20' : 'bg-white dark:bg-emerald-950 text-red-700 dark:text-red-400 hover:scale-110 active:scale-90')}`} 
                 data-help="Mode Khusus Disleksia. Mengubah font agar lebih mudah dibaca bagi penyandang disleksia."
               >
@@ -782,11 +799,11 @@ export const App: React.FC = () => {
                 <span className="text-xl">{currentTheme === 'flower' ? '🌸' : '🗣️'}</span>
               </button>
             </div>
-            
+
             <div className="space-y-8 w-full max-w-5xl mx-auto">
               <Mascot message={mascotMessage} isLoading={isBusy} forcedExpression={isViolationDetected ? 'shocked' : (isRecording ? 'happy' : undefined)} onAskInfo={async () => {
                 if (isBusy) return;
-                if (usageCount >= MAX_DAILY_REQUESTS) { setIsLimitModalOpen(true); return; }
+                if (usageCount >= MAX_DAILY_REQUESTS) { setIsLimitReached(true); return; }
                 const info = await askTaraAboutPlatform();
                 setMascotMessage(info);
                 const nc = usageCount + 1;
@@ -881,7 +898,7 @@ export const App: React.FC = () => {
                     <button 
                       onClick={() => setPermissionType('plagiarism')} 
                       disabled={!inputText.trim() || isBusy || usageCount >= MAX_DAILY_REQUESTS || isViolationDetected} 
-                      className={`flex-1 py-5 premium-shimmer text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg font-sans disabled:opacity-30 ${usageCount >= MAX_DAILY_REQUESTS || isViolationDetected ? 'grayscale cursor-not-allowed' : ''}`}
+                      className="flex-1 py-5 premium-shimmer text-white rounded-2xl font-bold transition-all active:scale-95 shadow-lg font-sans disabled:opacity-30 disabled:grayscale disabled:cursor-not-allowed"
                     >
                       Cek Plagiarisme
                     </button>
@@ -896,6 +913,37 @@ export const App: React.FC = () => {
                       <p className={`text-xl whitespace-pre-wrap leading-relaxed ${currentTheme === 'flower' ? 'text-pink-50' : 'text-emerald-950 dark:text-emerald-50'}`}>{result.correctedText}</p>
                       {result.readingGuideIndo && (<div className={`mt-6 pt-6 border-t ${currentTheme === 'flower' ? 'border-pink-500/20' : 'border-emerald-100/50 dark:border-emerald-800/20'}`}><h3 className={`text-[9px] font-bold uppercase tracking-[0.2em] mb-2 font-sans ${currentTheme === 'flower' ? 'text-pink-500/40' : 'text-emerald-700/30 dark:text-emerald-400/60'}`}>Panduan Baca (Suku Kata)</h3><p className={`text-sm font-medium italic ${currentTheme === 'flower' ? 'text-pink-100/60' : 'text-emerald-800/60 dark:text-emerald-400/60'}`}>{result.readingGuideIndo}</p></div>)}
                    </div>
+
+                   {result.plagiarism && (
+                     <div className={`p-8 rounded-[3rem] border animate-in zoom-in-95 duration-500 ${
+                        currentTheme === 'flower' 
+                        ? 'bg-petal-900/90 border-pink-500/30 shadow-2xl' 
+                        : (currentTheme === 'dark' ? 'bg-emerald-950/30 border-emerald-800/20 shadow-none' : 'bg-white border-emerald-100 shadow-xl')}`}>
+                        <div className="flex justify-between items-center mb-6">
+                           <h2 className={`text-[10px] font-bold uppercase tracking-[0.3em] font-sans ${currentTheme === 'flower' ? 'text-pink-400' : (currentTheme === 'dark' ? 'text-emerald-400' : 'text-emerald-600')}`}>Keaslian Aksara</h2>
+                           <div className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${result.plagiarism.score > 20 ? 'bg-rose-500 text-white' : 'bg-emerald-500 text-white'}`}>
+                              Kemiripan: {result.plagiarism.score}%
+                           </div>
+                        </div>
+                        <p className={`text-sm font-medium italic mb-8 leading-relaxed ${currentTheme === 'flower' ? 'text-pink-100/80' : (currentTheme === 'dark' ? 'text-emerald-100/70' : 'text-emerald-950/70')}`}>"{result.plagiarism.summary}"</p>
+                        {result.plagiarism.sources.length > 0 && (
+                          <div className="space-y-4">
+                             <h3 className={`text-[9px] font-bold uppercase tracking-[0.2em] ${currentTheme === 'flower' ? 'text-pink-500' : (currentTheme === 'dark' ? 'text-emerald-500/60' : 'text-emerald-700/50')}`}>Dahan Rujukan di Web Terbuka:</h3>
+                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                {result.plagiarism.sources.map((src, i) => (
+                                   <a key={i} href={src.uri} target="_blank" rel="noopener noreferrer" className={`p-5 rounded-2xl border transition-all hover:translate-x-1 hover:shadow-md flex items-center justify-between group ${
+                                      currentTheme === 'flower' 
+                                      ? 'bg-petal-800 border-pink-500/10 hover:bg-pink-500/10' 
+                                      : (currentTheme === 'dark' ? 'bg-white/5 border-white/5 hover:bg-white/10' : 'bg-emerald-50/50 border-emerald-100 hover:bg-emerald-100/50')}`}>
+                                      <span className={`text-xs font-bold truncate max-w-[140px] sm:max-w-xs ${currentTheme === 'flower' ? 'text-pink-100' : (currentTheme === 'dark' ? 'text-emerald-100' : 'text-emerald-900')}`}>{src.title}</span>
+                                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className={`opacity-30 group-hover:opacity-100 transition-all ${currentTheme === 'flower' ? 'text-pink-400' : (currentTheme === 'dark' ? 'text-emerald-400' : 'text-emerald-600')}`}><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6M15 3h6v6M10 14L21 3"/></svg>
+                                   </a>
+                                ))}
+                             </div>
+                          </div>
+                        )}
+                     </div>
+                   )}
 
                    {result.translation && (
                      <div className={`p-10 rounded-[3rem] border relative group ${translationCardBg}`}>
@@ -921,7 +969,7 @@ export const App: React.FC = () => {
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                            {result.suggestions.map((s, idx) => (
                              <div key={idx} className={`p-6 rounded-[2rem] border shadow-sm hover:shadow-md transition-shadow ${currentTheme === 'flower' ? 'bg-petal-800 border-pink-500/20' : (currentTheme === 'dark' ? 'bg-emerald-950/20 border-emerald-800/20' : 'bg-white border-emerald-50')}`}>
-                                <div className="flex justify-between items-start mb-4"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-md uppercase tracking-widest font-sans ${getSuggestionTypeColor(s.type)}`}>{s.type}</span></div>
+                                <div className="flex justify-between items-start mb-4"><span className={`text-[9px] font-bold px-2 py-0.5 rounded-md border-b-2 uppercase tracking-widest font-sans ${getSuggestionTypeColor(s.type)}`}>{s.type}</span></div>
                                 <div className="flex items-center gap-3 mb-3 text-sm font-bold font-sans"><span className="text-red-400 line-through decoration-2 opacity-50">{s.original}</span><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className={currentTheme === 'flower' ? 'text-pink-500/40' : 'text-emerald-400'}><path d="M5 12h14M12 5l7 7-7 7"/></svg><span className={currentTheme === 'flower' ? 'text-pink-300' : 'text-emerald-600 dark:text-emerald-400'}>{s.replacement}</span></div>
                                 <p className={`text-xs font-medium leading-relaxed italic ${currentTheme === 'flower' ? 'text-pink-100/60' : 'text-emerald-900/60 dark:text-emerald-500'}`}>"{s.reason}"</p>
                              </div>
@@ -943,8 +991,9 @@ export const App: React.FC = () => {
                 <TreeHugger />
                 <GardenPromoBox isFlower={currentTheme === 'flower'} isDark={currentTheme === 'dark'} />
               </div>
+            </div>
           </div>
-        </div>
+        </Layout>
 
           <ConsentModal isOpen={!hasAcceptedConsent} onAccept={() => setHasAcceptedConsent(true)} onReject={() => window.location.href = 'https://google.com'} recaptchaSiteKey={RECAPTCHA_SITE_KEY} />
           {permissionType && <PermissionModal type={permissionType} onAccept={() => { if (permissionType === 'mic') { startRecording(); } else if (permissionType === 'plagiarism') triggerAnalysis(true); setPermissionType(null); }} onDeny={() => setPermissionType(null)} />}
@@ -955,9 +1004,8 @@ export const App: React.FC = () => {
           <FanGalleryModal isOpen={isFanGalleryModalOpen} onClose={() => setIsFanGalleryModalOpen(false)} />
           <CatalogModal isOpen={isCatalogModalOpen} onClose={() => setIsCatalogModalOpen(false)} />
           <PronunciationModal isOpen={isPronunciationModalOpen} onClose={() => setIsPronunciationModalOpen(false)} originalText={result?.correctedText || inputText} translation={result?.translation} currentTargetLangLabel={currentLangLabel} onSuccess={() => {}} />
-        </Layout>
       </div>
     </>
   );
 };
-export default App;  // ✅ Default export
+export default App;
