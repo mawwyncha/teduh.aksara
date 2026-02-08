@@ -10,6 +10,7 @@ import { yenIngTawangAnaLintang } from './lagu/java/yogyakarta-yen_ing_tawang_an
 
 export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
   "Banten": {
+    capital: "Serang",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/banten%20-%20sate%20bandeng.png",
     headerDescription: "Sate Bandeng",
     headerLongDescription: "Sate bandeng khas Provinsi Banten memiliki rasa gurih dan legit dari daging bandeng yang lembut, dipadukan dengan bumbu rempah yang meresap sempurna. Teksturnya halus tanpa duri karena dagingnya dihaluskan lalu dimasukkan kembali ke kulit ikan sebelum dibakar hingga harum. Hidangan tradisional ini menggugah selera sebagai kuliner khas Banten yang unik, kaya rasa, dan sarat nilai sejarah.",
@@ -40,6 +41,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Jawa Barat": {
+    capital: "Bandung",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/jawa%20barat%20-%20es%20cendol.png",
     headerDescription: "Es Cendol",
     headerLongDescription: "Es cendol khas Provinsi Jawa Barat menghadirkan rasa manis dan segar yang berpadu sempurna antara santan gurih dan gula aren yang legit. Cendol hijau yang kenyal memberi sensasi lembut dan menyenangkan di setiap tegukan. Minuman tradisional ini menggugah selera sebagai pelepas dahaga khas Sunda yang menyegarkan dan tak lekang oleh waktu.",
@@ -73,6 +75,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Jawa Tengah": {
+    capital: "Semarang",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/jawa%20tengah%20-%20lumpia.png",
     headerDescription: "Lumpia",
     headerLongDescription: "Lumpia khas Provinsi Jawa Tengah memiliki rasa gurih dan lezat dengan isian rebung yang lembut, berpadu daging dan bumbu yang kaya cita rasa. Kulit lumpianya tipis dan renyah saat digoreng, menghadirkan aroma harum yang menggugah selera. Kuliner ikonik Semarang ini dikenal sebagai hidangan khas Jawa Tengah yang memadukan cita rasa tradisional dan pengaruh Tionghoa.",
@@ -108,6 +111,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Jawa Timur": {
+    capital: "Surabaya",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/jawa%20timur%20-%20rawon.png",
     headerDescription: "Rawon",
     headerLongDescription: "Rawon khas Provinsi Jawa Timur memiliki rasa gurih dan kaya rempah dengan kuah hitam pekat dari kluwek yang khas. Daging sapinya empuk dan meresap bumbu, berpadu dengan aroma bawang, ketumbar, dan serai yang menggugah selera. Hidangan tradisional ini menjadi ikon kuliner Jawa Timur yang menawarkan kelezatan mendalam dan cita rasa yang unik.",
@@ -147,6 +151,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Daerah Khusus Ibukota Jakarta": {
+    capital: "Jakarta",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/jakarta%20-%20kerak%20telor.png",
     headerDescription: "Kerak Telor",
     headerLongDescription: "Kerak telor khas Provinsi DKI Jakarta memiliki rasa gurih dan legit dari perpaduan telur, beras ketan, serta ebi yang harum. Bagian bawahnya renyah dengan aroma sangrai, sementara taburan kelapa sangrai dan bawang goreng menambah kekayaan rasa. Kuliner Betawi ini menggugah selera sebagai jajanan tradisional Jakarta yang unik dan penuh cita rasa.",
@@ -179,6 +184,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Daerah Istimewa Yogyakarta": {
+    capital: "Yogyakarta",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/yogyakarta%20-%20gudeg.png",
     headerDescription: "Gudeg",
     headerLongDescription: "Gudeg khas Daerah Istimewa Yogyakarta memiliki rasa manis yang lembut dari nangka muda yang dimasak lama bersama santan dan gula aren. Teksturnya empuk dan kaya bumbu, semakin nikmat saat dipadukan dengan krecek pedas, telur, dan ayam opor. Kuliner ikonik ini menggugah selera sebagai simbol kehangatan dan kekhasan cita rasa tradisional Yogyakarta.",

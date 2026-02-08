@@ -1,10 +1,10 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchTTSAudio, checkTTSCache, preloadFolkloreTTS } from '../services/geminiService';
 
 interface UseFolkloreTTSProps {
   storyText: string;
   languageName: string;
-  isModalOpen: boolean; // Trigger untuk cek cache
+  isModalOpen: boolean;
 }
 
 // Helper function - Convert PCM base64 to WAV Blob
@@ -49,126 +49,143 @@ function createWavBlob(pcmBase64: string, sampleRate: number = 24000): Blob {
 }
 
 export const useFolkloreTTS = ({ storyText, languageName, isModalOpen }: UseFolkloreTTSProps) => {
-  const [isReady, setIsReady] = useState(false); // Audio udah ready di cache?
+  const [isReady, setIsReady] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  
+  // ✅ FIX: Pakai useRef untuk audio element (tidak trigger re-render)
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioUrlRef = useRef<string | null>(null);
 
-  // Cek cache saat modal dibuka
+  // ✅ Prepare audio saat modal dibuka
   useEffect(() => {
     if (!isModalOpen || !storyText) {
-      // Modal ditutup, stop audio dan cleanup
-      if (audioElement) {
-        audioElement.pause();
-        audioElement.currentTime = 0;
-        if (audioElement.src) {
-          URL.revokeObjectURL(audioElement.src);
-        }
-        setAudioElement(null);
+      // Modal ditutup - cleanup
+      if (audioRef.current) {
+        audioRef.current.pause();
+        audioRef.current.currentTime = 0;
       }
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current);
+        audioUrlRef.current = null;
+      }
+      audioRef.current = null;
       setIsReady(false);
       setIsPlaying(false);
       setIsLoading(false);
       return;
     }
 
-    const checkCache = async () => {
-      const cached = await checkTTSCache(storyText, languageName);
-      setIsReady(cached);
+    // Modal dibuka - prepare audio
+    let isCancelled = false;
+    
+    const prepareAudio = async () => {
+      setIsLoading(true);
       
-      // Jika belum ada di cache, preload di background
-      if (!cached) {
-        console.log('🔄 Preloading audio in background...');
-        preloadFolkloreTTS(storyText, languageName).then(() => {
+      try {
+        // Cek cache
+        const cached = await checkTTSCache(storyText, languageName);
+        
+        if (!cached) {
+          console.log('🔄 Preloading audio...');
+          await preloadFolkloreTTS(storyText, languageName);
           console.log('✅ Audio preloaded');
+        }
+
+        if (isCancelled) return;
+
+        // Fetch audio
+        console.log('🎵 Preparing audio element...');
+        const audioBase64 = await fetchTTSAudio(storyText, languageName);
+        
+        if (!audioBase64 || isCancelled) {
+          console.error('❌ Failed to fetch audio');
+          setIsLoading(false);
+          return;
+        }
+
+        // Convert to WAV
+        const audioBlob = createWavBlob(audioBase64, 24000);
+        const audioUrl = URL.createObjectURL(audioBlob);
+        audioUrlRef.current = audioUrl;
+
+        // Create audio element
+        const audio = new Audio(audioUrl);
+        
+        audio.onplay = () => {
+          console.log('▶️ Playing');
+          setIsPlaying(true);
+        };
+        
+        audio.onended = () => {
+          console.log('⏹️ Ended');
+          setIsPlaying(false);
+        };
+        
+        audio.onerror = (e) => {
+          console.error('❌ Audio error:', e);
+          setIsPlaying(false);
+        };
+
+        if (!isCancelled) {
+          audioRef.current = audio;
           setIsReady(true);
-        }).catch(err => {
-          console.error('Preload failed:', err);
-        });
+          setIsLoading(false);
+          console.log('✅ Audio ready for instant play!');
+        }
+        
+      } catch (err) {
+        if (!isCancelled) {
+          console.error('Failed to prepare audio:', err);
+          setIsReady(false);
+          setIsLoading(false);
+        }
       }
     };
 
-    checkCache();
-  }, [isModalOpen, storyText, languageName, audioElement]);
+    prepareAudio();
 
-  // Function untuk play audio
+    // Cleanup function
+    return () => {
+      isCancelled = true;
+    };
+  }, [isModalOpen, storyText, languageName]); // ✅ Dependency benar (tanpa audioRef)
+
+  // ✅ Play function
   const playAudio = useCallback(async () => {
-    if (!storyText) return;
-
-    setIsLoading(true);
+    if (!audioRef.current) {
+      console.warn('⚠️ Audio not ready');
+      return;
+    }
 
     try {
-      // Fetch atau ambil dari cache
-      const audioBase64 = await fetchTTSAudio(storyText, languageName);
-      
-      if (!audioBase64) {
-        console.error('❌ Failed to fetch audio: audioBase64 is null');
-        throw new Error('Gagal generate audio');
-      }
-
-      console.log('✅ Audio fetched, converting to WAV...');
-
-      // Convert base64 PCM to WAV blob
-      const audioBlob = createWavBlob(audioBase64, 24000);
-      const audioUrl = URL.createObjectURL(audioBlob);
-      
-      console.log('✅ WAV blob created, size:', audioBlob.size, 'bytes');
-
-      const audio = new Audio(audioUrl);
-      setAudioElement(audio);
-      
-      audio.onplay = () => {
-        console.log('▶️ Audio started playing');
-        setIsPlaying(true);
-      };
-      
-      audio.onended = () => {
-        console.log('⏹️ Audio ended');
-        setIsPlaying(false);
-        URL.revokeObjectURL(audioUrl);
-      };
-      
-      audio.onerror = (e) => {
-        console.error('❌ Audio playback error:', e);
-        console.error('Audio error code:', audio.error?.code);
-        console.error('Audio error message:', audio.error?.message);
-        setIsPlaying(false);
-        setIsLoading(false);
-      };
-
-      console.log('🎵 Attempting to play audio...');
-      await audio.play();
-      setIsReady(true);
-      console.log('✅ Audio playing successfully');
+      await audioRef.current.play();
+      console.log('✅ Playing instantly!');
     } catch (error) {
-      console.error('❌ Error in playAudio:', error);
-      if (error instanceof Error) {
-        console.error('Error message:', error.message);
-        console.error('Error stack:', error.stack);
-      }
-    } finally {
-      setIsLoading(false);
+      console.error('❌ Play error:', error);
     }
-  }, [storyText, languageName]);
+  }, []); // ✅ Empty dependency (akses via ref)
 
-  // Function untuk stop audio
+  // ✅ Stop function
   const stopAudio = useCallback(() => {
-    if (audioElement) {
-      audioElement.pause();
-      audioElement.currentTime = 0;
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
       setIsPlaying(false);
     }
-  }, [audioElement]);
+  }, []); // ✅ Empty dependency (akses via ref)
 
-  // Cleanup saat unmount
+  // ✅ Cleanup saat unmount
   useEffect(() => {
     return () => {
-      if (audioElement) {
-        audioElement.pause();
-        audioElement.src = '';
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      if (audioUrlRef.current) {
+        URL.revokeObjectURL(audioUrlRef.current);
       }
     };
-  }, [audioElement]);
+  }, []);
 
   return {
     isReady,

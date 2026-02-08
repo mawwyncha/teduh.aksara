@@ -352,46 +352,42 @@ export const analyzeGrammar = async (text: string, style: WritingStyle, context:
     data.translation.languageName = targetLanguageName;
   }
 
-  if (withPlagiarism) {
-    try {
-      const pResponse = await ai.models.generateContent({
-        model: "gemini-3-pro-preview",
-        contents: [{
-          parts: [{
-            text: `Lakukan analisis orisinalitas/plagiarisme untuk naskah ini: "${sanitizeInput(text)}". 
-            HANYA cari kemiripan pada dahan-dahan web yang bersifat OPEN SOURCE, PUBLIC DOMAIN, atau berlisensi CREATIVE COMMONS (misalnya Wikipedia, Archive.org, jurnal Open Access, dan repositori publik). 
-            DILARANG KERAS merujuk pada konten berbayar (paywall) atau situs privat tertutup.
-            DILARANG KERAS merujuk pada konten vulgar.
-            Konteks penulisan ini adalah ${context} dengan gaya ${style}. 
-            Pastikan data grounding diekstrak secara etis.`
-          }]
-        }],
-        config: { 
-          tools: [{ googleSearch: {} }]
-        },
-      });
-      
-      const chunks = pResponse.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
-      const sources = chunks
-        .filter((c: any) => c.web)
-        .map((c: any) => ({ 
-          uri: c.web!.uri!, 
-          title: c.web!.title! || "Sumber Web"
-        }))
-        .slice(0, 3);
+if (withPlagiarism) {
+  try {
+    const pResponse = await callGeminiAPI('generateContent', {
+      model: "gemini-3-pro-preview",
+      contents: `Lakukan analisis orisinalitas/plagiarisme untuk naskah ini: "${sanitizeInput(text)}". 
+      HANYA cari kemiripan pada dahan-dahan web yang bersifat OPEN SOURCE, PUBLIC DOMAIN, atau berlisensi CREATIVE COMMONS (misalnya Wikipedia, Archive.org, jurnal Open Access, dan repositori publik). 
+      DILARANG KERAS merujuk pada konten berbayar (paywall) atau situs privat tertutup.
+      DILARANG KERAS merujuk pada konten vulgar.
+      Konteks penulisan ini adalah ${context} dengan gaya ${style}. 
+      Pastikan data grounding diekstrak secara etis.`,
+      config: { 
+        tools: [{ googleSearch: {} }]
+      }
+    });
+    
+    const chunks = pResponse.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+    const sources = chunks
+      .filter((c: any) => c.web)
+      .map((c: any) => ({ 
+        uri: c.web!.uri!, 
+        title: c.web!.title! || "Sumber Web"
+      }))
+      .slice(0, 3);
 
-      data.plagiarism = {
-        score: sources.length > 0 ? (sources.length * 20 + 15) : 0,
-        sources,
-        summary: sources.length > 0 
-          ? "Tara menemukan kemiripan aksaramu pada beberapa dahan di web luas, Sahabat." 
-          : "Naskahmu tampak sangat murni dan orisinal di taman web."
-      };
-    } catch (e) {
-      console.error("Plagiarism check failed:", e);
-      data.plagiarism = { score: 0, sources: [], summary: "Gagal menelusuri dahan web saat ini." };
-    }
+    data.plagiarism = {
+      score: sources.length > 0 ? (sources.length * 20 + 15) : 0,
+      sources,
+      summary: sources.length > 0 
+        ? "Tara menemukan kemiripan aksaramu pada beberapa dahan di web luas, Sahabat." 
+        : "Naskahmu tampak sangat murni dan orisinal di taman web."
+    };
+  } catch (e) {
+    console.error("Plagiarism check failed:", e);
+    data.plagiarism = { score: 0, sources: [], summary: "Gagal menelusuri dahan web saat ini." };
   }
+}
   return data;
 };
 

@@ -7,7 +7,7 @@ import { KalimantanMap } from './regions/maps/KalimantanMap';
 import { NusaTenggaraMap } from './regions/maps/NusaTenggaraMap';
 import { SulawesiMap } from './regions/maps/SulawesiMap';
 import { PapuaMap } from './regions/maps/PapuaMap';
-import { fetchTTSAudio } from '../../services/geminiService';
+import { fetchTTSAudio, generateSpeech } from '../../services/geminiService';
 import { useFolkloreTTS } from '../../hooks/useFolkloreTTS';
 import * as Tone from 'tone';
 
@@ -19,8 +19,52 @@ interface NusantaraMapSectionProps {
   onSeeResult: () => void; // ✅ Callback untuk menutup modal dan scroll ke hasil
 }
 
+interface PianoKey {
+  note: string;
+  label: string;
+  name: string;
+  isBlack: boolean;
+}
+
+const PIANO_KEYS: PianoKey[] = [
+  // Oktaf 4 (Tengah)
+  { note: 'G3', label: '5̣', name: 'Sol', isBlack: false },
+  { note: 'G#3', label: '5̣#', name: 'Sel', isBlack: true },
+  { note: 'A3', label: '6̣', name: 'La', isBlack: false },
+  { note: 'A#3', label: '6̣#', name: 'Li', isBlack: true },
+  { note: 'B3', label: '7̣', name: 'Si', isBlack: false },
+  { note: 'C4', label: '1', name: 'Do', isBlack: false },
+  { note: 'C#4', label: '1#', name: 'Di', isBlack: true },
+  { note: 'D4', label: '2', name: 'Re', isBlack: false },
+  { note: 'D#4', label: '2#', name: 'Ri', isBlack: true },
+  { note: 'E4', label: '3', name: 'Mi', isBlack: false },
+  { note: 'F4', label: '4', name: 'Fa', isBlack: false },
+  { note: 'F#4', label: '4#', name: 'Fi', isBlack: true },
+  { note: 'G4', label: '5', name: 'Sol', isBlack: false },
+  { note: 'G#4', label: '5#', name: 'Sel', isBlack: true },
+  { note: 'A4', label: '6', name: 'La', isBlack: false },
+  { note: 'A#4', label: '6#', name: 'Li', isBlack: true },
+  { note: 'B4', label: '7', name: 'Si', isBlack: false },
+  // Oktaf 5 (Tinggi)
+  { note: 'C5', label: '1̇', name: 'Do', isBlack: false },
+  { note: 'C#5', label: '1̇#', name: 'Di', isBlack: true },
+  { note: 'D5', label: '2̇', name: 'Re', isBlack: false },
+  { note: 'D#5', label: '2̇#', name: 'Ri', isBlack: true },
+  { note: 'E5', label: '3̇', name: 'Mi', isBlack: false },
+  { note: 'F5', label: '4̇', name: 'Fa', isBlack: false },
+  { note: 'F#5', label: '4̇#', name: 'Fi', isBlack: true },
+  { note: 'G5', label: '5̇', name: 'Sol', isBlack: false },
+  { note: 'G#5', label: '5̇#', name: 'Sel', isBlack: true },
+  { note: 'A5', label: '6̇', name: 'La', isBlack: false },
+  { note: 'A#5', label: '6̇#', name: 'Li', isBlack: true },
+  { note: 'B5', label: '7̇', name: 'Si', isBlack: false },
+  // Oktaf 6
+  { note: 'C6', label: '1̇̇', name: 'Do', isBlack: false },
+];
+
 export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({ 
-  currentTheme, 
+  currentTheme,
+  targetLang,
   inputBgClass, 
   isResultReady, // ✅ Destructure prop
   onSeeResult // ✅ Destructure callback
@@ -28,6 +72,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
   const [isUnfolded, setIsUnfolded] = useState(false);
   const [selectedRegion, setSelectedRegion] = useState<string | null>(null);
   const [hoveredRegion, setHoveredRegion] = useState<string | null>(null);
+  const [hoveredCapital, setHoveredCapital] = useState<string | null>(null);
   const [showLongDesc, setShowLongDesc] = useState(false);
   const [songProgress, setSongProgress] = useState(0);
   const [showCredits, setShowCredits] = useState(false);
@@ -38,6 +83,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
   });
 
   const [hoveredDialect, setHoveredDialect] = useState<string | null>(null);
+  const [loadingGreeting, setLoadingGreeting] = useState<string | null>(null);
   
   // Folklore Audio States
   const [isFolkloreLoading, setIsFolkloreLoading] = useState(false);
@@ -94,7 +140,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
   const { isReady, isPlaying, isLoading, playAudio, stopAudio } = useFolkloreTTS({
     storyText: folklore?.story || '',
     languageName: languageName,
-    isModalOpen: !!selectedRegion && showFolklore
+    isModalOpen: !!selectedRegion,
   });
 
   // SCROLL LOCK EFFECT
@@ -148,10 +194,13 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
 
   const handleMouseEnter = (name: string) => {
     setHoveredRegion(name);
+    const capital = PROVINCE_DIALECTS[name]?.capital || "-";
+    setHoveredCapital(capital);
   };
 
   const handleMouseLeave = () => {
     setHoveredRegion(null);
+    setHoveredCapital(null);
   };
 
   const toggleSection = (key: string) => {
@@ -191,6 +240,21 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
     setIsMelodyPlaying(false);
     setActiveNote(null);
   }, []);
+
+  const playSingleNote = async (note: string) => {
+    try {
+      await Tone.start();
+      if (!synthRef.current) {
+        synthRef.current = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: "sine" },
+          envelope: { attack: 0.1, decay: 0.2, sustain: 0.2, release: 1.2 }
+        }).toDestination();
+      }
+      synthRef.current.triggerAttackRelease(note, "8n");
+      setActiveNote(note);
+      setTimeout(() => setActiveNote(null), 200);
+    } catch (e) {}
+  };
 
   const playMelody = useCallback(async (melodyNotes: MelodyNote[]) => {
     if (isMelodyPlaying) {
@@ -314,16 +378,39 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
     setFolkloreProgress(0);
   }, []);
 
-  const handleSeekFolklore = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (!folkloreAudioRef.current) return;
-    const audio = folkloreAudioRef.current;
-    if (!audio.duration || !isFinite(audio.duration)) return;
-    const newTime = (parseFloat(e.target.value) / 100) * audio.duration;
-    if (isFinite(newTime) && newTime >= 0 && newTime <= audio.duration) {
-      audio.currentTime = newTime;
-      setFolkloreProgress(parseFloat(e.target.value));
-    }
-  };  
+const handleSeekFolklore = (e: React.ChangeEvent<HTMLInputElement>) => {
+  if (!folkloreAudioRef.current) return;
+  const audio = folkloreAudioRef.current;
+  if (!audio.duration || !isFinite(audio.duration)) return;
+  const newTime = (parseFloat(e.target.value) / 100) * audio.duration;
+  if (isFinite(newTime) && newTime >= 0 && newTime <= audio.duration) {
+    audio.currentTime = newTime;
+    setFolkloreProgress(parseFloat(e.target.value));
+  }
+};  
+
+const generateLocalGreeting = async (dialectName: string, description: string) => {
+  try {
+    const greetingText = `Halo dari ${dialectName}! ${description}`;
+    await generateSpeech(greetingText, "Bahasa Indonesia", dialectName);
+  } catch (error) {
+    console.error("Gagal generate greeting:", error);
+  }
+};
+
+const handlePlayDialectGreeting = async (e: React.MouseEvent, dialect: DialectInfo) => {
+  e.stopPropagation();
+  if (loadingGreeting) return;
+  
+  setLoadingGreeting(dialect.name);
+  try {
+    await generateLocalGreeting(dialect.name, dialect.description);
+  } catch (error) {
+    console.warn("Gagal memutar sapaan dialek", error);
+  } finally {
+    setLoadingGreeting(null);
+  }
+};
 
   const renderDialectList = (dialects: DialectInfo[], categoryLabel: string, sectionKey: string) => {
     if (!dialects || dialects.length === 0) return null;
@@ -353,13 +440,28 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
           <div className="space-y-4 mt-4 px-1 animate-in fade-in slide-in-from-top-2 duration-300">
             {dialects.map((dialect, idx) => (
               <div key={idx} className="flex flex-col gap-2">
-                <div 
-                  onClick={() => { playSoftChime(); setHoveredDialect(hoveredDialect === dialect.name ? null : dialect.name); }}
-                  className={`flex items-center gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${hoveredDialect === dialect.name ? (isFlower ? 'bg-pink-500 border-pink-400 text-white shadow-lg' : 'bg-emerald-600 border-emerald-500 text-white shadow-lg') : (isFlower ? 'bg-petal-900/20 border-pink-500/10 text-pink-100 hover:translate-x-1' : 'bg-white dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/30 text-emerald-950 dark:text-emerald-100 hover:translate-x-1')}`}
-                >
-                  <span className="text-lg">{isFlower ? '✨' : '🌱'}</span>
-                  <span className="text-sm font-bold tracking-tight">{dialect.name}</span>
+                <div className="flex items-center gap-2">
+                  <div 
+                    onClick={() => { playSoftChime(); setHoveredDialect(hoveredDialect === dialect.name ? null : dialect.name); }}
+                    className={`flex-1 flex items-center gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${hoveredDialect === dialect.name ? (isFlower ? 'bg-pink-500 border-pink-400 text-white shadow-lg' : 'bg-emerald-600 border-emerald-500 text-white shadow-lg') : (isFlower ? 'bg-petal-900/20 border-pink-500/10 text-pink-100 hover:translate-x-1' : 'bg-white dark:bg-emerald-900/10 border-emerald-100 dark:border-emerald-800/30 text-emerald-950 dark:text-emerald-100 hover:translate-x-1')}`}
+                  >
+                    <span className="text-lg">{isFlower ? '✨' : '🌱'}</span>
+                    <span className="text-sm font-bold tracking-tight">{dialect.name}</span>
+                  </div>
+                  <button 
+                    onClick={(e) => handlePlayDialectGreeting(e, dialect)}
+                    disabled={!!loadingGreeting}
+                    className={`p-3 rounded-2xl transition-all active:scale-90 relative shrink-0 ${loadingGreeting === dialect.name ? (isFlower ? 'bg-pink-500 text-white animate-pulse' : 'bg-emerald-600 text-white animate-pulse') : (isFlower ? 'bg-pink-100/10 text-pink-400 hover:bg-pink-500/20' : 'bg-emerald-50 dark:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 hover:bg-emerald-500/10')}`}
+                    title={`Dengar Sapaan ${dialect.name}`}
+                  >
+                    {loadingGreeting === dialect.name ? (
+                      <div className="w-5 h-5 border-2 border-current border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg>
+                    )}
+                  </button>
                 </div>
+
                 {hoveredDialect === dialect.name && (
                   <div className={`p-6 rounded-2xl border animate-in fade-in slide-in-from-top-1 duration-300 ${isFlower ? 'bg-petal-900/60 border-pink-500/10' : 'bg-emerald-50/40 dark:bg-black/40 border-emerald-100 dark:border-emerald-800/20'}`}>
                     {dialect.endonim && (
@@ -395,9 +497,23 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
     isDark,
     accentColor,
     hoveredRegion,
+    hoveredCapital,
     handleRegionClick,
     handleMouseEnter,
     handleMouseLeave,
+  };
+
+    // ✨ Robust calculation for Piano layout (18 white keys) ✨
+  const whiteKeysList = PIANO_KEYS.filter(k => !k.isBlack);
+  const whiteKeyWidthPercent = 100 / whiteKeysList.length;
+
+  const getBlackKeyLeft = (note: string) => {
+    // Find the white key that should be to the left of this black key
+    const baseNote = note.replace('#', '');
+    const whiteIdx = whiteKeysList.findIndex(k => k.note === baseNote);
+    if (whiteIdx === -1) return 0;
+    // Black key is placed exactly on the line between this white key and the next
+    return (whiteIdx + 1) * whiteKeyWidthPercent;
   };
 
   return (
@@ -512,9 +628,14 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
                   </g>
                 </g>
               </svg>
-              <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 px-5 py-2 rounded-2xl border backdrop-blur-xl transition-all duration-500 shadow-xl z-20 whitespace-nowrap ${hoveredRegion ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} ${isFlower ? 'bg-petal-900/90 border-pink-500/30' : 'bg-white/90 dark:bg-emerald-950/90 border-emerald-100 dark:border-emerald-800/30'}`}>
+              <div className={`absolute upper-0 left-1/2 -translate-x-1/2 px-5 py-2 rounded-2xl border backdrop-blur-xl transition-all duration-500 shadow-xl z-20 whitespace-nowrap ${hoveredRegion ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} ${isFlower ? 'bg-petal-900/90 border-pink-500/30' : 'bg-white/90 dark:bg-emerald-950/90 border-emerald-100 dark:border-emerald-800/30'}`}>
                 <p className={`text-[10px] font-bold uppercase tracking-widest ${isFlower ? 'text-pink-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
                   Provinsi: <span className={textColor}>{hoveredRegion || '-'}</span>
+                </p>
+              </div>
+              <div className={`absolute bottom-0 left-1/2 -translate-x-1/2 px-5 py-2 rounded-2xl border backdrop-blur-xl transition-all duration-500 shadow-xl z-20 whitespace-nowrap ${hoveredCapital ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'} ${isFlower ? 'bg-petal-900/90 border-pink-500/30' : 'bg-white/90 dark:bg-emerald-950/90 border-emerald-100 dark:border-emerald-800/30'}`}>
+                <p className={`text-[10px] font-bold uppercase tracking-widest ${isFlower ? 'text-pink-400' : 'text-emerald-600 dark:text-emerald-400'}`}>
+                  Ibukota: <span className={textColor}>{hoveredCapital || '-'}</span>
                 </p>
               </div>
             </div>
@@ -526,7 +647,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
 
       {selectedRegion && (
         <div className="fixed inset-0 z-[250] flex items-center justify-center p-4 sm:p-6 bg-black/60 backdrop-blur-md animate-in fade-in duration-300" onClick={() => setSelectedRegion(null)}>
-          <div className={`w-full max-w-2xl rounded-[3rem] shadow-2xl relative border overflow-hidden flex flex-col animate-in zoom-in-95 duration-300 max-h-[85vh] ${isFlower ? 'bg-petal-800 border-pink-500/20' : 'bg-white dark:bg-[#0a1a12] border-emerald-50 dark:border-emerald-800/20'}`} onClick={(e) => e.stopPropagation()}>
+          <div className={`w-full max-w-4xl rounded-[3rem] shadow-2xl relative border overflow-hidden flex flex-col animate-in zoom-in-95 duration-300 max-h-[85vh] ${isFlower ? 'bg-petal-800 border-pink-500/20' : 'bg-white dark:bg-[#0a1a12] border-emerald-50 dark:border-emerald-800/20'}`} onClick={(e) => e.stopPropagation()}>
             <audio ref={folkloreAudioRef} onTimeUpdate={handleFolkloreTimeUpdate} onEnded={handleFolkloreEnded} preload="metadata" />
 
             <div className={`sticky top-0 z-[260] p-8 md:p-10 pb-4 border-b shrink-0 ${isFlower ? 'bg-petal-800 border-pink-500/10' : 'bg-white dark:bg-[#0a1a12] border-emerald-100 dark:border-emerald-800/20'}`}>
@@ -588,24 +709,53 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
                       </div>
                     )}
 
-                    {PROVINCE_DIALECTS[selectedRegion].regionalSong?.melodyNotes && (
-                      <button 
-                        onClick={() => playMelody(PROVINCE_DIALECTS[selectedRegion].regionalSong?.melodyNotes || [])}
-                        className={`w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${isMelodyPlaying ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/20' : (isFlower ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/20' : 'bg-emerald-700 text-white shadow-lg shadow-emerald-700/20')}`}
-                      >
-                        {isMelodyPlaying ? (
-                          <>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-                            Berhenti Memutar: {activeNote}
-                          </>
-                        ) : (
-                          <>
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                            Dengar Melodi Instrumen
-                          </>
-                        )}
+                    <div className="space-y-4">
+                      <button onClick={() => playMelody(PROVINCE_DIALECTS[selectedRegion].regionalSong?.melodyNotes || [])} className={`w-full py-3 rounded-xl font-bold text-[10px] uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${isMelodyPlaying ? 'bg-red-500 text-white animate-pulse shadow-lg shadow-red-500/20' : (isFlower ? 'bg-pink-500 text-white shadow-lg shadow-pink-500/20' : 'bg-emerald-700 text-white shadow-lg shadow-emerald-700/20')}`}>
+                        {isMelodyPlaying ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>Berhenti Memutar: {activeNote}</> : <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><polygon points="5 3 19 12 5 21 5 3"/></svg>Dengar Melodi Instrumen</>}
                       </button>
-                    )}
+
+                      {/* ✨ PIANO MINI CHROMATIC 2 OKTAF (Lengkap & Tanpa Geser) ✨ */}
+                      <div className={`p-4 rounded-[2.5rem] border transition-all ${isFlower ? 'bg-pink-900/20 border-pink-500/10' : 'bg-black/5 dark:bg-white/5 border-emerald-100 dark:border-emerald-800/10'}`}>
+                        <div className="flex justify-center items-center mb-4">
+                           <p className={`text-[9px] font-bold uppercase tracking-[0.2em] ${isFlower ? 'text-pink-400' : 'text-emerald-600 dark:text-emerald-400'}`}>Papan Piano Latihan</p>
+                        </div>
+                        
+                                                  <div className="relative w-full h-40 sm:h-52 mt-4 px-4 overflow-hidden">
+                            <div className="absolute inset-0 flex px-4">
+                              {/* Layer Tuts Putih */}
+                              {whiteKeysList.map((key, i) => (
+                                <button
+                                  key={`white-${i}`}
+                                  onMouseDown={() => playSingleNote(key.note)}
+                                  className={`relative flex flex-col items-center justify-end pb-3 h-full rounded-b-lg border-x border-b-4 transition-all duration-75 active:translate-y-1 active:border-b-0 touch-none shadow-sm ${activeNote === key.note ? (isFlower ? 'bg-pink-200 border-pink-400' : 'bg-amber-100 border-amber-300') : 'bg-white hover:bg-gray-50 border-gray-200'}`}
+                                  style={{ width: `${whiteKeyWidthPercent}%`, flexShrink: 0 }}
+                                >
+                                  <span className="text-[9px] font-bold text-gray-400 select-none pointer-events-none">{key.label}</span>
+                                </button>
+                              ))}
+
+                              {/* Layer Tuts Hitam */}
+                              {PIANO_KEYS.filter(k => k.isBlack).map((key, i) => (
+                                <button
+                                  key={`black-${i}`}
+                                  onMouseDown={() => playSingleNote(key.note)}
+                                  className={`absolute top-0 h-[60%] z-20 rounded-b-md border-b-4 transition-all active:h-[58%] active:border-b-0 touch-none shadow-md ${activeNote === key.note ? (isFlower ? 'bg-pink-400 border-pink-600' : 'bg-amber-400 border-amber-600') : (isFlower ? 'bg-[#3d2b1f] border-black' : 'bg-[#1a110c] hover:bg-[#333] border-black')}`}
+                                  style={{ 
+                                    left: `${getBlackKeyLeft(key.note)}%`, 
+                                    width: `${whiteKeyWidthPercent * 0.5}%`,
+                                    transform: 'translateX(-50%)'
+                                  }}
+                                >
+                                  <div className="flex items-end justify-center h-full pb-2 pointer-events-none">
+                                    <span className="text-[7px] font-bold text-white/40 select-none">{key.label}</span>
+                                  </div>
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                          <p className={`text-[9px] text-center italic opacity-40 font-bold uppercase tracking-widest mt-4 ${textColor}`}>Ketuk tuts untuk mencoba tangga nada khas daerah</p>
+                      </div>
+                    </div>
 
                     {PROVINCE_DIALECTS[selectedRegion].folklore && (
                       <div className="mb-10">
@@ -712,19 +862,12 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
                       </div>
                     )}
                     
-                    <p className={`text-[11px] mb-6 italic opacity-70 leading-relaxed ${isFlower ? 'text-pink-100' : 'text-emerald-800 dark:text-emerald-400'}`}>
-                      Klik untuk melihat dahan bahasa di {selectedRegion}:
-                    </p>
+                    <p className={`text-[11px] mb-6 italic opacity-70 leading-relaxed ${textColor}`}>Klik untuk melihat dahan bahasa di {selectedRegion}:</p>
                     {renderDialectList(PROVINCE_DIALECTS[selectedRegion].native, "Bahasa Pribumi", "native")}
                     {renderDialectList(PROVINCE_DIALECTS[selectedRegion].community, "Bahasa Peranakan Nusantara", "community")}
-                    {renderDialectList(PROVINCE_DIALECTS[selectedRegion].foreign || [], "Bahasa Peranakan Asing", "foreign")}                    
+                    {renderDialectList(PROVINCE_DIALECTS[selectedRegion].foreign || [], "Bahasa Peranakan Asing", "foreign")}
                   </>
-                ) : (
-                  <div className="py-20 text-center">
-                    <span className="text-4xl block mb-4 opacity-20">🍃</span>
-                    <p className={`text-sm italic opacity-50 ${textColor}`}>Informasi sedang dikumpulkan untuk {selectedRegion}...</p>
-                  </div>
-                )}
+                ) : <div className="py-20 text-center"><p className={`text-sm italic opacity-50 ${textColor}`}>Informasi sedang dikumpulkan...</p></div>}
               </div>
             </div>
           </div>

@@ -29,6 +29,7 @@ export interface Folklore {
 }
 
 export interface ProvinceData {
+  capital: string;
   headerImage: string;
   headerDescription?: string;
   headerLongDescription?: string;

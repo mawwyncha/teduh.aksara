@@ -13,6 +13,7 @@ import { pangLipangDang } from './lagu/sumatera/lampung-pang_lipang_dang.ts';
 
 export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
   "Daerah Istimewa Aceh": {
+    capital: "Bandar Aceh",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/aceh%20-%20mi%20aceh.png",
     headerDescription: "Mi Aceh",
     headerLongDescription: "Mi Aceh menghadirkan rasa gurih pedas yang kaya dari rempah-rempah khas Aceh yang kuat dan aromatik. Kuahnya kental dengan sentuhan kari yang hangat, berpadu sempurna dengan mi tebal dan isian daging atau seafood. Setiap suapan terasa bold, pedas menggigit, dan bikin ketagihan.",
@@ -51,6 +52,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Sumatera Utara": {
+    capital: "Medan",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/sumut%20-%20bika%20ambon.png",
     headerDescription: "Bika Ambon",
     headerLongDescription: "Bika Ambon khas Sumatera Utara memiliki rasa manis legit dengan aroma pandan dan santan yang harum menggoda. Teksturnya kenyal berongga, lembut di mulut, dan terasa unik di setiap gigitan. Perpaduan rasa manis dan gurihnya meninggalkan sensasi lezat yang bikin ingin terus menyantapnya.",
@@ -85,6 +87,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Sumatera Barat": {
+    capital: "Padang",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/sumbar%20-%20rendang.jpg",
     headerDescription: "Rendang Sapi",
     headerLongDescription: "Rendang sapi memiliki rasa gurih yang dalam dan kompleks, berpadu antara santan kental, rempah-rempah hangat, serta sentuhan pedas yang meresap hingga ke serat daging. Dagingnya empuk, kaya aroma serai, lengkuas, dan daun jeruk, dengan lapisan rasa yang semakin kuat di setiap kunyahan. Hidangan khas Minangkabau ini bukan sekadar makanan, melainkan pengalaman rasa yang memanjakan lidah dan meninggalkan kesan tak terlupakan.",
@@ -114,6 +117,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Riau": {
+    capital: "Pekanbaru",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/riau%20-%20gulai%20tepek%20ikan.png",
     headerDescription: "Gulai Tepek Ikan",
     headerLongDescription: "Gulai tepek ikan khas Provinsi Riau menghadirkan rasa gurih santan yang lembut dengan sentuhan rempah Melayu yang harum dan menenangkan. Tepek ikan berbahan ikan sungai terasa kenyal dan ringan, menyerap kuah gulai yang kaya rasa hingga setiap suapan begitu nikmat. Hidangan tradisional ini menggugah selera sebagai sajian hangat yang sederhana, autentik, dan penuh kelezatan khas Riau.",
@@ -146,6 +150,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Kepulauan Riau": {
+    capital: "Tanjungpinang",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/kepri%20-%20gonggong.png",
     headerDescription: "Gonggong",
     headerLongDescription: "Gonggong khas Kepulauan Riau memiliki rasa gurih alami laut yang segar, dengan daging siput yang kenyal namun lembut saat dikunyah. Disajikan sederhana dengan cara direbus, cita rasa aslinya semakin menonjol ketika dicocol sambal pedas atau saus khas. Hidangan laut ikonik ini menggugah selera sebagai sajian autentik yang sederhana, segar, dan penuh kelezatan pesisir.",
@@ -181,6 +186,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Kepulauan Bangka Belitung": {
+    capital: "Pangkalpinang",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/bangka%20belitung%20-%20kericu%20-%20keripik%20cumi.png",
     headerDescription: "Kericu",
     headerLongDescription: "Kericu khas Kepulauan Bangka Belitung memiliki rasa gurih laut yang khas dari telur cumi, berpadu dengan aroma bumbu sederhana yang menggoda selera. Teksturnya renyah dan ringan saat digigit, menghadirkan sensasi kriuk yang memuaskan di setiap suapan. Camilan tradisional ini menggugah selera sebagai oleh-oleh favorit yang lezat, bergizi, dan sarat cita rasa pesisir.",
@@ -213,6 +219,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Jambi": {
+    capital: "Jambi",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/jambi%20-%20gulai%20ikan%20patin.png",
     headerDescription: "Gulai Ikan Patin",
     headerLongDescription: "Gulai ikan patin khas Provinsi Jambi memiliki rasa gurih dan segar dengan kuah kuning kaya rempah yang berpadu asam lembut dari buah tempoyak atau asam kandis. Daging ikan patinnya lembut dan berlemak, menyerap bumbu hingga setiap suapan terasa nikmat dan menggoda selera. Hidangan khas ini menjadi kebanggaan kuliner Jambi yang menghadirkan kelezatan tradisional dan cita rasa Melayu yang khas.",
@@ -244,6 +251,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Sumatera Selatan": {
+    capital: "Palembang",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/sumsel%20-%20pempek.png",
     headerDescription: "Pempek",
     headerLongDescription: "Pempek khas Provinsi Sumatera Selatan memiliki rasa gurih ikan yang kuat dengan tekstur kenyal dan lembut saat digigit. Kelezatannya semakin sempurna saat disiram cuko berwarna gelap yang bercita rasa asam, manis, dan pedas yang menyegarkan. Kuliner ikonik Palembang ini menggugah selera sebagai perpaduan harmonis antara olahan ikan tradisional dan saus khas yang menggoda lidah.",
@@ -282,6 +290,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Bengkulu": {
+    capital: "Bengkulu",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/bengkulu%20-%20pendap.png",
     headerDescription: "Pendap",
     headerLongDescription: "Pendap adalah makanan khas Bengkulu yang terbuat dari ikan berbumbu rempah dan kelapa parut, dibungkus daun talas serta daun pisang lalu dimasak perlahan di atas bara api selama berjam-jam. Proses ini menghasilkan rasa gurih pedas yang kuat dengan tekstur ikan yang sangat lembut dan aroma khas yang menggugah selera. Pendap dikenal sebagai hidangan spesial dan oleh-oleh khas Bengkulu, bahkan menjadi makanan favorit Presiden Soekarno saat diasingkan di daerah tersebut.",
@@ -320,6 +329,7 @@ export const PROVINCE_DIALECTS: Record<string, ProvinceData> = {
     ]
   },
   "Lampung": {
+    capital: "Bandar Lampung",
     headerImage: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Iconic%20Foods/apa%20yang%20ikonik/lampung%20-%20umbu.png",
     headerDescription: "Umbu",
     headerLongDescription: "Umbu adalah sajian eksotis khas Lampung yang menawarkan sensasi rasa pahit-gurih nan elegan, berasal dari pucuk rotan muda yang direbus hingga empuk atau dibakar untuk mengeluarkan aroma khas hutan yang autentik. Teksturnya yang renyah sekaligus lembut seketika lumer di lidah, apalagi saat dipadukan dengan sambal terasi pedas atau diolah menjadi oseng bumbu santan yang kaya rempah. Hidangan langka ini bukan sekadar makanan, melainkan petualangan rasa unik yang memberikan efek segar dan membangkitkan selera makan bagi siapa pun yang menikmatinya.",
