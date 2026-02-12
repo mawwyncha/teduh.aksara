@@ -3,7 +3,6 @@
   publish = "dist"
   functions = "netlify/functions"
 
-# Environment variables untuk AI providers
 [build.environment]
   NODE_VERSION = "18"
   NODE_ENV = "production"
@@ -19,15 +18,9 @@
   node_bundler = "esbuild"
   included_files = ["netlify/functions/**/*.ts"]
   
-  # Security: Rate limiting untuk AI Gateway
   [functions."ai-gateway"]
-    rate_limit = {
-      aggregate = "user_id",
-      window = 3600,
-      count = 50
-    }
+    rate_limit = { aggregate = "user_id", window = 3600, count = 50 }
 
-# Security headers
 [[headers]]
   for = "/*"
   [headers.values]
@@ -37,14 +30,12 @@
     Permissions-Policy = "microphone=(), geolocation=()"
     Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline';"
 
-# Redirects untuk functions
 [[redirects]]
   from = "/.netlify/functions/*"
   to = "/.netlify/functions/:splat"
   status = 200
   force = true
 
-# SPA routing
 [[redirects]]
   from = "/*"
   to = "/index.html"
