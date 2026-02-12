@@ -6,6 +6,8 @@ export interface DialectInfo {
   endonim?: string;
   makna?: string;
   dialek?: string;
+  iconicGreeting?: string;
+  phoneticGuide?: string;
 }
 
 export interface MelodyNote {

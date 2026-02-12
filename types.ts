@@ -7,11 +7,12 @@ export type TargetLanguage =
   | 'lp' | 'sas' | 'pap' | 'amb' | 'go' | 'ni' | 'tet' | 'pt_tl' 
   | 'zh_hokkien_medan' | 'zh_hokkien_jakarta' | 'zh_hakka_singkawang' | 'zh_hakka_bangka' | 'zh_teochew_pontianak' | 'zh_cantonese_id';
 
+export type SuggestionType = "Ejaan" | "Tata Bahasa" | "Gaya Bahasa" | "Tanda Baca" | "Budaya";
 export interface GrammarSuggestion {
   original: string;
   replacement: string;
   reason: string;
-  type: 'Ejaan' | 'Tata Bahasa' | 'Gaya Bahasa' | 'Tanda Baca' | 'Budaya';
+  type: SuggestionType;  // ← BUKAN string
 }
 
 export interface PlagiarismResult {
@@ -52,5 +53,15 @@ export interface HistoryItem {
   options: {
     style: WritingStyle;
     context: WritingContext;
+  };
+
+  metadata?: {  // ← TAMBAHKAN INI
+    aiProvider?: string;
+    latency?: number;
+    cached?: boolean;
+    fallbackUsed?: boolean;
+    parsedFromText?: boolean;
+    originalTextLength?: number;
+    [key: string]: any;
   };
 }

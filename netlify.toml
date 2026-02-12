@@ -1,7 +1,50 @@
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
+# Environment variables untuk AI providers
+[build.environment]
+  NODE_VERSION = "18"
+  NODE_ENV = "production"
+
+[context.production.environment]
+  GEMINI_API_KEY = "@gemini_api_key"
+  DEEPSEEK_API_KEY = "@deepseek_api_key"
+  GROQ_API_KEY = "@groq_api_key"
+  HF_API_KEY = "@huggingface_api_key"
+  RECAPTCHA_SECRET_KEY = "@recaptcha_secret_key"
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["netlify/functions/**/*.ts"]
+  
+  # Security: Rate limiting untuk AI Gateway
+  [functions."ai-gateway"]
+    rate_limit = {
+      aggregate = "user_id",
+      window = 3600,
+      count = 50
+    }
+
+# Security headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "microphone=(), geolocation=()"
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com; style-src 'self' 'unsafe-inline';"
+
+# Redirects untuk functions
+[[redirects]]
+  from = "/.netlify/functions/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+  force = true
+
+# SPA routing
 [[redirects]]
   from = "/*"
   to = "/index.html"

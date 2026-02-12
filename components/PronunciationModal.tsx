@@ -1,7 +1,8 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { PronunciationResult, TranslationResult } from '../types';
-import { generateSpeech, analyzePronunciation } from '../services/geminiService';
+import { analyzePronunciation } from '../services/analysis-service';
+import { generateSpeech } from '../services/tts-service';
 
 interface PronunciationModalProps {
   isOpen: boolean;
@@ -81,7 +82,7 @@ export const PronunciationModal: React.FC<PronunciationModalProps> = ({ isOpen, 
     }, 2000); // Pesan muncul lebih cepat
 
     try {
-      await generateSpeech(currentTargetText, currentLangName, currentPhoneticGuide);
+      await generateSpeech(currentTargetText, currentLangName);
     } catch (e) {
       alert("Maaf, Tara gagal membacakan contoh.");
     } finally {

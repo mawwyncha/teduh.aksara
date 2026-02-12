@@ -1,63 +1,78 @@
-import type { Handler } from '@netlify/functions';
-import { GoogleGenAI, Type, Modality } from "@google/genai";
+// netlify/functions/gemini-api.ts - VERSI DIPERBARUI
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
-const getAI = () => {
-  const apiKey = process.env.GEMINI_API_KEY || process.env.GEMINI_API_KEY_BACKUP;
-  if (!apiKey) throw new Error("API_KEY_MISSING");
-  return new GoogleGenAI({ apiKey });
-};
-
-export const handler: Handler = async (event) => {
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
-
-  try {
-    const { action, params } = JSON.parse(event.body || '{}');
-    const ai = getAI();
-
-    let result;
-
-    switch (action) {
-      case 'generateContent':
-        // General content generation (analysis, transcription, etc)
-        result = await ai.models.generateContent(params);
-        return {
-          statusCode: 200,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            text: result.text,
-            candidates: result.candidates
-          })
-        };
-
-      case 'generateTTS':
-        // Text-to-Speech generation
-        result = await ai.models.generateContent(params);
-        const audioData = result.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-        return {
-          statusCode: 200,
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            audioBase64: audioData || null
-          })
-        };
-
-      default:
-        return {
-          statusCode: 400,
-          body: JSON.stringify({ error: 'Unknown action' })
-        };
-    }
-  } catch (error) {
-    console.error('Gemini API error:', error);
+exports.handler = async function(event, context) {
+  // 1. Validasi API key
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
     return {
       statusCode: 500,
-      body: JSON.stringify({
-        error: error instanceof Error ? error.message : 'Unknown error'
+      body: JSON.stringify({ error: 'GEMINI_API_KEY not configured' })
+    };
+  }
+  
+  // 2. Parse request
+  const { action, params } = JSON.parse(event.body || '{}');
+  const genAI = new GoogleGenerativeAI(apiKey);
+  
+  try {
+    if (action === 'generateTTS') {
+      // Untuk TTS
+      const model = genAI.getGenerativeModel({ 
+        model: "gemini-2.0-flash-exp"  // Model yang support TTS
+      });
+      
+      const result = await model.generateContent({
+        contents: params.contents,
+        generationConfig: params.config
+      });
+      
+      const response = await result.response;
+      const audioData = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+      
+      return {
+        statusCode: 200,
+        body: JSON.stringify({ 
+          success: true,
+          audioBase64: audioData || null 
+        })
+      };
+    } else {
+      // Untuk regular content
+      const model = genAI.getGenerativeModel({ 
+        model: params.model || "gemini-2.0-flash-exp",
+        systemInstruction: params.config?.systemInstruction,
+        generationConfig: params.config
+      });
+      
+      const result = await model.generateContent(params.contents);
+      const response = await result.response;
+      
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          success: true,
+          text: response.text(),
+          candidates: response.candidates
+        })
+      };
+    }
+  } catch (error: any) {
+    console.error('Gemini Function error:', error);
+    
+    // Berikan error yang lebih informatif
+    let errorMessage = error.message;
+    if (errorMessage.includes('quota')) {
+      errorMessage = 'Kuota Gemini telah habis. Coba lagi nanti atau gunakan fitur lain.';
+    } else if (errorMessage.includes('model not found')) {
+      errorMessage = 'Model Gemini tidak ditemukan. Coba model lain.';
+    }
+    
+    return {
+      statusCode: 500,
+      body: JSON.stringify({ 
+        success: false,
+        error: errorMessage 
       })
     };
   }

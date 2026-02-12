@@ -1,197 +1,372 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
-import { fetchTTSAudio, checkTTSCache, preloadFolkloreTTS } from '../services/geminiService';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { fetchTTSAudio } from '../services/tts-service';
 
-interface UseFolkloreTTSProps {
-  storyText: string;
-  languageName: string;
-  isModalOpen: boolean;
+interface UseFolkloreTTSCallbacks {
+  onStart?: () => void;
+  onEnd?: () => void;
+  onError?: (error: Error) => void;
+  onSuccess?: () => void;
+  onProgress?: (progress: number) => void;
+  onSeek?: (time: number) => void;
 }
 
-// Helper function - Convert PCM base64 to WAV Blob
-function createWavBlob(pcmBase64: string, sampleRate: number = 24000): Blob {
-  const binary = atob(pcmBase64);
-  const pcmData = new Uint8Array(binary.length);
-  
-  for (let i = 0; i < binary.length; i++) {
-    pcmData[i] = binary.charCodeAt(i);
-  }
-  
-  const buffer = new ArrayBuffer(44 + pcmData.length);
-  const view = new DataView(buffer);
-  
-  const writeString = (offset: number, string: string) => {
-    for (let i = 0; i < string.length; i++) {
-      view.setUint8(offset + i, string.charCodeAt(i));
-    }
-  };
-  
-  // WAV header
-  writeString(0, 'RIFF');
-  view.setUint32(4, 36 + pcmData.length, true);
-  writeString(8, 'WAVE');
-  writeString(12, 'fmt ');
-  view.setUint32(16, 16, true);
-  view.setUint16(20, 1, true); // PCM format
-  view.setUint16(22, 1, true); // Mono
-  view.setUint32(24, sampleRate, true);
-  view.setUint32(28, sampleRate * 2, true);
-  view.setUint16(32, 2, true);
-  view.setUint16(34, 16, true);
-  writeString(36, 'data');
-  view.setUint32(40, pcmData.length, true);
-  
-  // Copy PCM data
-  for (let i = 0; i < pcmData.length; i++) {
-    view.setUint8(44 + i, pcmData[i]);
-  }
-  
-  return new Blob([buffer], { type: 'audio/wav' });
-}
-
-export const useFolkloreTTS = ({ storyText, languageName, isModalOpen }: UseFolkloreTTSProps) => {
-  const [isReady, setIsReady] = useState(false);
+export const useFolkloreTTS = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState(0);
+  const [duration, setDuration] = useState(0);
+  const [currentTime, setCurrentTime] = useState(0);
   
-  // ✅ FIX: Pakai useRef untuk audio element (tidak trigger re-render)
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const audioUrlRef = useRef<string | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const progressIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const estimatedDurationRef = useRef<number>(3000);
+  const isWebSpeechRef = useRef<boolean>(false);
+  const fullTextRef = useRef<string>('');
 
-  // ✅ Prepare audio saat modal dibuka
-  useEffect(() => {
-    if (!isModalOpen || !storyText) {
-      // Modal ditutup - cleanup
-      if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
-      }
-      if (audioUrlRef.current) {
-        URL.revokeObjectURL(audioUrlRef.current);
-        audioUrlRef.current = null;
-      }
-      audioRef.current = null;
-      setIsReady(false);
-      setIsPlaying(false);
-      setIsLoading(false);
-      return;
-    }
-
-    // Modal dibuka - prepare audio
-    let isCancelled = false;
-    
-    const prepareAudio = async () => {
-      setIsLoading(true);
-      
+  // ========== CLEANUP ==========
+  const stopAllAudio = useCallback(() => {
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
       try {
-        // Cek cache
-        const cached = await checkTTSCache(storyText, languageName);
-        
-        if (!cached) {
-          console.log('🔄 Preloading audio...');
-          await preloadFolkloreTTS(storyText, languageName);
-          console.log('✅ Audio preloaded');
-        }
-
-        if (isCancelled) return;
-
-        // Fetch audio
-        console.log('🎵 Preparing audio element...');
-        const audioBase64 = await fetchTTSAudio(storyText, languageName);
-        
-        if (!audioBase64 || isCancelled) {
-          console.error('❌ Failed to fetch audio');
-          setIsLoading(false);
-          return;
-        }
-
-        // Convert to WAV
-        const audioBlob = createWavBlob(audioBase64, 24000);
-        const audioUrl = URL.createObjectURL(audioBlob);
-        audioUrlRef.current = audioUrl;
-
-        // Create audio element
-        const audio = new Audio(audioUrl);
-        
-        audio.onplay = () => {
-          console.log('▶️ Playing');
-          setIsPlaying(true);
-        };
-        
-        audio.onended = () => {
-          console.log('⏹️ Ended');
-          setIsPlaying(false);
-        };
-        
-        audio.onerror = (e) => {
-          console.error('❌ Audio error:', e);
-          setIsPlaying(false);
-        };
-
-        if (!isCancelled) {
-          audioRef.current = audio;
-          setIsReady(true);
-          setIsLoading(false);
-          console.log('✅ Audio ready for instant play!');
-        }
-        
-      } catch (err) {
-        if (!isCancelled) {
-          console.error('Failed to prepare audio:', err);
-          setIsReady(false);
-          setIsLoading(false);
-        }
-      }
-    };
-
-    prepareAudio();
-
-    // Cleanup function
-    return () => {
-      isCancelled = true;
-    };
-  }, [isModalOpen, storyText, languageName]); // ✅ Dependency benar (tanpa audioRef)
-
-  // ✅ Play function
-  const playAudio = useCallback(async () => {
-    if (!audioRef.current) {
-      console.warn('⚠️ Audio not ready');
-      return;
+        window.speechSynthesis.cancel();
+      } catch (e) {}
     }
-
-    try {
-      await audioRef.current.play();
-      console.log('✅ Playing instantly!');
-    } catch (error) {
-      console.error('❌ Play error:', error);
-    }
-  }, []); // ✅ Empty dependency (akses via ref)
-
-  // ✅ Stop function
-  const stopAudio = useCallback(() => {
+    
     if (audioRef.current) {
       audioRef.current.pause();
       audioRef.current.currentTime = 0;
-      setIsPlaying(false);
+      audioRef.current.src = '';
     }
-  }, []); // ✅ Empty dependency (akses via ref)
-
-  // ✅ Cleanup saat unmount
-  useEffect(() => {
-    return () => {
-      if (audioRef.current) {
-        audioRef.current.pause();
-      }
-      if (audioUrlRef.current) {
-        URL.revokeObjectURL(audioUrlRef.current);
-      }
-    };
+    
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+    
+    setIsPlaying(false);
+    setIsLoading(false);
+    setProgress(0);
+    setCurrentTime(0);
+    isWebSpeechRef.current = false;
   }, []);
 
+  useEffect(() => {
+    return () => {
+      stopAllAudio();
+    };
+  }, [stopAllAudio]);
+
+  // ========== PROGRESS SIMULATION ==========
+  const startProgressSimulation = (durationMs: number = 3000) => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+    
+    estimatedDurationRef.current = durationMs;
+    setDuration(durationMs / 1000);
+    setProgress(0);
+    setCurrentTime(0);
+    
+    const startTime = Date.now();
+    
+    progressIntervalRef.current = setInterval(() => {
+      const elapsed = Date.now() - startTime;
+      const calculatedProgress = Math.min((elapsed / estimatedDurationRef.current) * 100, 99);
+      const calculatedTime = elapsed / 1000;
+      
+      setProgress(calculatedProgress);
+      setCurrentTime(calculatedTime);
+    }, 100);
+  };
+
+  const stopProgressSimulation = () => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+      progressIntervalRef.current = null;
+    }
+  };
+
+  // ========== ESTIMATE DURATION ==========
+  const estimateDuration = (text: string): number => {
+    const words = text.split(' ').length;
+    return Math.max(2000, words * 300);
+  };
+
+  // ========== SEEK - WEB SPEECH VERSION ==========
+  const handleSeek = useCallback(async (newProgress: number, text: string, voiceId: string) => {
+    setProgress(newProgress);
+    
+    if (isWebSpeechRef.current) {
+      console.log(`🎯 Web Speech seek ke ${newProgress}%`);
+      
+      // Potong teks berdasarkan progress
+      const words = fullTextRef.current.split(' ');
+      const totalWords = words.length;
+      const targetWordIndex = Math.min(
+        Math.floor((newProgress / 100) * totalWords),
+        totalWords - 1
+      );
+      
+      const remainingText = words.slice(targetWordIndex).join(' ');
+      
+      // Cancel speech lama
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        try {
+          window.speechSynthesis.cancel();
+        } catch (e) {}
+        await new Promise(resolve => setTimeout(resolve, 50));
+      }
+      
+      // Update durasi berdasarkan sisa teks
+      const newEstimatedDuration = estimateDuration(remainingText);
+      estimatedDurationRef.current = newEstimatedDuration;
+      setDuration(newEstimatedDuration / 1000);
+      
+      const newCurrentTime = (newProgress / 100) * (estimatedDurationRef.current / 1000);
+      setCurrentTime(newCurrentTime);
+      
+      startProgressSimulation(newEstimatedDuration);
+      
+      // Mulai bicara dari posisi yang dipilih
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        const utterance = new SpeechSynthesisUtterance(remainingText);
+        utterance.lang = 'id-ID';
+        utterance.rate = 0.9;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        const voices = window.speechSynthesis.getVoices();
+        const indonesianVoice = voices.find(v => 
+          v.lang.includes('id') || v.lang.includes('ID') || v.name.includes('Indonesian')
+        );
+        if (indonesianVoice) utterance.voice = indonesianVoice;
+        
+        utterance.onstart = () => {
+          setIsPlaying(true);
+        };
+        
+        utterance.onend = () => {
+          stopProgressSimulation();
+          setProgress(100);
+          setCurrentTime(estimatedDurationRef.current / 1000);
+          setIsPlaying(false);
+          isWebSpeechRef.current = false;
+        };
+        
+        utterance.onerror = (event) => {
+          if (event.error === 'interrupted') {
+            console.log('⏸️ Web Speech: diinterupsi');
+          } else {
+            console.error('❌ Web Speech error:', event);
+          }
+        };
+        
+        utteranceRef.current = utterance;
+        window.speechSynthesis.speak(utterance);
+      }
+      
+    } else if (audioRef.current) {
+      // HTML Audio: langsung seek
+      const newTime = (newProgress / 100) * (audioRef.current.duration || 0);
+      audioRef.current.currentTime = newTime;
+      setCurrentTime(newTime);
+    }
+  }, []);
+
+  // ========== PLAY ==========
+  const play = useCallback(async (
+    text: string,
+    voiceId: string,
+    callbacks?: UseFolkloreTTSCallbacks,
+    startProgress: number = 0
+  ) => {
+    try {
+      stopAllAudio();
+      
+      setIsLoading(true);
+      setIsPlaying(false);
+      setError(null);
+      
+      fullTextRef.current = text;
+      callbacks?.onStart?.();
+      
+      // ========== DEV MODE - WEB SPEECH ==========
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🎵 [DEV] Web Speech untuk:', text.substring(0, 50));
+        
+        await new Promise(resolve => setTimeout(resolve, 800));
+        
+        // Potong teks jika seek
+        let textToSpeak = text;
+        if (startProgress > 0) {
+          const words = text.split(' ');
+          const totalWords = words.length;
+          const targetWordIndex = Math.floor((startProgress / 100) * totalWords);
+          textToSpeak = words.slice(targetWordIndex).join(' ');
+          console.log(`🔍 Seek ke ${startProgress}%, mulai dari kata ke-${targetWordIndex}`);
+        }
+        
+        const estimatedDuration = estimateDuration(textToSpeak);
+        
+        setIsLoading(false);
+        setIsPlaying(true);
+        isWebSpeechRef.current = true;
+        
+        startProgressSimulation(estimatedDuration);
+        callbacks?.onSuccess?.();
+        
+        if (typeof window !== 'undefined' && window.speechSynthesis) {
+          try {
+            window.speechSynthesis.cancel();
+          } catch (e) {}
+          
+          await new Promise(resolve => setTimeout(resolve, 50));
+          
+          const utterance = new SpeechSynthesisUtterance(textToSpeak);
+          utterance.lang = 'id-ID';
+          utterance.rate = 0.9;
+          utterance.pitch = 1.0;
+          utterance.volume = 1.0;
+          
+          const voices = window.speechSynthesis.getVoices();
+          const indonesianVoice = voices.find(v => 
+            v.lang.includes('id') || v.lang.includes('ID') || v.name.includes('Indonesian')
+          );
+          if (indonesianVoice) utterance.voice = indonesianVoice;
+          
+          utterance.onstart = () => {
+            setIsPlaying(true);
+          };
+          
+          utterance.onend = () => {
+            stopProgressSimulation();
+            setProgress(100);
+            setCurrentTime(estimatedDuration / 1000);
+            setIsPlaying(false);
+            isWebSpeechRef.current = false;
+            callbacks?.onEnd?.();
+          };
+          
+          utterance.onerror = (event) => {
+            if (event.error === 'interrupted') {
+              console.log('⏸️ Web Speech: diinterupsi');
+            } else {
+              console.error('❌ Web Speech error:', event);
+              stopAllAudio();
+              setError('Gagal memutar suara');
+              callbacks?.onError?.(new Error('Gagal memutar suara'));
+            }
+          };
+          
+          utteranceRef.current = utterance;
+          
+          setTimeout(() => {
+            try {
+              window.speechSynthesis.speak(utterance);
+            } catch (e) {
+              console.error('❌ Speech synthesis error:', e);
+            }
+          }, 50);
+        }
+        
+        return;
+      }
+      
+      // ========== PRODUCTION - HTML AUDIO ==========
+      const audioData = await fetchTTSAudio(text, voiceId);
+      
+      if (!audioData) {
+        throw new Error('No audio data received');
+      }
+      
+      const audio = new Audio(audioData);
+      audioRef.current = audio;
+      
+      setIsLoading(false);
+      setIsPlaying(true);
+      isWebSpeechRef.current = false;
+      
+      audio.onloadedmetadata = () => {
+        setDuration(audio.duration);
+        if (startProgress > 0) {
+          audio.currentTime = (startProgress / 100) * audio.duration;
+        }
+      };
+      
+      audio.ontimeupdate = () => {
+        if (audio.duration) {
+          const currentProgress = (audio.currentTime / audio.duration) * 100;
+          setProgress(currentProgress);
+          setCurrentTime(audio.currentTime);
+          callbacks?.onProgress?.(currentProgress);
+        }
+      };
+      
+      audio.onended = () => {
+        stopProgressSimulation();
+        setProgress(100);
+        setCurrentTime(audio.duration || 0);
+        setIsPlaying(false);
+        callbacks?.onEnd?.();
+      };
+      
+      audio.onerror = () => {
+        stopAllAudio();
+        setError('Gagal memutar audio');
+        callbacks?.onError?.(new Error('Gagal memutar audio'));
+      };
+      
+      audio.oncanplay = () => {
+        if (startProgress > 0) {
+          audio.currentTime = (startProgress / 100) * audio.duration;
+        }
+      };
+      
+      await audio.play();
+      callbacks?.onSuccess?.();
+      
+    } catch (err) {
+      console.error('❌ TTS failed:', err);
+      stopAllAudio();
+      setError(err instanceof Error ? err.message : 'Gagal memuat audio');
+      callbacks?.onError?.(err instanceof Error ? err : new Error('Gagal memuat audio'));
+    }
+  }, [stopAllAudio]);
+
+  // ========== STOP ==========
+  const stop = useCallback(() => {
+    stopAllAudio();
+  }, [stopAllAudio]);
+
+  // ========== PAUSE ==========
+  const pause = useCallback(() => {
+    if (audioRef.current && isPlaying && !isWebSpeechRef.current) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    }
+  }, [isPlaying]);
+
+  // ========== RESUME ==========
+  const resume = useCallback(() => {
+    if (audioRef.current && !isPlaying && !isWebSpeechRef.current && audioRef.current.currentTime > 0) {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
+  }, [isPlaying]);
+
   return {
-    isReady,
     isPlaying,
     isLoading,
-    playAudio,
-    stopAudio
+    error,
+    progress,
+    duration,
+    currentTime,
+    play,
+    stop,
+    pause,
+    resume,
+    seek: handleSeek,
+    stopAllAudio
   };
 };

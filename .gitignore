@@ -7,27 +7,197 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
-*.local
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependency directories
+node_modules/
+dist/
+dist-ssr/
+*.tsbuildinfo
+
+# Environment variables (KRITIS untuk keamanan API keys!)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+.env.*.local
+.env.production
+.env.staging
+
+# API Keys dan secrets
+*.key
+*.pem
+*.crt
+serviceAccountKey.json
+firebase-config.json
+
+# Netlify build cache dan config
+.netlify/
+.netlify/functions/
+.netlify/edge-functions/
+.netlify/deploy/
+.netlify/cache/
+
+# Database lokal (jika ada)
+*.db
+*.sqlite
+*.sqlite3
+indexeddb/
+
+# Audio cache files (dari TTS)
+*.mp3
+*.wav
+*.ogg
+*.m4a
+tts-cache/
+audio-cache/
+
+# AI Model files (jika ada local models)
+models/
+*.bin
+*.gguf
+*.ggml
+*.safetensors
+
+# Build artifacts
+build/
+.cache/
+.temp/
+.tmp/
+.temp/
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-*.env
-*.env.local
-*.netlify/
-*.env.production
-*.env.*.local
-.env
-.env.local
-.env.production
-.env.*.local
+.vs/
+.vscode/settings.json
+.vscode/launch.json
+
+# Testing
+coverage/
+.nyc_output/
+jest-report/
+test-results/
+
+# Package manager specific
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+shrinkwrap.yaml
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+._*
+
+# IDE
+.sass-cache/
+*.komodoproject
+.komodotools
+
+# Misc
+*.bak
+*.tmp
+*.temp
+*.sass-cache
+*.scssc
+.sass-cache/
+*.class
+.history/
+.chrome/
+*.sublime-*
+dump.rdb
+
+# TypeScript
+*.tsbuildinfo
+
+# Vite/Vue/React
+*.vue.swp
+*.swp
+
+# Custom untuk Teduh Aksara
+# ==========================
+# Cache audio TTS dari Gemini/other AI
+services/tts-cache/
+services/audio-cache/
+
+# IndexedDB backup (jika ada export)
+db-backup/
+db-export/
+
+# Analytics dan monitoring data
+analytics/
+logs/ai-performance.log
+logs/provider-health.log
+
+# Temporary uploads
+uploads/
+temp-uploads/
+
+# Testing audio files
+test-audio/
+test-recordings/
+
+# Browser testing
+playwright-report/
+test-results/
+
+# Bundle analyzer reports
+report.html
+stats.html
+
+# Performance profiles
+*.cpuprofile
+*.heapsnapshot
+
+# Mobile app files (jika ada PWA)
+*-manifest.json
+service-worker.js
+workbox-*.js
+
+# Docker (jika pakai)
+docker-compose.yml
+Dockerfile
+.dockerignore
+
+# SSL certificates (jika ada)
+ssl/
+*.csr
+*.csr.pem
+*.key.pem
+
+# Backup files dari editor
+*~
+*.swp
+*.swo
+
+# Windows
+[Tt]humbs.db
+$RECYCLE.BIN/
+*.stackdump
+
+# Linux
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+
+# macOS
+.Spotlight-V100
+.Trashes
+.fseventsd
+.AppleDouble
+.LSOverride
