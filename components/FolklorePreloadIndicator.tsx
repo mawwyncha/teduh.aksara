@@ -66,10 +66,18 @@ export class FolklorePreloadIndicator extends React.Component<FolklorePreloadInd
                 <span className="text-2xl">✓</span>
               )}
               <div>
-                <p className="text-xs font-bold uppercase tracking-wider opacity-60">
+                <p className={`text-xs font-bold uppercase tracking-wider opacity-60 ${
+                  isFlower ? 'text-[rgb(252,231,243)]' 
+                    : isDark ? 'text-[rgb(251,191,36)]' 
+                    : 'text-[rgb(5,150,105)]'
+                }`}>
                   {progress.isLoading ? 'Menyiapkan Dongeng' : 'Dongeng Siap!'}
                 </p>
-                <p className="text-sm font-bold">
+                <p className={`text-sm font-bold ${
+                  isFlower ? 'text-[rgb(252,231,243)]' 
+                    : isDark ? 'text-[rgb(251,191,36)]' 
+                    : 'text-[rgb(5,150,105)]'
+                }`}>
                   {progress.completed} / {progress.total}
                 </p>
               </div>
@@ -77,7 +85,11 @@ export class FolklorePreloadIndicator extends React.Component<FolklorePreloadInd
             {onDismiss && (
               <button
                 onClick={onDismiss}
-                className="w-6 h-6 rounded-full opacity-40 hover:opacity-100 transition-opacity flex items-center justify-center"
+                className={`w-6 h-6 rounded-full opacity-40 hover:opacity-100 transition-opacity flex items-center justify-center ${
+                  isFlower ? 'text-[rgb(252,231,243)]' 
+                    : isDark ? 'text-[rgb(251,191,36)]' 
+                    : 'text-[rgb(5,150,105)]'
+                }`}
                 aria-label="Tutup"
               >
                 ×
@@ -107,14 +119,22 @@ export class FolklorePreloadIndicator extends React.Component<FolklorePreloadInd
 
           {/* Current Item */}
           {progress.current && progress.isLoading && (
-            <p className="text-xs opacity-60 truncate mb-2">
+            <p className={`text-xs opacity-60 truncate mb-2 ${
+              isFlower ? 'text-[rgb(252,231,243)]' 
+                : isDark ? 'text-[rgb(251,191,36)]' 
+                : 'text-[rgb(5,150,105)]'
+            }`}>
               📖 {progress.current}
             </p>
           )}
 
           {/* Complete Message */}
           {progress.isComplete && (
-            <p className="text-xs italic opacity-80">
+            <p className={`text-xs italic opacity-80 ${
+              isFlower ? 'text-[rgb(252,231,243)]' 
+                : isDark ? 'text-[rgb(251,191,36)]' 
+                : 'text-[rgb(5,150,105)]'
+            }`}>
               Semua dongeng kini siap diputar instan! 🎉
             </p>
           )}
@@ -122,10 +142,18 @@ export class FolklorePreloadIndicator extends React.Component<FolklorePreloadInd
           {/* Errors */}
           {progress.errors.length > 0 && (
             <details className="mt-2">
-              <summary className="text-xs cursor-pointer opacity-60 hover:opacity-100">
+              <summary className={`text-xs cursor-pointer opacity-60 hover:opacity-100 ${
+                isFlower ? 'text-[rgb(252,231,243)]' 
+                  : isDark ? 'text-[rgb(251,191,36)]' 
+                  : 'text-[rgb(5,150,105)]'
+              }`}>
                 ⚠ {progress.errors.length} error(s)
               </summary>
-              <div className="mt-1 text-[10px] opacity-50 max-h-20 overflow-y-auto">
+              <div className={`mt-1 text-[10px] opacity-50 max-h-20 overflow-y-auto ${
+                isFlower ? 'text-[rgb(252,231,243)]' 
+                  : isDark ? 'text-[rgb(251,191,36)]' 
+                  : 'text-[rgb(5,150,105)]'
+              }`}>
                 {progress.errors.map((err, i) => (
                   <div key={i} className="mb-1">• {err}</div>
                 ))}

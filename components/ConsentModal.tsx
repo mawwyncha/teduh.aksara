@@ -232,7 +232,7 @@ export const ConsentModal: React.FC<ConsentModalProps> = ({
 
           <div className={`${boxHak} p-5 rounded-3xl border shadow-sm`}>
             <h3 className={`font-bold mb-2 flex items-center gap-2 ${isFlower ? 'text-blue-300' : 'text-blue-900 dark:text-blue-300'}`}>
-              <span>�...</span> Hak Anda:
+              <span>🛡️</span> Hak Anda:
             </h3>
             <ul className="list-disc list-inside space-y-1 text-xs opacity-80">
               <li>Mengakses dan menghapus data Anda kapan saja</li>

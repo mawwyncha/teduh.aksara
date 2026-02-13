@@ -186,19 +186,19 @@ export const AppContent: React.FC<AppContentProps> = ({ isHelpActive, onHelpTogg
           <div className="flex flex-col gap-1.5">
             <label className={`text-[10px] font-bold uppercase tracking-[0.2em] ml-4 font-sans ${app.currentTheme === 'flower' ? 'text-pink-300' : 'text-emerald-800/40 dark:text-emerald-400/30'}`}>Gaya</label>
             <select disabled={app.isBusy} value={app.selectedStyle} onChange={(e) => app.setSelectedStyle(e.target.value as any)} className={selectClass}>
-              {STYLE_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 flower:bg-petal-800 text-current">{o.label}</option>)}
+              {STYLE_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 flower:bg-[#2A1A12] text-current">{o.label}</option>)}
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className={`text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5 ml-4 font-sans ${app.currentTheme === 'flower' ? 'text-pink-300' : 'text-emerald-800/40 dark:text-emerald-400/30'}`}>Konteks</label>
             <select disabled={app.isBusy} value={app.selectedContext} onChange={(e) => app.setSelectedContext(e.target.value as any)} className={selectClass}>
-              {CONTEXT_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 flower:bg-petal-800 text-current">{o.label}</option>)}
+              {CONTEXT_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 flower:bg-[#2A1A12] text-current">{o.label}</option>)}
             </select>
           </div>
           <div className="flex flex-col gap-1.5">
             <label className={`text-[10px] font-bold uppercase tracking-[0.2em] mb-1.5 ml-4 font-sans ${app.currentTheme === 'flower' ? 'text-pink-300' : 'text-emerald-800/40 dark:text-emerald-400/30'}`}>Bahasa Target</label>
             <select disabled={app.isBusy} value={app.targetLang} onChange={(e) => app.setTargetLang(e.target.value as any)} className={selectClass}>
-              {LANG_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 flower:bg-petal-800 text-current">{o.label}</option>)}
+              {LANG_OPTIONS.map(o => <option key={o.value} value={o.value} className="bg-white dark:bg-forest-950 flower:bg-[#2A1A12] text-current">{o.label}</option>)}
             </select>
           </div>
         </section>

@@ -52,30 +52,34 @@ const speakWithWebSpeech = (text: string): void => {
 };
 
 /**
- * Mock TTS untuk development mode - PAKAI WEB SPEECH API
- */
-const getMockAudio = (): string => {
-  // Di DEV mode, kita gak perlu return audio base64
-  // Karena suara langsung dari Web Speech API
-  console.log('🔊 [DEV MODE] Menggunakan Web Speech API (bukan mock audio)');
-  return ''; // Return empty string, tidak dipakai
-};
-
-/**
- * Direct TTS API call via Netlify Function
+ * Direct TTS API call via Netlify Function (AI Gateway)
  */
 export const directTTSApiCall = async (text: string, voiceId: string): Promise<any> => {
+  // VALIDASI INPUT
+  if (!text) {
+    console.error('❌ [VALIDATION] text is undefined or empty');
+    throw new Error('Text is required for TTS');
+  }
+  
+  if (!voiceId) {
+    console.warn('⚠️ [VALIDATION] voiceId is empty, using default');
+    voiceId = 'default';
+  }
+
+  console.log('📤 [TTS REQUEST] Text length:', text.length);
+  console.log('📤 [TTS REQUEST] First 100 chars:', text.substring(0, 100));
+  console.log('📤 [TTS REQUEST] Voice ID:', voiceId);
+
   // ============== DEV MODE ==============
   if (process.env.NODE_ENV === 'development') {
     console.log('🔇 [DEV] TTS API bypass - menggunakan Web Speech langsung');
-    console.log('🎤 Teks:', text.substring(0, 100) + (text.length > 100 ? '...' : ''));
     
     // LANGSUNG BICARA PAKAI WEB SPEECH!
     speakWithWebSpeech(text);
     
     return {
       success: true,
-      audioContent: '', // Empty karena gak dipakai
+      audioContent: '',
       provider: 'web-speech-dev'
     };
   }
@@ -83,16 +87,37 @@ export const directTTSApiCall = async (text: string, voiceId: string): Promise<a
 
   // ============== PRODUCTION ==============
   try {
+    // AI GATEWAY mengharapkan format: { provider, task, input }
     const response = await fetch('/.netlify/functions/ai-gateway', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text, voiceId, type: 'tts' })
+      headers: { 
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ 
+        provider: 'google-tts',        // Field yang diharapkan
+        task: 'synthesize',             // Field yang diharapkan
+        input: {                        // Field yang diharapkan
+          text: String(text).trim(),
+          language: voiceId,
+          voice: voiceId
+        }
+      })
     });
     
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    return await response.json();
+    console.log('📥 [TTS RESPONSE] Status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('❌ [TTS ERROR] Response:', errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+    
+    const data = await response.json();
+    console.log('✅ [TTS SUCCESS] Response received');
+    return data;
   } catch (error) {
-    console.error('❌ TTS API error:', error);
+    console.error('❌ [TTS API] Error:', error);
     throw error;
   }
   // ======================================
@@ -102,51 +127,64 @@ export const directTTSApiCall = async (text: string, voiceId: string): Promise<a
  * Fetch TTS audio - MAIN FUNCTION
  */
 export const fetchTTSAudio = async (text: string, voiceId: string): Promise<string> => {
+  // VALIDASI INPUT DI AWAL
+  if (!text) {
+    console.error('❌ [fetchTTSAudio] text is undefined or empty');
+    throw new Error('Text is required for TTS');
+  }
+
+  console.log('🔊 [fetchTTSAudio] Memproses TTS untuk:', text.substring(0, 50) + '...');
+  console.log('🔊 [fetchTTSAudio] Voice ID:', voiceId);
+
   // ============== DEV MODE CHECK ==============
   if (process.env.NODE_ENV === 'development') {
-    console.log('🔊 [DEV MODE] Memproses TTS untuk:', text.substring(0, 50) + '...');
-    
-    // Simulasi network delay (biar keliatan loading)
+    // Simulasi network delay
     await new Promise(resolve => setTimeout(resolve, 800));
     
     // Panggil directTTSApiCall yang akan memainkan Web Speech
     await directTTSApiCall(text, voiceId);
     
-    // Return empty string karena suara langsung dari Web Speech
     return '';
   }
   // ============================================
 
   // ============== PRODUCTION ==============
   try {
-    // Try direct API first
+    // Try AI Gateway first
     const directResult = await directTTSApiCall(text, voiceId);
     if (directResult.success && directResult.audioContent) {
+      console.log('✅ [TTS] Success from AI Gateway');
       return directResult.audioContent;
     }
   } catch (error) {
-    console.warn('⚠️ Direct API failed, trying SDK...');
+    console.warn('⚠️ Direct API failed, trying Gemini API...');
   }
 
   try {
-    // Fallback ke Gemini API
+    // Fallback ke Gemini API dengan format yang benar
+    console.log('🔄 [TTS] Falling back to Gemini API');
+    
+    // Ekstrak language dari voiceId (misal: "Bahasa Sunda" -> "Sunda")
+    let language = voiceId;
+    if (voiceId.startsWith('Bahasa ')) {
+      language = voiceId.replace('Bahasa ', '');
+    }
+    
     const geminiResult = await callGeminiAPI('generateContent', {
-      model: "gemini-1.5-flash",
-      contents: [{
-        parts: [{
-          text: text
-        }]
-      }],
-      config: {
-        responseModalities: ["AUDIO"]
-      }
+      text: text,
+      language: language,
+      model: "gemini-2.0-flash-exp"
     });
     
-    if (geminiResult.success && geminiResult.audioContent) {
-      return geminiResult.audioContent;
+    if (geminiResult.success && geminiResult.text) {
+      console.log('✅ [TTS] Success from Gemini API');
+      
+      // Di Gemini API, kita perlu generate audio dari text
+      // Ini bisa diimplementasikan dengan Google Cloud TTS atau lainnya
+      return geminiResult.text; // Sementara return text dulu
     }
   } catch (error) {
-    console.error('❌ SDK also failed:', error);
+    console.error('❌ Gemini API also failed:', error);
     throw error;
   }
 
@@ -158,12 +196,9 @@ export const fetchTTSAudio = async (text: string, voiceId: string): Promise<stri
  * Check TTS cache
  */
 export const checkTTSCache = async (text: string, voiceId: string): Promise<boolean> => {
-  // DEV MODE - selalu false biar simulasi jalan
   if (process.env.NODE_ENV === 'development') {
     return false;
   }
-
-  // TODO: Implement actual cache check untuk production
   return false;
 };
 
@@ -190,7 +225,11 @@ export const getAudioContext = (): AudioContext | null => {
 export const preloadFolkloreTTS = async (text: string, voiceId: string): Promise<string> => {
   console.log('🎵 Preloading TTS untuk:', text.substring(0, 30) + '...');
   
-  // Di DEV mode, preload cuma simulasi
+  if (!text) {
+    console.error('❌ [preloadFolkloreTTS] text is undefined');
+    throw new Error('Text is required for preload');
+  }
+  
   if (process.env.NODE_ENV === 'development') {
     console.log('⏳ Simulasi preload (1 detik)');
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -201,7 +240,7 @@ export const preloadFolkloreTTS = async (text: string, voiceId: string): Promise
 };
 
 /**
- * Preload semua voices Web Speech (biar cepet)
+ * Preload semua voices Web Speech
  */
 export const preloadWebSpeechVoices = (): Promise<void> => {
   return new Promise((resolve) => {
@@ -223,7 +262,6 @@ export const preloadWebSpeechVoices = (): Promise<void> => {
       resolve();
     });
 
-    // Timeout 2 detik
     setTimeout(resolve, 2000);
   });
 };

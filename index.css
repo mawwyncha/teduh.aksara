@@ -172,3 +172,79 @@
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
   }
 }
+
+/* ========== FIX DROPDOWN SELECT - 3 THEMES ========== */
+
+/* LIGHT MODE (Default/Putih) */
+select option {
+  background-color: #ffffff !important;  /* Putih */
+  color: #064e3b !important;  /* emerald-800 untuk text */
+}
+
+select option:hover,
+select option:focus,
+select option:checked {
+  background-color: #f0fdf4 !important;  /* emerald-50 untuk hover */
+  color: #064e3b !important;
+}
+
+/* DARK MODE */
+.dark select option {
+  background-color: #0a1f12 !important;  /* forest-950 */
+  color: #d1fae5 !important;  /* emerald-200 */
+}
+
+.dark select option:hover,
+.dark select option:focus,
+.dark select option:checked {
+  background-color: #0f2917 !important;  /* Sedikit lebih terang */
+  color: #d1fae5 !important;
+}
+
+/* FLOWER MODE (Coklat Gelap) */
+.flower select option {
+  background-color: #2A1A12 !important;  /* Coklat gelap */
+  color: #fce7f3 !important;  /* pink-100 */
+}
+
+.flower select option:hover,
+.flower select option:focus,
+.flower select option:checked {
+  background-color: #3d2817 !important;  /* Coklat lebih terang untuk hover */
+  color: #fce7f3 !important;
+}
+
+/* Hilangkan highlight biru dari browser */
+select option::selection {
+  background-color: transparent !important;
+}
+
+/* Firefox specific */
+@-moz-document url-prefix() {
+  select option {
+    background-color: #ffffff !important;
+  }
+  
+  .dark select option {
+    background-color: #0a1f12 !important;
+  }
+  
+  .flower select option {
+    background-color: #2A1A12 !important;
+  }
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+@supports (-webkit-appearance: none) {
+  select option {
+    background-color: #ffffff !important;
+  }
+  
+  .dark select option {
+    background-color: #0a1f12 !important;
+  }
+  
+  .flower select option {
+    background-color: #2A1A12 !important;
+  }
+}

@@ -48,12 +48,25 @@ export const handler: Handler = async (event) => {
   const { provider, task, input, options, timestamp } = requestData;
   const userId = options?.userId || event.headers['client-ip'] || 'anonymous';
   
-  if (!provider || !task || !input) {
+  // PERBAIKAN: Handle TTS request yang tidak punya input di root level
+  // TTS mengirim: { provider: 'google-tts', task: 'synthesize', input: { text, language, voice } }
+  if (!provider || !task) {
     return {
       statusCode: 400,
       body: JSON.stringify({ 
         success: false, 
-        error: 'Missing required fields: provider, task, input' 
+        error: 'Missing required fields: provider, task' 
+      })
+    };
+  }
+  
+  // PERBAIKAN: Untuk TTS, input ada di dalam object, bukan string langsung
+  if (!input && task !== 'synthesize' && task !== 'tts') {
+    return {
+      statusCode: 400,
+      body: JSON.stringify({ 
+        success: false, 
+        error: 'Missing required field: input' 
       })
     };
   }
@@ -80,8 +93,24 @@ export const handler: Handler = async (event) => {
     let result;
     
     switch (provider) {
+      case 'google-tts':
       case 'gemini':
-        // Gunakan localhost untuk development, domain untuk production
+        // PERBAIKAN: Handle TTS request khusus
+        if (task === 'synthesize' || task === 'tts') {
+          console.log('🎤 TTS request received:', input);
+          
+          // Untuk sekarang, return error karena Google TTS belum dikonfigurasi
+          // Ini akan di-catch oleh tts-service.ts dan fallback ke Gemini API
+          return {
+            statusCode: 400,
+            body: JSON.stringify({
+              success: false,
+              error: 'Google TTS not configured, please use Gemini API directly'
+            })
+          };
+        }
+        
+        // Untuk non-TTS Gemini requests
         const geminiUrl = process.env.NODE_ENV === 'development' 
           ? 'http://localhost:8888/.netlify/functions/gemini-api'
           : `/.netlify/functions/gemini-api`;
@@ -111,7 +140,7 @@ export const handler: Handler = async (event) => {
             messages: [
               {
                 role: 'system',
-                content: getSystemPrompt(task, options) // PERBAIKAN: gunakan fungsi langsung
+                content: getSystemPrompt(task, options)
               },
               { role: 'user', content: input }
             ],
@@ -133,7 +162,7 @@ export const handler: Handler = async (event) => {
             messages: [
               {
                 role: 'system',
-                content: getSystemPrompt(task, options) // PERBAIKAN: gunakan fungsi langsung
+                content: getSystemPrompt(task, options)
               },
               { role: 'user', content: input }
             ],
