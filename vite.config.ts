@@ -4,8 +4,8 @@ import svgFixPlugin from "./vite-svg-fix-plugin.js";
 
 export default defineConfig({
   plugins: [
-    svgFixPlugin(),
     react(),
+    svgFixPlugin(),
   ],
   server: {
     port: 5173

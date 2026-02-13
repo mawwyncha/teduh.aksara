@@ -5,6 +5,7 @@ import { Layout } from './components/Layout';
 import { AppContent } from './components/AppContent';
 import { useAppLogic } from './hooks/useAppLogic';
 import { askTaraAboutPlatform } from './services';
+import './index.css'
 
 // Lazy load all modals
 const HistoryModal = lazy(() => import('./components/HistoryModal').then(m => ({ default: m.HistoryModal })));
