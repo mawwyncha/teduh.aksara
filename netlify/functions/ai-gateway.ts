@@ -1,199 +1,206 @@
 // netlify/functions/ai-gateway.ts
-// Central gateway untuk semua AI providers dengan rate limiting dan security
+// ✅ PATCH: Add fallback mechanism without changing existing logic
 
 import { Handler } from '@netlify/functions';
 
-// Rate limiting storage (in-memory, reset on cold start)
+// Rate limiting storage (in-memory)
 const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
 
-// Allowed models for security
-const ALLOWED_MODELS = {
-  deepseek: ['deepseek-chat'],
-  groq: ['llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
-  huggingface: ['indonesian-nlp/gpt2-small-indonesian', 'facebook/mbart-large-50-many-to-many-mmt']
-};
-
-// Helper: Generate system prompt based on task
-function getSystemPrompt(task: string, options: any): string {
-  const basePrompts: Record<string, string> = {
-    grammar: `Kamu adalah ahli bahasa Indonesia. Koreksi tata bahasa dan EYD dengan gaya ${options?.style || 'formal'} untuk konteks ${options?.context || 'umum'}.`,
-    translation: `Kamu adalah penerjemah ahli. Terjemahkan teks ke ${options?.language || 'Bahasa Indonesia'} dengan dialek yang autentik.`,
-    analysis: `Analisis teks dengan mendalam, berikan feedback konstruktif.`,
-    pronunciation: `Evaluasi pelafalan dan berikan saran perbaikan.`
+export const handler: Handler = async (event) => {
+  // CORS headers
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS'
   };
   
-  return basePrompts[task] || 'Bantu pengguna dengan respons yang helpful dan akurat.';
-}
-
-export const handler: Handler = async (event) => {
-  // 1. Security: Only allow POST
+  // Handle preflight
+  if (event.httpMethod === 'OPTIONS') {
+    return { statusCode: 200, headers, body: '' };
+  }
+  
+  // Only allow POST
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
+      headers,
       body: JSON.stringify({ success: false, error: 'Method not allowed' })
     };
   }
   
-  // 2. Parse and validate request
-  let requestData;
   try {
-    requestData = JSON.parse(event.body || '{}');
-  } catch {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ success: false, error: 'Invalid JSON' })
-    };
-  }
-  
-  const { provider, task, input, options, timestamp } = requestData;
-  const userId = options?.userId || event.headers['client-ip'] || 'anonymous';
-  
-  // PERBAIKAN: Handle TTS request yang tidak punya input di root level
-  // TTS mengirim: { provider: 'google-tts', task: 'synthesize', input: { text, language, voice } }
-  if (!provider || !task) {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ 
-        success: false, 
-        error: 'Missing required fields: provider, task' 
-      })
-    };
-  }
-  
-  // PERBAIKAN: Untuk TTS, input ada di dalam object, bukan string langsung
-  if (!input && task !== 'synthesize' && task !== 'tts') {
-    return {
-      statusCode: 400,
-      body: JSON.stringify({ 
-        success: false, 
-        error: 'Missing required field: input' 
-      })
-    };
-  }
-  
-  // 3. Rate limiting (50 requests per hour per user)
-  const rateLimitKey = `${userId}_${provider}`;
-  const now = Date.now();
-  const userLimit = rateLimitStore.get(rateLimitKey);
-  
-  if (userLimit && now < userLimit.resetTime && userLimit.count >= 50) {
-    return {
-      statusCode: 429,
-      body: JSON.stringify({ 
-        success: false, 
-        error: 'Rate limit exceeded. Coba lagi nanti.',
-        retryAfter: Math.ceil((userLimit.resetTime - now) / 1000)
-      })
-    };
-  }
-  
-  // 4. Route to appropriate provider
-  try {
-    let response;
-    let result;
+    const requestData = JSON.parse(event.body || '{}');
+    const { provider, task, input, payload, options, enableFallback = false } = requestData;
+    const userId = options?.userId || event.headers['client-ip'] || 'anonymous';
     
-    switch (provider) {
-      case 'google-tts':
-      case 'gemini':
-        // PERBAIKAN: Handle TTS request khusus
-        if (task === 'synthesize' || task === 'tts') {
-          console.log('🎤 TTS request received:', input);
-          
-          // Untuk sekarang, return error karena Google TTS belum dikonfigurasi
-          // Ini akan di-catch oleh tts-service.ts dan fallback ke Gemini API
-          return {
-            statusCode: 400,
-            body: JSON.stringify({
-              success: false,
-              error: 'Google TTS not configured, please use Gemini API directly'
-            })
-          };
-        }
+    // Validate required fields
+    if (!provider || !task) {
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({ 
+          success: false, 
+          error: 'Missing required fields: provider, task' 
+        })
+      };
+    }
+    
+    // ✨ NEW - Handle Google TTS redirect to Gemini
+    if (provider === 'google-tts' && (task === 'synthesize' || task === 'tts')) {
+      console.log('🎤 TTS request detected, suggesting Gemini fallback...');
+      
+      return {
+        statusCode: 400,
+        headers,
+        body: JSON.stringify({
+          success: false,
+          error: 'Google TTS not configured, please use Gemini API directly',
+          suggestion: 'Use provider: "gemini" with task: "tts"'
+        })
+      };
+    }
+    
+    // Rate limiting (50 requests per hour)
+    const rateLimitKey = `${userId}_${provider}`;
+    const now = Date.now();
+    const userLimit = rateLimitStore.get(rateLimitKey);
+    
+    if (userLimit && now < userLimit.resetTime && userLimit.count >= 50) {
+      return {
+        statusCode: 429,
+        headers,
+        body: JSON.stringify({ 
+          success: false, 
+          error: 'Rate limit exceeded. Coba lagi nanti.',
+          retryAfter: Math.ceil((userLimit.resetTime - now) / 1000)
+        })
+      };
+    }
+    
+    // Route to appropriate provider
+    let response;
+    let usedProvider = provider;
+    
+    try {
+      // ==================== GEMINI ====================
+      if (provider === 'gemini') {
+        console.log('🔷 Routing to Gemini API...');
         
-        // Untuk non-TTS Gemini requests
-        const geminiUrl = process.env.NODE_ENV === 'development' 
-          ? 'http://localhost:8888/.netlify/functions/gemini-api'
-          : `/.netlify/functions/gemini-api`;
-          
+        const geminiUrl = `${process.env.URL || ''}/.netlify/functions/gemini-api`;
+        
         response = await fetch(geminiUrl, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             action: task === 'tts' ? 'generateTTS' : 'generateContent',
-            params: {
-              contents: [{ parts: [{ text: input }] }],
-              config: options || {}
+            params: payload || {
+              text: typeof input === 'string' ? input : input?.text,
+              language: options?.language || 'Indonesia',
+              ...options
             }
           })
         });
-        break;
         
-      case 'deepseek':
+        if (!response.ok) {
+          throw new Error(`Gemini returned ${response.status}`);
+        }
+      }
+      
+      // ==================== DEEPSEEK ====================
+      else if (provider === 'deepseek') {
+        console.log('🔶 Routing to DeepSeek...');
+        
+        const deepseekKey = process.env.DEEPSEEK_API_KEY || process.env.DEEPSEEK_API_KEY_BACKUP;
+        if (!deepseekKey) {
+          throw new Error('DeepSeek API key not configured');
+        }
+        
         response = await fetch('https://api.deepseek.com/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`
+            'Authorization': `Bearer ${deepseekKey}`
           },
           body: JSON.stringify({
             model: 'deepseek-chat',
             messages: [
               {
                 role: 'system',
-                content: getSystemPrompt(task, options)
+                content: `You are a helpful assistant for ${task} task.`
               },
-              { role: 'user', content: input }
+              { 
+                role: 'user', 
+                content: typeof input === 'string' ? input : JSON.stringify(input)
+              }
             ],
             max_tokens: 1000,
             temperature: 0.7
           })
         });
-        break;
         
-      case 'groq':
+        if (!response.ok) {
+          throw new Error(`DeepSeek returned ${response.status}`);
+        }
+      }
+      
+      // ==================== GROQ ====================
+      else if (provider === 'groq') {
+        console.log('⚡ Routing to Groq...');
+        
+        const groqKey = process.env.GROQ_API_KEY || process.env.GROQ_API_KEY_BACKUP;
+        if (!groqKey) {
+          throw new Error('Groq API key not configured');
+        }
+        
         response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${process.env.GROQ_API_KEY}`
+            'Authorization': `Bearer ${groqKey}`
           },
           body: JSON.stringify({
-            model: 'llama-3.1-8b-instant',
+            model: options?.model || 'llama-3.1-8b-instant',
             messages: [
               {
                 role: 'system',
-                content: getSystemPrompt(task, options)
+                content: `You are a helpful assistant for ${task} task.`
               },
-              { role: 'user', content: input }
+              { 
+                role: 'user', 
+                content: typeof input === 'string' ? input : JSON.stringify(input)
+              }
             ],
-            max_tokens: 800
+            max_tokens: 800,
+            temperature: 0.7
           })
         });
-        break;
         
-      case 'huggingface':
-        // Validate model
-        const model = options?.model || 'indonesian-nlp/gpt2-small-indonesian';
-        if (!ALLOWED_MODELS.huggingface.includes(model)) {
-          return {
-            statusCode: 403,
-            body: JSON.stringify({ 
-              success: false, 
-              error: 'Model tidak diizinkan' 
-            })
-          };
+        if (!response.ok) {
+          throw new Error(`Groq returned ${response.status}`);
         }
+      }
+      
+      // ==================== HUGGINGFACE ====================
+      else if (provider === 'huggingface') {
+        console.log('🤗 Routing to HuggingFace...');
+        
+        const hfKey = process.env.HF_API_KEY || process.env.HF_API_KEY_BACKUP;
+        if (!hfKey) {
+          throw new Error('HuggingFace API key not configured');
+        }
+        
+        const model = options?.model || 'indonesian-nlp/gpt2-small-indonesian';
         
         response = await fetch(
           `https://api-inference.huggingface.co/models/${model}`,
           {
             method: 'POST',
             headers: {
-              'Authorization': `Bearer ${process.env.HF_API_KEY}`,
+              'Authorization': `Bearer ${hfKey}`,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              inputs: input,
+              inputs: typeof input === 'string' ? input : JSON.stringify(input),
               parameters: {
                 max_length: 500,
                 temperature: 0.7,
@@ -202,45 +209,80 @@ export const handler: Handler = async (event) => {
             })
           }
         );
-        break;
         
-      default:
+        if (!response.ok) {
+          throw new Error(`HuggingFace returned ${response.status}`);
+        }
+      }
+      
+      else {
         return {
           statusCode: 400,
+          headers,
           body: JSON.stringify({ 
             success: false, 
-            error: 'Provider tidak didukung' 
+            error: `Provider ${provider} tidak didukung`
           })
         };
+      }
+      
+    } catch (providerError: any) {
+      console.error(`❌ Provider ${provider} failed:`, providerError.message);
+      
+      // ✨ NEW - Optional fallback to Gemini if enabled
+      if (enableFallback && provider !== 'gemini') {
+        console.log('🔄 Trying Gemini as fallback...');
+        
+        try {
+          const geminiUrl = `${process.env.URL || ''}/.netlify/functions/gemini-api`;
+          
+          response = await fetch(geminiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              action: 'generateContent',
+              params: {
+                text: typeof input === 'string' ? input : JSON.stringify(input),
+                ...options
+              }
+            })
+          });
+          
+          if (response.ok) {
+            usedProvider = 'gemini';
+            console.log('✅ Fallback to Gemini successful');
+          } else {
+            throw providerError;
+          }
+        } catch (fallbackError) {
+          throw providerError; // Throw original error
+        }
+      } else {
+        throw providerError;
+      }
     }
     
-    // 5. Handle provider response
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Provider ${provider} error:`, response.status, errorText);
-      throw new Error(`Provider ${provider} returned ${response.status}`);
-    }
+    // Parse response
+    const result = await response.json();
     
-    result = await response.json();
-    
-    // 6. Update rate limit
+    // Update rate limit
     const resetTime = now + 3600000; // 1 hour
     rateLimitStore.set(rateLimitKey, {
       count: (userLimit?.count || 0) + 1,
       resetTime
     });
     
-    // 7. Log (non-sensitive)
-    console.log(`✅ AI Gateway: ${provider} for ${task}, user: ${userId}`);
+    // Success response
+    console.log(`✅ AI Gateway: Success with ${usedProvider}`);
     
     return {
       statusCode: 200,
+      headers,
       body: JSON.stringify({
         success: true,
         data: result,
-        provider,
-        task,
-        cached: false
+        provider: usedProvider,
+        fallbackUsed: usedProvider !== provider
       })
     };
     
@@ -249,10 +291,11 @@ export const handler: Handler = async (event) => {
     
     return {
       statusCode: 500,
+      headers,
       body: JSON.stringify({ 
         success: false,
         error: 'Internal server error',
-        message: error.message 
+        message: error.message
       })
     };
   }

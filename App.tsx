@@ -5,7 +5,7 @@ import { Layout } from './components/Layout';
 import { AppContent } from './components/AppContent';
 import { useAppLogic } from './hooks/useAppLogic';
 import { askTaraAboutPlatform } from './services';
-import './index.css'
+
 
 // Lazy load all modals
 const HistoryModal = lazy(() => import('./components/HistoryModal').then(m => ({ default: m.HistoryModal })));
@@ -41,7 +41,7 @@ export const App: React.FC = () => {
 
   return (
     <>
-      <div className="pt-10 md:pt-12 font-sans">
+      <div className="font-sans">
         <Layout
           activeModal={app.isHistoryModalOpen ? 'history' : app.isGuideModalOpen ? 'guide' : app.isDevModalOpen ? 'dev' : app.isFanGalleryModalOpen ? 'gallery' : app.isCatalogModalOpen ? 'catalog' : null}
           onHistoryClick={() => !app.isBusy && app.setIsHistoryModalOpen(true)}

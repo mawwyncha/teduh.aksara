@@ -1,16 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { fetchTTSAudio, checkTTSCache } from '../services/tts-service';
 
-interface ImportMetaEnv {
-  readonly DEV: boolean;
-}
-
-declare global {
-  interface ImportMeta {
-    readonly env: ImportMetaEnv;
-  }
-}
-
 interface FolkloreItem {
   provinceName: string;
   languageName: string;
@@ -52,7 +42,8 @@ export const usePreloadAllFolklore = (folkloreData: FolkloreItem[]) => {
 
     const preloadAll = async () => {
       // ==================== DEV MODE CHECK ====================
-      if (import.meta.env.DEV) {
+      // Fix: Gunakan optional chaining untuk akses safe ke import.meta.env
+      if (typeof import.meta !== 'undefined' && (import.meta as any).env?.DEV) {
         console.log('🎯 [DEV MODE] Simulating TTS preload without API calls');
         
         isPreloadingRef.current = true;

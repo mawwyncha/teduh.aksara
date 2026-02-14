@@ -1,7 +1,11 @@
 import { callGeminiAPI } from './gemini-core';
-import { voiceService } from './voiceService';
 
-// ==================== TTS SERVICE - DENGAN WEB SPEECH UNTUK DEV MODE ====================
+// Helper untuk deteksi mode development secara aman
+const isDevMode = () => {
+  if (typeof import.meta !== 'undefined' && (import.meta as any).env?.DEV) return true;
+  if (typeof process !== 'undefined' && process.env.NODE_ENV === 'development') return true;
+  return false;
+};
 
 /**
  * PLAY SUARA LANGSUNG PAKAI WEB SPEECH API (DEV MODE)
@@ -12,25 +16,13 @@ const speakWithWebSpeech = (text: string): void => {
     return;
   }
 
-  // Cancel speech yang sedang berjalan
   window.speechSynthesis.cancel();
-
-  // Buat utterance baru
   const utterance = new SpeechSynthesisUtterance(text);
-  
-  // Set bahasa Indonesia
   utterance.lang = 'id-ID';
-  
-  // Kecepatan normal (0.9 biar lebih natural)
   utterance.rate = 0.9;
-  
-  // Pitch normal
   utterance.pitch = 1.0;
-  
-  // Volume maksimal
   utterance.volume = 1.0;
 
-  // Cari voice Indonesia
   const voices = window.speechSynthesis.getVoices();
   const indonesianVoice = voices.find(voice => 
     voice.lang.includes('id') || 
@@ -42,12 +34,10 @@ const speakWithWebSpeech = (text: string): void => {
     utterance.voice = indonesianVoice;
   }
 
-  // Event listeners untuk debugging
   utterance.onstart = () => console.log('🔊 Web Speech: mulai bicara');
   utterance.onend = () => console.log('✅ Web Speech: selesai');
   utterance.onerror = (event) => console.error('❌ Web Speech error:', event);
 
-  // Mulai bicara!
   window.speechSynthesis.speak(utterance);
 };
 
@@ -55,7 +45,6 @@ const speakWithWebSpeech = (text: string): void => {
  * Direct TTS API call via Netlify Function (AI Gateway)
  */
 export const directTTSApiCall = async (text: string, voiceId: string): Promise<any> => {
-  // VALIDASI INPUT
   if (!text) {
     console.error('❌ [VALIDATION] text is undefined or empty');
     throw new Error('Text is required for TTS');
@@ -67,27 +56,18 @@ export const directTTSApiCall = async (text: string, voiceId: string): Promise<a
   }
 
   console.log('📤 [TTS REQUEST] Text length:', text.length);
-  console.log('📤 [TTS REQUEST] First 100 chars:', text.substring(0, 100));
-  console.log('📤 [TTS REQUEST] Voice ID:', voiceId);
-
-  // ============== DEV MODE ==============
-  if (process.env.NODE_ENV === 'development') {
+  
+  if (isDevMode()) {
     console.log('🔇 [DEV] TTS API bypass - menggunakan Web Speech langsung');
-    
-    // LANGSUNG BICARA PAKAI WEB SPEECH!
     speakWithWebSpeech(text);
-    
     return {
       success: true,
       audioContent: '',
       provider: 'web-speech-dev'
     };
   }
-  // ======================================
 
-  // ============== PRODUCTION ==============
   try {
-    // AI GATEWAY mengharapkan format: { provider, task, input }
     const response = await fetch('/.netlify/functions/ai-gateway', {
       method: 'POST',
       headers: { 
@@ -95,17 +75,16 @@ export const directTTSApiCall = async (text: string, voiceId: string): Promise<a
         'Accept': 'application/json'
       },
       body: JSON.stringify({ 
-        provider: 'google-tts',        // Field yang diharapkan
-        task: 'synthesize',             // Field yang diharapkan
-        input: {                        // Field yang diharapkan
+        provider: 'google-tts',
+        task: 'synthesize',
+        input: {
           text: String(text).trim(),
           language: voiceId,
           voice: voiceId
-        }
+        },
+        enableFallback: true
       })
     });
-    
-    console.log('📥 [TTS RESPONSE] Status:', response.status);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -113,47 +92,31 @@ export const directTTSApiCall = async (text: string, voiceId: string): Promise<a
       throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
     
-    const data = await response.json();
-    console.log('✅ [TTS SUCCESS] Response received');
-    return data;
+    return await response.json();
   } catch (error) {
     console.error('❌ [TTS API] Error:', error);
     throw error;
   }
-  // ======================================
 };
 
 /**
  * Fetch TTS audio - MAIN FUNCTION
  */
 export const fetchTTSAudio = async (text: string, voiceId: string): Promise<string> => {
-  // VALIDASI INPUT DI AWAL
   if (!text) {
     console.error('❌ [fetchTTSAudio] text is undefined or empty');
     throw new Error('Text is required for TTS');
   }
 
-  console.log('🔊 [fetchTTSAudio] Memproses TTS untuk:', text.substring(0, 50) + '...');
-  console.log('🔊 [fetchTTSAudio] Voice ID:', voiceId);
-
-  // ============== DEV MODE CHECK ==============
-  if (process.env.NODE_ENV === 'development') {
-    // Simulasi network delay
+  if (isDevMode()) {
     await new Promise(resolve => setTimeout(resolve, 800));
-    
-    // Panggil directTTSApiCall yang akan memainkan Web Speech
     await directTTSApiCall(text, voiceId);
-    
     return '';
   }
-  // ============================================
 
-  // ============== PRODUCTION ==============
   try {
-    // Try AI Gateway first
     const directResult = await directTTSApiCall(text, voiceId);
     if (directResult.success && directResult.audioContent) {
-      console.log('✅ [TTS] Success from AI Gateway');
       return directResult.audioContent;
     }
   } catch (error) {
@@ -161,10 +124,6 @@ export const fetchTTSAudio = async (text: string, voiceId: string): Promise<stri
   }
 
   try {
-    // Fallback ke Gemini API dengan format yang benar
-    console.log('🔄 [TTS] Falling back to Gemini API');
-    
-    // Ekstrak language dari voiceId (misal: "Bahasa Sunda" -> "Sunda")
     let language = voiceId;
     if (voiceId.startsWith('Bahasa ')) {
       language = voiceId.replace('Bahasa ', '');
@@ -173,32 +132,28 @@ export const fetchTTSAudio = async (text: string, voiceId: string): Promise<stri
     const geminiResult = await callGeminiAPI('generateContent', {
       text: text,
       language: language,
-      model: "gemini-2.0-flash-exp"
+      model: "gemini-1.5-flash"
     });
     
     if (geminiResult.success && geminiResult.text) {
-      console.log('✅ [TTS] Success from Gemini API');
-      
-      // Di Gemini API, kita perlu generate audio dari text
-      // Ini bisa diimplementasikan dengan Google Cloud TTS atau lainnya
-      return geminiResult.text; // Sementara return text dulu
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        speakWithWebSpeech(geminiResult.text);
+      }
+      return geminiResult.text;
     }
   } catch (error) {
-    console.error('❌ Gemini API also failed:', error);
+    console.error('❌ Gemini API juga gagal:', error);
     throw error;
   }
 
   throw new Error('All TTS methods failed');
-  // ======================================
 };
 
 /**
  * Check TTS cache
  */
 export const checkTTSCache = async (text: string, voiceId: string): Promise<boolean> => {
-  if (process.env.NODE_ENV === 'development') {
-    return false;
-  }
+  if (isDevMode()) return false;
   return false;
 };
 
@@ -223,15 +178,12 @@ export const getAudioContext = (): AudioContext | null => {
  * Preload TTS untuk multiple teks
  */
 export const preloadFolkloreTTS = async (text: string, voiceId: string): Promise<string> => {
-  console.log('🎵 Preloading TTS untuk:', text.substring(0, 30) + '...');
-  
   if (!text) {
     console.error('❌ [preloadFolkloreTTS] text is undefined');
     throw new Error('Text is required for preload');
   }
   
-  if (process.env.NODE_ENV === 'development') {
-    console.log('⏳ Simulasi preload (1 detik)');
+  if (isDevMode()) {
     await new Promise(resolve => setTimeout(resolve, 1000));
     return '';
   }
@@ -251,14 +203,11 @@ export const preloadWebSpeechVoices = (): Promise<void> => {
 
     const voices = window.speechSynthesis.getVoices();
     if (voices.length > 0) {
-      console.log(`🗣️ ${voices.length} voices tersedia`);
       resolve();
       return;
     }
 
     window.speechSynthesis.addEventListener('voiceschanged', () => {
-      const loadedVoices = window.speechSynthesis.getVoices();
-      console.log(`🗣️ ${loadedVoices.length} voices dimuat`);
       resolve();
     });
 

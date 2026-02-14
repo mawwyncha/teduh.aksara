@@ -499,7 +499,8 @@ export const useAppLogic = () => {
     loadingMsg,
     funFactMsg,
     permissionType, setPermissionType,
-    isLimitReached,
+    // Added setIsLimitReached to fix error in App.tsx
+    isLimitReached, setIsLimitReached,
     isLimitModalOpen, setIsLimitModalOpen,
     isHistoryModalOpen, setIsHistoryModalOpen,
     isGuideModalOpen, setIsGuideModalOpen,

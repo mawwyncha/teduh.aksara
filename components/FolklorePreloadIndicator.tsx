@@ -21,7 +21,6 @@ interface FolklorePreloadIndicatorProps {
  */
 export class FolklorePreloadIndicator extends React.Component<FolklorePreloadIndicatorProps> {
   private timer: NodeJS.Timeout | null = null;
-  props: any;
 
   componentDidUpdate(prevProps: FolklorePreloadIndicatorProps) {
     if (this.props.progress.isComplete && 
@@ -85,14 +84,28 @@ export class FolklorePreloadIndicator extends React.Component<FolklorePreloadInd
             {onDismiss && (
               <button
                 onClick={onDismiss}
-                className={`w-6 h-6 rounded-full opacity-40 hover:opacity-100 transition-opacity flex items-center justify-center ${
-                  isFlower ? 'text-[rgb(252,231,243)]' 
-                    : isDark ? 'text-[rgb(251,191,36)]' 
-                    : 'text-[rgb(5,150,105)]'
+                className={`w-8 h-8 rounded-full flex items-center justify-center transition-all hover:scale-110 active:scale-95 ${
+                  isFlower ? 'bg-pink-800/50 hover:bg-pink-700 text-[rgb(252,231,243)]' 
+                    : isDark ? 'bg-emerald-800/50 hover:bg-emerald-700 text-[rgb(251,191,36)]' 
+                    : 'bg-emerald-100/50 hover:bg-emerald-200 text-[rgb(5,150,105)]'
                 }`}
                 aria-label="Tutup"
+                title="Tutup notifikasi"
               >
-                ×
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  width="16" 
+                  height="16" 
+                  viewBox="0 0 24 24" 
+                  fill="none" 
+                  stroke="currentColor" 
+                  strokeWidth="2.5" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                >
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
               </button>
             )}
           </div>

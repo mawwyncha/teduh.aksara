@@ -70,6 +70,7 @@ export const AppContent: React.FC<AppContentProps> = ({ isHelpActive, onHelpTogg
   const app = useAppLogic();
   const folkloreData = getAllFolkloreData();
   const progress = usePreloadAllFolklore(folkloreData);
+  const [showPreload, setShowPreload] = React.useState(true);
 
   const currentLangLabel = LANG_OPTIONS.find(opt => opt.value === app.targetLang)?.label || app.targetLang;
 
@@ -396,10 +397,13 @@ export const AppContent: React.FC<AppContentProps> = ({ isHelpActive, onHelpTogg
         </div>
       </div>
       
-      <FolklorePreloadIndicator 
-        progress={progress} 
-        theme={app.currentTheme}
-      />
+      {showPreload && (
+        <FolklorePreloadIndicator 
+          progress={progress} 
+          theme={app.currentTheme}
+          onDismiss={() => setShowPreload(false)}
+        />
+      )}
     </>
   );
 };

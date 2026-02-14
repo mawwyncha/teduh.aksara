@@ -10,10 +10,6 @@
       "DOM.Iterable"
     ],
     "skipLibCheck": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "./types"
-    ],
     "types": [
       "node"
     ],
@@ -29,14 +25,5 @@
     },
     "allowImportingTsExtensions": true,
     "noEmit": true
-  },
-  "include": [
-    "**/*.ts",
-    "**/*.tsx",
-    "types/**/*.d.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  }
 }

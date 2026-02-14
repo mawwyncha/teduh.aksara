@@ -104,6 +104,57 @@
   .container-custom {
     @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
   }
+
+  /* ====== TAMBAHAN KOMPONEN BARU ====== */
+  
+  /* Button dengan ripple effect */
+  .btn-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-ripple::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .btn-ripple:hover::before {
+    width: 300px;
+    height: 300px;
+  }
+
+  /* Card dengan glass effect */
+  .card-glass {
+    @apply backdrop-blur-md bg-white/70 dark:bg-gray-900/70 
+           border border-white/20 rounded-2xl shadow-soft p-6 
+           transition-all duration-300;
+  }
+
+  /* Badge dengan animasi */
+  .badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold
+           transition-all duration-300 transform hover:scale-110;
+  }
+
+  .badge-emerald {
+    @apply badge bg-emerald-100 text-emerald-800;
+  }
+
+  .badge-pink {
+    @apply badge bg-pink-100 text-pink-800;
+  }
+
+  .badge-amber {
+    @apply badge bg-amber-100 text-amber-800;
+  }
 }
 
 /* Custom utilities */
@@ -170,6 +221,223 @@
   
   .animate-pulse-slow {
     animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  /* ====== TAMBAHAN UTILITIES BARU ====== */
+
+  /* Glass effect variants */
+  .glass-pink {
+    @apply backdrop-blur-md bg-pink-50/70 border border-pink-200/20;
+  }
+
+  .glass-emerald {
+    @apply backdrop-blur-md bg-emerald-50/70 border border-emerald-200/20;
+  }
+
+  /* Gradient backgrounds dengan animasi */
+  .bg-gradient-animated {
+    background-size: 200% auto;
+    animation: gradient-shift 8s ease infinite;
+  }
+
+  .bg-gradient-emerald {
+    @apply bg-gradient-to-r from-emerald-500 to-teal-600;
+  }
+
+  .bg-gradient-flower {
+    @apply bg-gradient-to-r from-pink-400 via-purple-500 to-pink-600;
+  }
+
+  /* Shadow glow effects */
+  .shadow-glow-emerald {
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.5),
+                0 0 40px rgba(34, 197, 94, 0.3);
+  }
+
+  .shadow-glow-pink {
+    box-shadow: 0 0 20px rgba(236, 72, 153, 0.5),
+                0 0 40px rgba(236, 72, 153, 0.3);
+  }
+
+  .shadow-glow-blue {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5),
+                0 0 40px rgba(59, 130, 246, 0.3);
+  }
+
+  /* Shimmer effect untuk loading */
+  .shimmer {
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.4) 50%,
+      transparent 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 2s linear infinite;
+  }
+
+  /* Premium Shimmer Effect */
+  .premium-shimmer {
+    background: linear-gradient(
+      120deg,
+      #22c55e 0%,
+      #10b981 25%,
+      #14b8a6 50%,
+      #10b981 75%,
+      #22c55e 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  .flower .premium-shimmer {
+    background: linear-gradient(
+      120deg,
+      #ec4899 0%,
+      #f472b6 25%,
+      #f9a8d4 50%,
+      #f472b6 75%,
+      #ec4899 100%
+    );
+    background-size: 200% auto;
+    animation: shimmer 3s linear infinite;
+  }
+
+  /* Floating animations dengan variasi */
+  .float-slow {
+    animation: float-slow 6s ease-in-out infinite;
+  }
+
+  .float-delayed {
+    animation: float 4s ease-in-out 1s infinite;
+  }
+
+  /* Hover effects */
+  .hover-lift {
+    @apply transition-all duration-300;
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.15);
+  }
+
+  .hover-grow {
+    @apply transition-transform duration-300;
+  }
+
+  .hover-grow:hover {
+    transform: scale(1.05);
+  }
+
+  .hover-rotate {
+    @apply transition-transform duration-500;
+  }
+
+  .hover-rotate:hover {
+    transform: rotate(360deg);
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    background: linear-gradient(120deg, #22c55e, #10b981, #14b8a6);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% auto;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  .gradient-text-pink {
+    background: linear-gradient(120deg, #ec4899, #f472b6, #f9a8d4);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% auto;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  .gradient-text-blue {
+    background: linear-gradient(120deg, #3b82f6, #8b5cf6, #6366f1);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200% auto;
+    animation: gradient-shift 3s ease infinite;
+  }
+
+  /* Wiggle effect */
+  .animate-wiggle {
+    animation: wiggle 1s ease-in-out infinite;
+  }
+
+  .animate-wiggle-slow {
+    animation: wiggle 2s ease-in-out infinite;
+  }
+
+  /* Bounce variations */
+  .animate-bounce-soft {
+    animation: bounce-soft 2s infinite;
+  }
+
+  /* Spin variations */
+  .animate-spin-slow {
+    animation: spin 3s linear infinite;
+  }
+
+  .animate-spin-slower {
+    animation: spin 6s linear infinite;
+  }
+
+  /* Pulse variations */
+  .animate-pulse-soft {
+    animation: pulse-soft 3s ease-in-out infinite;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Interactive card effect */
+  .interactive-card {
+    @apply transition-all duration-300 cursor-pointer;
+  }
+
+  .interactive-card:hover {
+    transform: translateY(-4px) scale(1.02);
+    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.15);
+  }
+
+  .interactive-card:active {
+    transform: translateY(-2px) scale(1.01);
+  }
+
+  /* Backdrop blur glass */
+  .backdrop-blur-glass {
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+  }
+
+  /* Neon glow text */
+  .neon-emerald {
+    text-shadow: 
+      0 0 10px rgba(34, 197, 94, 0.8),
+      0 0 20px rgba(34, 197, 94, 0.6),
+      0 0 30px rgba(34, 197, 94, 0.4);
+  }
+
+  .neon-pink {
+    text-shadow: 
+      0 0 10px rgba(236, 72, 153, 0.8),
+      0 0 20px rgba(236, 72, 153, 0.6),
+      0 0 30px rgba(236, 72, 153, 0.4);
+  }
+
+  .neon-blue {
+    text-shadow: 
+      0 0 10px rgba(59, 130, 246, 0.8),
+      0 0 20px rgba(59, 130, 246, 0.6),
+      0 0 30px rgba(59, 130, 246, 0.4);
   }
 }
 
@@ -246,5 +514,100 @@ select option::selection {
   
   .flower select option {
     background-color: #2A1A12 !important;
+  }
+}
+
+/* ========== KEYFRAMES ANIMATIONS (BARU) ========== */
+
+@keyframes gradient-shift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% center;
+  }
+  100% {
+    background-position: 200% center;
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+}
+
+@keyframes wiggle {
+  0%, 100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(3deg);
+  }
+}
+
+@keyframes bounce-soft {
+  0%, 100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(-15%);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+  }
+  50% {
+    opacity: 0.9;
+    box-shadow: 0 0 40px rgba(34, 197, 94, 0.8);
+  }
+}
+
+/* ========== ACCESSIBILITY ========== */
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ========== PRINT STYLES ========== */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
   }
 }

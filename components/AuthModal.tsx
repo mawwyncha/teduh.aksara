@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useRef } from 'react';
 
 interface AuthModalProps {
@@ -13,52 +12,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [honeypot, setHoneypot] = useState('');
-  const [recaptchaWidgetId, setRecaptchaWidgetId] = useState<number | null>(null);
-  const captchaContainerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const initRecaptcha = () => {
-      if (isOpen && mode === 'signup' && window.grecaptcha && window.grecaptcha.render && captchaContainerRef.current && recaptchaWidgetId === null) {
-        try {
-          const id = window.grecaptcha.render(captchaContainerRef.current, {
-            sitekey: "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI",
-            callback: 'onAuthCaptchaSubmit',
-            size: 'invisible'
-          });
-          setRecaptchaWidgetId(id);
-        } catch (e) {
-          console.warn("Auth reCAPTCHA render failed", e);
-        }
-      }
-    };
-
-    if (isOpen) {
-      setHoneypot('');
-      
-      // Global callback for auth recaptcha
-      (window as any).onAuthCaptchaSubmit = (token: string) => {
-        if (token) {
-           completeAuthProcess();
-        }
-      };
-
-      if (mode === 'signup') {
-        if (window.grecaptcha && window.grecaptcha.render) {
-          initRecaptcha();
-        } else {
-          const timer = setInterval(() => {
-            if (window.grecaptcha && window.grecaptcha.render) {
-              initRecaptcha();
-              clearInterval(timer);
-            }
-          }, 500);
-          return () => clearInterval(timer);
-        }
-      }
-    } else {
-      setRecaptchaWidgetId(null);
-    }
-  }, [isOpen, mode, recaptchaWidgetId]);
 
   if (!isOpen) return null;
 
@@ -71,21 +24,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
       return;
     }
 
-    // Protection 2: Invisible reCAPTCHA (only for signup)
-    if (mode === 'signup' && window.grecaptcha && recaptchaWidgetId !== null) {
-      window.grecaptcha.execute(recaptchaWidgetId);
-    } else {
-      completeAuthProcess();
-    }
+    // Bypass reCAPTCHA and complete process
+    completeAuthProcess();
   };
 
   const completeAuthProcess = () => {
     const finalName = mode === 'signup' ? name : email.split('@')[0];
     onSuccess(finalName || 'Sahabat Alam');
     onClose();
-    if (window.grecaptcha && recaptchaWidgetId !== null) {
-      window.grecaptcha.reset(recaptchaWidgetId);
-    }
   };
 
   return (
@@ -101,7 +47,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         <div className="flex justify-center mb-6 sm:mb-8 mt-4 sm:mt-0">
           <div className="inline-flex p-1.5 bg-emerald-50/50 dark:bg-emerald-900/20 rounded-2xl">
             <button 
-              onClick={() => { setMode('login'); setRecaptchaWidgetId(null); }}
+              onClick={() => setMode('login')}
               className={`px-6 sm:px-8 py-2.5 sm:py-3 rounded-xl text-base font-bold transition-all ${mode === 'login' ? 'bg-white dark:bg-emerald-800 text-emerald-700 dark:text-emerald-100 shadow-sm' : 'text-emerald-400 dark:text-emerald-600'}`}
             >
               Masuk
@@ -125,18 +71,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, onSuccess
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-          {/* Honeypot field - Totally hidden */}
           <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', visibility: 'hidden' }} aria-hidden="true">
             <input type="text" value={honeypot} onChange={e => setHoneypot(e.target.value)} tabIndex={-1} autoComplete="off" name="auth_verify_field" />
           </div>
-
-          {/* reCAPTCHA Invisible Anchor for Auth */}
-          {mode === 'signup' && (
-            <div 
-              ref={captchaContainerRef}
-              className="recaptcha-auth-container"
-            ></div>
-          )}
 
           {mode === 'signup' && (
             <div className="group">
