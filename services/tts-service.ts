@@ -159,8 +159,12 @@ export const checkTTSCache = async (text: string, voiceId: string): Promise<bool
 
 /**
  * Generate speech (alias untuk fetchTTSAudio)
+ * Parameter ke-3 readingGuide diterima tapi tidak dipakai di TTS,
+ * hanya untuk kompatibilitas dengan pemanggil di App.tsx
  */
-export const generateSpeech = fetchTTSAudio;
+export const generateSpeech = (text: string, voiceId: string, _readingGuide?: string): Promise<string> => {
+  return fetchTTSAudio(text, voiceId);
+};
 
 /**
  * Get audio context (untuk Tone.js)

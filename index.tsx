@@ -1,9 +1,7 @@
-
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-// Fix: Reverted to default import as the main App component is usually exported as default
+// Fix: Reverted to default import as the App component is typically exported as default
 import App from './App';
-import './index.css';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) {

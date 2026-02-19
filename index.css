@@ -1,613 +1,82 @@
+/* Base Reset untuk Teduh Aksara */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom base styles */
-@layer base {
-  html {
-    @apply scroll-smooth;
-  }
-
-  body {
-    @apply antialiased bg-gray-50 text-gray-900;
-    font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  }
-
-  /* Custom scrollbar */
-  ::-webkit-scrollbar {
-    @apply w-2;
-  }
-
-  ::-webkit-scrollbar-track {
-    @apply bg-gray-100;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    @apply bg-gray-300 rounded-full;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    @apply bg-gray-400;
-  }
-
-  /* Selection color */
-  ::selection {
-    @apply bg-blue-100 text-blue-900;
-  }
-
-  /* Better focus outline */
-  :focus-visible {
-    @apply outline-none ring-2 ring-blue-500 ring-offset-2;
-  }
-
-  /* Heading styles */
-  h1 {
-    @apply text-4xl font-bold text-gray-900;
-  }
-  
-  h2 {
-    @apply text-3xl font-bold text-gray-800;
-  }
-  
-  h3 {
-    @apply text-2xl font-semibold text-gray-700;
-  }
-  
-  h4 {
-    @apply text-xl font-semibold text-gray-700;
-  }
-  
-  p {
-    @apply text-gray-600 leading-relaxed;
-  }
+:root {
+  --forest-50: #f0f7f4;
+  --forest-900: #05140d;
 }
 
-/* Custom component classes */
-@layer components {
-  .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 
-           focus:outline-none focus:ring-2 focus:ring-offset-2 
-           disabled:opacity-50 disabled:cursor-not-allowed;
-  }
-
-  .btn-primary {
-    @apply btn bg-blue-500 text-white hover:bg-blue-600 
-           focus:ring-blue-500 active:bg-blue-700;
-  }
-
-  .btn-secondary {
-    @apply btn bg-gray-200 text-gray-800 hover:bg-gray-300 
-           focus:ring-gray-500 active:bg-gray-400;
-  }
-
-  .btn-danger {
-    @apply btn bg-red-500 text-white hover:bg-red-600 
-           focus:ring-red-500 active:bg-red-700;
-  }
-
-  .card {
-    @apply bg-white rounded-lg shadow-sm border border-gray-200 
-           p-6 transition-all duration-200 hover:shadow-md;
-  }
-
-  .input {
-    @apply w-full px-4 py-2 border border-gray-300 rounded-lg 
-           focus:border-blue-500 focus:ring-2 focus:ring-blue-200 
-           transition-all duration-200 placeholder-gray-400 
-           bg-white text-gray-900;
-  }
-
-  .label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
-  }
-  
-  .container-custom {
-    @apply max-w-7xl mx-auto px-4 sm:px-6 lg:px-8;
-  }
-
-  /* ====== TAMBAHAN KOMPONEN BARU ====== */
-  
-  /* Button dengan ripple effect */
-  .btn-ripple {
-    position: relative;
-    overflow: hidden;
-  }
-
-  .btn-ripple::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-  }
-
-  .btn-ripple:hover::before {
-    width: 300px;
-    height: 300px;
-  }
-
-  /* Card dengan glass effect */
-  .card-glass {
-    @apply backdrop-blur-md bg-white/70 dark:bg-gray-900/70 
-           border border-white/20 rounded-2xl shadow-soft p-6 
-           transition-all duration-300;
-  }
-
-  /* Badge dengan animasi */
-  .badge {
-    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold
-           transition-all duration-300 transform hover:scale-110;
-  }
-
-  .badge-emerald {
-    @apply badge bg-emerald-100 text-emerald-800;
-  }
-
-  .badge-pink {
-    @apply badge bg-pink-100 text-pink-800;
-  }
-
-  .badge-amber {
-    @apply badge bg-amber-100 text-amber-800;
-  }
+* {
+  -webkit-tap-highlight-color: transparent;
 }
 
-/* Custom utilities */
-@layer utilities {
-  /* Text balance */
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  /* Hide scrollbar but keep functionality */
-  .scrollbar-hide {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-  
-  .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Glass effect */
-  .glass {
-    @apply backdrop-blur-md bg-white/70 border border-white/20;
-  }
-
-  .glass-dark {
-    @apply backdrop-blur-md bg-black/70 border border-white/10;
-  }
-
-  /* Gradient backgrounds */
-  .bg-gradient-primary {
-    @apply bg-gradient-to-r from-blue-500 to-purple-600;
-  }
-  
-  .bg-gradient-warm {
-    @apply bg-gradient-to-r from-orange-400 to-pink-500;
-  }
-  
-  .bg-gradient-cool {
-    @apply bg-gradient-to-r from-green-400 to-cyan-500;
-  }
-
-  /* Custom shadows */
-  .shadow-soft {
-    box-shadow: 0 2px 15px -3px rgba(0, 0, 0, 0.07), 0 10px 20px -2px rgba(0, 0, 0, 0.04);
-  }
-
-  .shadow-hard {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-  }
-  
-  /* Animation utilities */
-  .animate-float {
-    animation: float 3s ease-in-out infinite;
-  }
-  
-  @keyframes float {
-    0%, 100% {
-      transform: translateY(0);
-    }
-    50% {
-      transform: translateY(-10px);
-    }
-  }
-  
-  .animate-pulse-slow {
-    animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-
-  /* ====== TAMBAHAN UTILITIES BARU ====== */
-
-  /* Glass effect variants */
-  .glass-pink {
-    @apply backdrop-blur-md bg-pink-50/70 border border-pink-200/20;
-  }
-
-  .glass-emerald {
-    @apply backdrop-blur-md bg-emerald-50/70 border border-emerald-200/20;
-  }
-
-  /* Gradient backgrounds dengan animasi */
-  .bg-gradient-animated {
-    background-size: 200% auto;
-    animation: gradient-shift 8s ease infinite;
-  }
-
-  .bg-gradient-emerald {
-    @apply bg-gradient-to-r from-emerald-500 to-teal-600;
-  }
-
-  .bg-gradient-flower {
-    @apply bg-gradient-to-r from-pink-400 via-purple-500 to-pink-600;
-  }
-
-  /* Shadow glow effects */
-  .shadow-glow-emerald {
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.5),
-                0 0 40px rgba(34, 197, 94, 0.3);
-  }
-
-  .shadow-glow-pink {
-    box-shadow: 0 0 20px rgba(236, 72, 153, 0.5),
-                0 0 40px rgba(236, 72, 153, 0.3);
-  }
-
-  .shadow-glow-blue {
-    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5),
-                0 0 40px rgba(59, 130, 246, 0.3);
-  }
-
-  /* Shimmer effect untuk loading */
-  .shimmer {
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      rgba(255, 255, 255, 0.4) 50%,
-      transparent 100%
-    );
-    background-size: 200% auto;
-    animation: shimmer 2s linear infinite;
-  }
-
-  /* Premium Shimmer Effect */
-  .premium-shimmer {
-    background: linear-gradient(
-      120deg,
-      #22c55e 0%,
-      #10b981 25%,
-      #14b8a6 50%,
-      #10b981 75%,
-      #22c55e 100%
-    );
-    background-size: 200% auto;
-    animation: shimmer 3s linear infinite;
-  }
-
-  .flower .premium-shimmer {
-    background: linear-gradient(
-      120deg,
-      #ec4899 0%,
-      #f472b6 25%,
-      #f9a8d4 50%,
-      #f472b6 75%,
-      #ec4899 100%
-    );
-    background-size: 200% auto;
-    animation: shimmer 3s linear infinite;
-  }
-
-  /* Floating animations dengan variasi */
-  .float-slow {
-    animation: float-slow 6s ease-in-out infinite;
-  }
-
-  .float-delayed {
-    animation: float 4s ease-in-out 1s infinite;
-  }
-
-  /* Hover effects */
-  .hover-lift {
-    @apply transition-all duration-300;
-  }
-
-  .hover-lift:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.15);
-  }
-
-  .hover-grow {
-    @apply transition-transform duration-300;
-  }
-
-  .hover-grow:hover {
-    transform: scale(1.05);
-  }
-
-  .hover-rotate {
-    @apply transition-transform duration-500;
-  }
-
-  .hover-rotate:hover {
-    transform: rotate(360deg);
-  }
-
-  /* Gradient text */
-  .gradient-text {
-    background: linear-gradient(120deg, #22c55e, #10b981, #14b8a6);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 200% auto;
-    animation: gradient-shift 3s ease infinite;
-  }
-
-  .gradient-text-pink {
-    background: linear-gradient(120deg, #ec4899, #f472b6, #f9a8d4);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 200% auto;
-    animation: gradient-shift 3s ease infinite;
-  }
-
-  .gradient-text-blue {
-    background: linear-gradient(120deg, #3b82f6, #8b5cf6, #6366f1);
-    background-clip: text;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-size: 200% auto;
-    animation: gradient-shift 3s ease infinite;
-  }
-
-  /* Wiggle effect */
-  .animate-wiggle {
-    animation: wiggle 1s ease-in-out infinite;
-  }
-
-  .animate-wiggle-slow {
-    animation: wiggle 2s ease-in-out infinite;
-  }
-
-  /* Bounce variations */
-  .animate-bounce-soft {
-    animation: bounce-soft 2s infinite;
-  }
-
-  /* Spin variations */
-  .animate-spin-slow {
-    animation: spin 3s linear infinite;
-  }
-
-  .animate-spin-slower {
-    animation: spin 6s linear infinite;
-  }
-
-  /* Pulse variations */
-  .animate-pulse-soft {
-    animation: pulse-soft 3s ease-in-out infinite;
-  }
-
-  .animate-pulse-glow {
-    animation: pulse-glow 2s ease-in-out infinite;
-  }
-
-  /* Interactive card effect */
-  .interactive-card {
-    @apply transition-all duration-300 cursor-pointer;
-  }
-
-  .interactive-card:hover {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.15);
-  }
-
-  .interactive-card:active {
-    transform: translateY(-2px) scale(1.01);
-  }
-
-  /* Backdrop blur glass */
-  .backdrop-blur-glass {
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
-  }
-
-  /* Neon glow text */
-  .neon-emerald {
-    text-shadow: 
-      0 0 10px rgba(34, 197, 94, 0.8),
-      0 0 20px rgba(34, 197, 94, 0.6),
-      0 0 30px rgba(34, 197, 94, 0.4);
-  }
-
-  .neon-pink {
-    text-shadow: 
-      0 0 10px rgba(236, 72, 153, 0.8),
-      0 0 20px rgba(236, 72, 153, 0.6),
-      0 0 30px rgba(236, 72, 153, 0.4);
-  }
-
-  .neon-blue {
-    text-shadow: 
-      0 0 10px rgba(59, 130, 246, 0.8),
-      0 0 20px rgba(59, 130, 246, 0.6),
-      0 0 30px rgba(59, 130, 246, 0.4);
-  }
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
-/* ========== FIX DROPDOWN SELECT - 3 THEMES ========== */
-
-/* LIGHT MODE (Default/Putih) */
-select option {
-  background-color: #ffffff !important;  /* Putih */
-  color: #064e3b !important;  /* emerald-800 untuk text */
+/* Glassmorphism Scrollbar Responsif & Elegan */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* Lebih ramping agar tidak mengganggu ikon */
 }
 
-select option:hover,
-select option:focus,
-select option:checked {
-  background-color: #f0fdf4 !important;  /* emerald-50 untuk hover */
-  color: #064e3b !important;
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* Track sepenuhnya transparan */
 }
 
-/* DARK MODE */
-.dark select option {
-  background-color: #0a1f12 !important;  /* forest-950 */
-  color: #d1fae5 !important;  /* emerald-200 */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  border: 2px solid transparent; /* Jarak untuk efek glass */
+  border-radius: 12px;
+  min-height: 40px;
+  transition: background-color 0.3s ease;
 }
 
-.dark select option:hover,
-.dark select option:focus,
-.dark select option:checked {
-  background-color: #0f2917 !important;  /* Sedikit lebih terang */
-  color: #d1fae5 !important;
+/* 1. Mode Embun Pagi (Light) - Hijau Emerald Transparan */
+html:not(.dark):not(.flower) .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(5, 150, 105, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.8); /* Efek pantulan kaca */
 }
 
-/* FLOWER MODE (Coklat Gelap) */
-.flower select option {
-  background-color: #2A1A12 !important;  /* Coklat gelap */
-  color: #fce7f3 !important;  /* pink-100 */
+html:not(.dark):not(.flower) .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(5, 150, 105, 0.5);
 }
 
-.flower select option:hover,
-.flower select option:focus,
-.flower select option:checked {
-  background-color: #3d2817 !important;  /* Coklat lebih terang untuk hover */
-  color: #fce7f3 !important;
+/* 2. Mode Rimbun Malam (Dark) - Hijau Mint Neon Redup */
+.dark .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(52, 211, 153, 0.15);
+  border: 2px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Hilangkan highlight biru dari browser */
-select option::selection {
-  background-color: transparent !important;
+.dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(52, 211, 153, 0.4);
 }
 
-/* Firefox specific */
-@-moz-document url-prefix() {
-  select option {
-    background-color: #ffffff !important;
-  }
-  
-  .dark select option {
-    background-color: #0a1f12 !important;
-  }
-  
-  .flower select option {
-    background-color: #2A1A12 !important;
-  }
+/* 3. Mode Kembang Lestari (Flower) - Merah Muda Kelopak */
+.flower .custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgba(236, 72, 153, 0.25);
+  border: 2px solid rgba(255, 255, 255, 0.2);
 }
 
-/* Webkit browsers (Chrome, Safari, Edge) */
-@supports (-webkit-appearance: none) {
-  select option {
-    background-color: #ffffff !important;
-  }
-  
-  .dark select option {
-    background-color: #0a1f12 !important;
-  }
-  
-  .flower select option {
-    background-color: #2A1A12 !important;
-  }
+.flower .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(236, 72, 153, 0.5);
 }
 
-/* ========== KEYFRAMES ANIMATIONS (BARU) ========== */
-
-@keyframes gradient-shift {
-  0%, 100% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
+/* Penyeimbang Layout & Fokus */
+.custom-scrollbar:focus {
+  outline: none;
 }
 
-@keyframes shimmer {
-  0% {
-    background-position: -200% center;
-  }
-  100% {
-    background-position: 200% center;
-  }
+.overflow-y-auto {
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
 }
 
-@keyframes float-slow {
-  0%, 100% {
-    transform: translateY(0px);
-  }
-  50% {
-    transform: translateY(-15px);
-  }
-}
-
-@keyframes wiggle {
-  0%, 100% {
-    transform: rotate(-3deg);
-  }
-  50% {
-    transform: rotate(3deg);
-  }
-}
-
-@keyframes bounce-soft {
-  0%, 100% {
-    transform: translateY(0);
-    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-  }
-  50% {
-    transform: translateY(-15%);
-    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-  }
-}
-
-@keyframes pulse-soft {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.8;
-  }
-}
-
-@keyframes pulse-glow {
-  0%, 100% {
-    opacity: 1;
-    box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
-  }
-  50% {
-    opacity: 0.9;
-    box-shadow: 0 0 40px rgba(34, 197, 94, 0.8);
-  }
-}
-
-/* ========== ACCESSIBILITY ========== */
-
-/* Reduced motion preferences */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-  }
-}
-
-/* ========== PRINT STYLES ========== */
-
-@media print {
-  .no-print {
-    display: none !important;
-  }
-  
-  body {
-    background: white !important;
-    color: black !important;
-  }
+body {
+  transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }

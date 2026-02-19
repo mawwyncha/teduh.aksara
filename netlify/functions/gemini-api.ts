@@ -1,5 +1,5 @@
 // netlify/functions/gemini-api.ts
-// ✅ PATCH: Only fix deprecated model name
+// ✅ FIXED: Updated to use valid Gemini models
 
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 
@@ -37,21 +37,25 @@ exports.handler = async function(event, context) {
       };
     }
     
-    // 4. Initialize Gemini with STABLE MODEL
+    // 4. Initialize Gemini with VALID MODELS
     const genAI = new GoogleGenerativeAI(apiKey);
     
-    // ✨ FIX - Use stable model with fallback
+    // ✨ FIXED - Use VALID and STABLE models
     const requestedModel = params.model || "gemini-1.5-flash";
     let modelName;
     
-    // Map deprecated models to stable ones
+    // Map all models to VALID CURRENT models
     const MODEL_MAPPING = {
-      "gemini-2.0-flash-exp": "gemini-1.5-flash",
-      "gemini-exp": "gemini-1.5-flash",
-      "gemini-2.0": "gemini-1.5-pro",
+      // Deprecated models → Valid replacements
+      "gemini-1.5-flash": "gemini-1.5-flash-latest",
+      "gemini-2.0-flash-exp": "gemini-2.0-flash-exp", 
+      "gemini-exp": "gemini-2.0-flash-exp",
+      "gemini-2.0": "gemini-1.5-pro-latest",
+      "gemini-1.5-pro": "gemini-1.5-pro-latest",
     };
     
-    modelName = MODEL_MAPPING[requestedModel] || requestedModel;
+    // Use mapping or fallback to latest flash
+    modelName = MODEL_MAPPING[requestedModel] || "gemini-1.5-flash-latest";
     
     console.log(`🔷 Using model: ${modelName} (requested: ${requestedModel})`);
     

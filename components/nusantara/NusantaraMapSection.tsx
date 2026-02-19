@@ -97,6 +97,14 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
 
   const isFlower = currentTheme === 'flower';
   const isDark = currentTheme === 'dark';
+  
+  // Perbaikan warna latar belakang berdasarkan tema - mengikuti kode referensi
+  const bgClass = isFlower 
+    ? 'bg-petal-800 border-pink-500/20 text-petal-50' 
+    : isDark 
+      ? 'bg-emerald-950/20 border-emerald-800/30' 
+      : 'bg-white border-emerald-50';
+
   const textColor = isFlower ? 'text-pink-100' : 'text-emerald-950 dark:text-emerald-50';
   const dotColor = isFlower ? '#FDFFF6' : (isDark ? '#FFD700' : '#D2042D');
   const accentColor = isFlower ? '#f472b6' : (isDark ? '#fbbf24' : '#059669');
@@ -163,11 +171,17 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
     setSelectedRegion(null);
   };
 
+  // SCROLL LOCK logic for region detail pop-up
   useEffect(() => {
-    if (selectedRegion || selectedGreetingDialect) document.body.style.overflow = 'hidden';
-    else document.body.style.overflow = 'unset';
-    return () => { document.body.style.overflow = 'unset'; };
-  }, [selectedRegion, selectedGreetingDialect]);
+    if (selectedRegion) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => {
+      document.body.classList.remove('modal-open');
+    };
+  }, [selectedRegion]);
 
   useEffect(() => {
     return () => {
@@ -453,7 +467,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
   };
 
   return (
-    <div className={`w-full p-4 md:p-8 rounded-[2.5rem] border transition-all relative overflow-hidden flex flex-col items-center justify-center ${inputBgClass} min-h-[220px]`}>
+    <div className={`w-full p-4 md:p-8 rounded-[2.5rem] border transition-all relative overflow-hidden flex flex-col items-center justify-center ${bgClass} min-h-[220px]`}>
       {!isUnfolded ? (
         <div onClick={toggleUnfold} className="flex flex-col items-center justify-center cursor-pointer group transition-all duration-500 hover:scale-110 active:scale-95">
           <div className="relative">
@@ -485,7 +499,7 @@ export const NusantaraMapSection: React.FC<NusantaraMapSectionProps> = ({
       ) : (
         <div className="w-full animate-in fade-in zoom-in-95 duration-700 flex flex-col items-center">
           <div className={`w-full max-w-3xl h-4 rounded-t-full shadow-lg z-20 border-b ${isFlower ? 'bg-petal-900 border-pink-500/20' : 'bg-emerald-50 dark:bg-[#1a110c] border-emerald-100 dark:border-emerald-800/30'}`}></div>
-          <div className={`w-full relative py-12 px-4 sm:px-10 border-x transition-all duration-1000 ${isFlower ? 'bg-petal-100/5 border-pink-500/10' : 'bg-white/40 dark:bg-[#0a1a12]/40 border-emerald-50 dark:border-emerald-800/20'}`}>
+          <div className={`w-full relative py-12 px-4 sm:px-10 border-x transition-all duration-1000 ${isFlower ? 'bg-petal-900/40 border-pink-500/10' : 'bg-white/40 dark:bg-[#0a1a12]/40 border-emerald-50 dark:border-emerald-800/20'}`}>
             
             <div className="absolute top-4 left-4 z-40 flex items-center gap-2 group/credit">
               <button 

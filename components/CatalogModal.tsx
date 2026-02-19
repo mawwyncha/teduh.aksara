@@ -54,6 +54,24 @@ export const CatalogModal: React.FC<CatalogModalProps> = ({ isOpen, onClose }) =
     if (isOpen) setActiveIdx(0);
   }, [isOpen]);
 
+  // Keyboard Navigation Support
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowRight') {
+        nextSlide();
+      } else if (e.key === 'ArrowLeft') {
+        prevSlide();
+      } else if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isOpen, activeIdx]);
+
   if (!isOpen) return null;
 
   const nextSlide = () => setActiveIdx((prev) => (prev + 1) % CATALOG_ITEMS.length);
@@ -78,7 +96,7 @@ export const CatalogModal: React.FC<CatalogModalProps> = ({ isOpen, onClose }) =
         onClick={(e) => e.stopPropagation()}
       >
         <button onClick={onClose} className="absolute top-4 right-4 p-2 bg-black/20 hover:bg-rose-500 backdrop-blur-md rounded-full text-white transition-all z-[160] md:hidden">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" cy="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
         </button>
 
         <div className={`w-full md:w-1/2 h-64 sm:h-80 md:h-auto relative ${leftSideBg} flex-shrink-0 overflow-hidden`}>
@@ -111,7 +129,7 @@ export const CatalogModal: React.FC<CatalogModalProps> = ({ isOpen, onClose }) =
 
         <div className={`w-full md:w-1/2 p-6 sm:p-8 md:p-12 overflow-y-auto no-scrollbar flex flex-col relative ${rightSideBg}`}>
           <button onClick={onClose} className={`absolute top-8 right-8 p-2 transition-colors z-20 hidden md:block ${isFlower ? 'text-pink-300 hover:text-pink-500' : 'text-emerald-300 dark:text-emerald-700 hover:text-rose-500'}`}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" cy="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
           </button>
 
           <div className="mb-6 md:mb-8">
@@ -123,7 +141,7 @@ export const CatalogModal: React.FC<CatalogModalProps> = ({ isOpen, onClose }) =
             <span className={`text-[10px] font-bold uppercase tracking-[0.3em] block mb-2 mt-4 md:mt-0 ${labelColor}`}>Dukungan Sahabat</span>
             <h2 className={`text-2xl md:text-3xl font-bold mb-4 ${titleColor}`}>Pupuk Kemajuan Tara</h2>
             <p className={`text-xs md:text-sm leading-relaxed italic ${descColor}`}>
-              "Setiap kontribusimu membantu dahan-dahan Teduh Aksara terus tumbuh rimbun dan melayani lebih banyak Sahabat Penulis."
+              "Setiap kontribusimu membantu dahan-dahanan Teduh Aksara terus tumbuh rimbun dan melayani lebih banyak Sahabat Penulis."
             </p>
           </div>
 

@@ -56,7 +56,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, his
           className={`absolute top-6 right-6 p-2 transition-colors z-30 ${closeButtonColor}`}
           aria-label="Tutup"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><line x1="18" cy="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
         </button>
 
         <div className={`p-6 sm:p-8 pb-4 sm:pb-5 flex items-center justify-between ${headerBg} pr-16`}>
@@ -86,7 +86,7 @@ export const HistoryModal: React.FC<HistoryModalProps> = ({ isOpen, onClose, his
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto no-scrollbar px-6 sm:px-8 pb-8 space-y-4 mt-4">
+        <div className="flex-1 overflow-y-auto no-scrollbar modal-content-scroll px-6 sm:px-8 pb-8 space-y-4 mt-4">
           {filteredHistory.length > 0 ? (
             filteredHistory.map((item) => (
               <button

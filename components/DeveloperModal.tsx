@@ -44,10 +44,6 @@ const TARA_STORY_PAGES: BookPage[] = [
     videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/Story/video3.mp4",
   },
   { 
-    imageUrl: "",
-    videoUrl: "",
-  },
-  { 
     imageUrl: "https://raw.githubusercontent.com/mawwyncha/teduh.aksara/refs/heads/main/contents/Story/page5.jpeg",
     videoUrl: "https://github.com/mawwyncha/teduh.aksara/raw/refs/heads/main/contents/Story/video5.mp4",
   },
@@ -62,12 +58,15 @@ const TARA_STORY_PAGES: BookPage[] = [
 ];
 
 export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose }) => {
+  if (!isOpen) return null;
+
   const [isBookClosed, setIsBookClosed] = useState(true);
   const [currentPage, setCurrentPage] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isFading, setIsFading] = useState(false);
   const [isFlower, setIsFlower] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const modalRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const checkTheme = () => setIsFlower(document.documentElement.classList.contains('flower'));
@@ -78,13 +77,37 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
   }, []);
 
   useEffect(() => {
-    if (isOpen) {
-      setIsBookClosed(true);
-      setCurrentPage(0);
-      setIsPlaying(false);
-      setIsFading(false);
-    }
+    setIsBookClosed(true);
+    setCurrentPage(0);
+    setIsPlaying(false);
+    setIsFading(false);
+    
+    requestAnimationFrame(() => {
+      modalRef.current?.focus();
+    });
   }, [isOpen]);
+
+  // Keyboard Navigation Support
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      } else if (isBookClosed) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          handleOpenBook();
+        }
+      } else {
+        if (e.key === 'ArrowRight' || e.key === ' ') {
+          navigate('next');
+        } else if (e.key === 'ArrowLeft') {
+          navigate('prev');
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isBookClosed, currentPage, onClose]);
 
   const playSoftChime = () => {
     try {
@@ -115,8 +138,6 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
       setTimeout(() => ctx.close(), 700);
     } catch (e) {}
   };
-
-  if (!isOpen) return null;
 
   const currentContent = TARA_STORY_PAGES[currentPage];
 
@@ -159,7 +180,11 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
 
   if (isBookClosed) {
     return (
-      <div className="fixed inset-0 z-[200] bg-black/90 flex items-center justify-center p-4 animate-in fade-in duration-700 overflow-hidden">
+      <div 
+        ref={modalRef}
+        tabIndex={-1}
+        className="fixed inset-0 z-[400] bg-black/90 flex items-center justify-center p-4 animate-in fade-in duration-700 overflow-hidden outline-none"
+      >
         <div 
           className={`relative w-full max-w-[340px] aspect-[3/4] rounded-r-3xl shadow-[0_30px_60px_-15px_rgba(0,0,0,0.8)] border-l-[12px] cursor-pointer transition-all duration-700 md:hover:scale-105 active:scale-95 group perspective-1000 ${isFading ? 'opacity-0 scale-105 blur-xl' : 'opacity-100'}`}
           style={{ backgroundColor: coverBg, borderColor: spineBorder }}
@@ -177,7 +202,7 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
                 className="relative z-10 p-6 rounded-full border-2 border-white/30 shadow-[0_0_30px_rgba(255,255,255,0.1)] md:group-hover:shadow-[0_0_50px_rgba(255,255,255,0.3)] transition-all"
                 style={{ backgroundColor: sealBg }}
               >
-                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke={isFlower ? "#f472b6" : BOOK_THEME.sealStroke} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse">
+                <svg width="60" height="60" viewBox="0 0 24 24" fill="none" stroke={isFlower ? "#f472b6" : "#ffffff"} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="animate-pulse">
                   <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
                 </svg>
               </div>
@@ -188,15 +213,22 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
             <h2 className={`font-serif text-2xl tracking-widest drop-shadow-md ${accentColor}`}>{BOOK_CONFIG.mainTitle}</h2>
           </div>
         </div>
-        <button onClick={onClose} className={`absolute top-8 right-8 p-4 bg-white/5 backdrop-blur-xl rounded-full text-white/40 border border-white/5 transition-all ${closeBtnHover}`}>
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button 
+          onClick={(e) => { e.stopPropagation(); onClose(); }} 
+          className={`absolute top-8 right-8 p-4 bg-white/5 backdrop-blur-xl rounded-full text-white/40 border border-white/5 transition-all z-[450] ${closeBtnHover}`}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" cy="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-[200] bg-black flex items-center justify-center animate-in fade-in duration-700 overflow-hidden">
+    <div 
+      ref={modalRef}
+      tabIndex={-1}
+      className="fixed inset-0 z-[400] bg-black flex items-center justify-center animate-in fade-in duration-700 overflow-hidden outline-none"
+    >
       <div className="absolute inset-0 z-0 opacity-20 pointer-events-none transition-all duration-700">
         <img src={currentContent.imageUrl} className="w-full h-full object-cover blur-3xl scale-110" alt="blur-bg" />
       </div>
@@ -244,8 +276,11 @@ export const DeveloperModal: React.FC<DeveloperModalProps> = ({ isOpen, onClose 
           <h2 className="text-white/90 text-xs sm:text-sm font-serif italic tracking-[0.2em] truncate max-w-[150px] sm:max-w-none">{BOOK_CONFIG.headerTitle}</h2>
           <span className="text-white/30 text-[10px] font-bold border-l border-white/10 pl-3 sm:pl-4">{currentPage + 1} / {TARA_STORY_PAGES.length}</span>
         </div>
-        <button onClick={(e) => { e.stopPropagation(); onClose(); }} className={`p-3 sm:p-4 bg-white/10 backdrop-blur-xl rounded-full text-white pointer-events-auto border border-white/10 ${closeBtnHoverInner}`}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        <button 
+          onClick={(e) => { e.stopPropagation(); onClose(); }} 
+          className={`p-3 sm:p-4 bg-white/10 backdrop-blur-xl rounded-full text-white pointer-events-auto border border-white/10 z-[450] ${closeBtnHoverInner}`}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3"><line x1="18" cy="6" x2="6" y2="18"></line><line x1="6" cy="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
     </div>

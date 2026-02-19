@@ -86,12 +86,13 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo, f
     setExpression(randomExp.type);
     setReaction(randomExp.text);
     
-    const newParticles: Particle[] = Array.from({ length: 15 }).map((_, i) => ({
+    const count = 18;
+    const newParticles: Particle[] = Array.from({ length: count }).map((_, i) => ({
       id: Date.now() + i,
       type: theme === 'flower' ? (Math.random() > 0.4 ? 'flower' : 'leaf') : (Math.random() > 0.4 ? 'cherry' : 'leaf'),
-      left: 10 + Math.random() * 80,
-      duration: (1.2 + Math.random() * 2) + 's',
-      drift: (Math.random() * 100 - 50) + 'px',
+      left: Math.random() * 100,
+      duration: (1.5 + Math.random() * 2) + 's',
+      drift: (Math.random() * 200 - 100) + 'px',
       rotation: (Math.random() * 360) + 'deg'
     }));
 
@@ -101,7 +102,7 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo, f
       if (!forcedExpression) setExpression('normal');
       setReaction(null);
       setParticles(prev => prev.filter(p => !newParticles.find(np => np.id === p.id)));
-    }, 3500);
+    }, 4000);
   };
 
   const expressionColor = theme === 'flower' ? "#3d2b1f" : (theme === 'dark' ? "#e0f2f1" : "#212121");
@@ -134,8 +135,6 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo, f
       case 'dizzy':
         return (
           <g>
-            <path d="M30 48 Q35 43 40 48 Q35 53 30 48" fill="none" stroke={expressionColor} strokeWidth="2" strokeLinecap="round" />
-            <path d="M60 48 Q65 43 70 48 Q65 53 60 48" fill="none" stroke={expressionColor} strokeWidth="2" strokeLinecap="round" />
             <path d="M32 52 L38 58 M38 52 L32 58" fill="none" stroke={expressionColor} strokeWidth="2" strokeLinecap="round" />
             <path d="M62 52 L68 58 M68 52 L62 58" fill="none" stroke={expressionColor} strokeWidth="2" strokeLinecap="round" />
           </g>
@@ -145,7 +144,6 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo, f
           <g>
             <rect x="28" y="48" width="18" height="4" rx="2" fill={expressionColor} />
             <rect x="54" y="48" width="18" height="4" rx="2" fill={expressionColor} />
-            <path d="M46 50 L54 50" stroke={expressionColor} strokeWidth="1" />
           </g>
         );
       default: // Normal
@@ -177,36 +175,16 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo, f
     }
   };
 
-  const FlowerShape = ({ cx, cy }: { cx: number; cy: number }) => (
-    <g transform={`translate(${cx}, ${cy}) scale(0.6)`}>
-      <circle cx="0" cy="0" r="3.5" fill="#e9c46a" className="shadow-sm" />
-      <circle cx="0" cy="-7" r="5" fill="#f472b6" />
-      <circle cx="0" cy="7" r="5" fill="#f472b6" />
-      <circle cx="-7" cy="0" r="5" fill="#f472b6" />
-      <circle cx="7" cy="0" r="5" fill="#f472b6" />
-    </g>
-  );
-
-  const CherryNight = ({ cx, cy }: { cx: number; cy: number }) => (
-    <circle 
-      cx={cx} 
-      cy={cy} 
-      r="4" 
-      fill="#fbbf24" 
-      className="transition-all duration-700 group-hover:fill-[#fde68a] group-hover:filter group-hover:drop-shadow-[0_0_12px_rgba(251,191,36,1)]"
-    />
-  );
-
   return (
     <div className={`backdrop-blur-xl p-8 rounded-[3rem] border shadow-2xl flex flex-col sm:flex-row items-center gap-10 transition-all relative overflow-hidden group ${theme === 'flower' ? 'bg-petal-800 border-pink-500/30' : 'bg-white/70 dark:bg-emerald-950/20 border-emerald-50 dark:border-emerald-800/10'}`}>
-      <div className="absolute inset-0 pointer-events-none z-50">
+      <div className="absolute inset-0 pointer-events-none z-[100]">
         {particles.map(p => (
           <div 
             key={p.id}
             className="animate-particle"
             style={{ 
               left: `${p.left}%`, 
-              top: '-20px',
+              top: '-40px',
               '--duration': p.duration,
               '--drift': p.drift 
             } as React.CSSProperties}
@@ -217,7 +195,7 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo, f
                 <div className={`w-4 h-4 rounded-full shadow-md ${theme === 'dark' ? 'bg-[#fbbf24] shadow-amber-500/50' : 'bg-red-600'}`} />
               </div>
             ) : p.type === 'flower' ? (
-              <svg width="24" height="24" viewBox="0 0 24 24" className="drop-shadow-[0_2px_3px_rgba(0,0,0,0.2)]">
+              <svg width="24" height="24" viewBox="0 0 24 24" className="drop-shadow-md">
                 <circle cx="12" cy="12" r="2" fill="#fcd34d" />
                 <circle cx="12" cy="7" r="4" fill="#f472b6" />
                 <circle cx="12" cy="17" r="4" fill="#f472b6" />
@@ -225,7 +203,7 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo, f
                 <circle cx="17" cy="12" r="4" fill="#f472b6" />
               </svg>
             ) : (
-              <svg width="20" height="20" viewBox="0 0 24 24" fill={theme === 'flower' ? "#e7d8c9" : "#15803d"} style={{ transform: `rotate(${p.rotation})` }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill={theme === 'flower' ? "#f472b6" : "#15803d"} style={{ transform: `rotate(${p.rotation})` }}>
                 <path d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8.17,20C14.31,20 22,14 22,10C22,10 21,8 17,8Z" />
               </svg>
             )}
@@ -259,15 +237,15 @@ export const Mascot: React.FC<MascotProps> = ({ message, isLoading, onAskInfo, f
             
             {theme === 'flower' ? (
               <>
-                <FlowerShape cx={30} cy={35} />
-                <FlowerShape cx={70} cy={40} />
-                <FlowerShape cx={50} cy={25} />
+                <circle cx="30" cy="35" r="4" fill="#f472b6" />
+                <circle cx="70" cy="40" r="4" fill="#f472b6" />
+                <circle cx="50" cy="25" r="4" fill="#f472b6" />
               </>
             ) : theme === 'dark' ? (
               <>
-                <CherryNight cx={30} cy={35} />
-                <CherryNight cx={70} cy={40} />
-                <CherryNight cx={50} cy={25} />
+                <circle cx="30" cy="35" r="4" fill="#fbbf24" className="animate-pulse" />
+                <circle cx="70" cy="40" r="4" fill="#fbbf24" className="animate-pulse" />
+                <circle cx="50" cy="25" r="4" fill="#fbbf24" className="animate-pulse" />
               </>
             ) : (
               <>
